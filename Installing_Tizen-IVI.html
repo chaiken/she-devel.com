@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Building Tizen-IVI on Debian</title>
+  <link rel="stylesheet" type="text/css" href="pt_style.css" />
+  <link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+  <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+<!-- copied from Alexis Menard, http://darktears.fr/presentations/DevDays2011/HTML5/html5.html
+-->
+  <script type="text/javascript"
+  src="google-code-prettify/prettify.js"></script>
+<meta name="description" content= "technical documentation about
+  automotive firmware" />
+<meta name="keywords" content= "linux, IVI, Tizen, Tizen-IVI, Debian, installation, gbs, build system, git, tips, tricks, reference" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+</head>
+
+<body onload="prettyPrint()">
+
+<hr />
+
+<div class="title">Building Tizen-IVI on a Debian System</div>
+
+<div class="figure"><p>Prepared by <a href="mailto:alison@she-devel.com">Alison Chaiken<img height=20 src="logo/she-devel_small.jpg" alt="she-devel logo"/></a>
+and offered under <a href="
+http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" height=20 src="/icons1/by-sa.png" alt="Creative Commons logo" /></a>
+</p>
+</div>
+
+<hr />
+
+<p><em>Environment</em>: fully patched Debian Testing (rolling release) system with KDE desktop.</p>
+
+<div class="heading">Accessing Tizen Git repos</div>
+
+<ol>
+
+<li>First, followed <a href="https://source.tizen.org/documentation/developer-guide/environment-setup">instructions</a> and got to 
+
+<pre>
+[alison@bonnet gitsrc]$ ssh tizen
+  [ . . . ]
+  To clone a hosted Git repository, use:
+  git clone ssh://alison@review.tizen.org:29418/REPOSITORY_NAME.git
+</pre>
+</li>
+
+<li>Cool! But REPOSITORY_NAME is not clear, and ".git" suffix doesn't work for me; I get a "not found" error.   The <a href="https://source.tizen.org/documentation/developer-guide/cloning-tizen-source">advice</a> about using "https://&lt;username&gt;:&lt;HTTP_Password&gt;@review.tizen.org/gerrit/p" doesn't work, either: authentication of credentials fails.   What works instead is 
+</li>
+
+<pre>
+[alison@bonnet gitsrc]$ git clone ssh://alison@review.tizen.org:29418/profile/ivi/automotive-message-broker
+Cloning into 'automotive-message-broker'...
+</pre>
+
+<li>How to find out the correct URI for the clone command?   Use the "project name" fields from <a href="https://review.tizen.org/gerrit/#/admin/projects/">package list</a>.   (Use Chromium browser to view this package list; the javascript causes a fully patched Firefox to hang.)
+</li>
+
+<li>Filed <a href="https://bugs.tizen.org/jira/browse/DEVT-137"> Tizen bug DEVT-137</a>, "Instructions printed by "ssh tizen" don't work" to describe the problem.
+</li>
+
+</ol>
+
+<div class="heading">Installing gbs and mic</div>
+
+<ol>
+
+<li>Continuing with the <a href="https://source.tizen.org/documentation/developer-guide/installing-development-tools">instructions</a>, "sudo apt-get install mic" worked fine, but "sudo apt-get install gbs" failed because it depends on perlapi-5.14.2, which in Debian <a href="http://packages.debian.org/wheezy/perlapi-5.14.2"> is provided by perl-base</a>.   So I had the libraries gbs needs already installed, but couldn't figure out how to tell the package manager.
+</li>
+
+<li>The only solution I could figure out was to create an empty package called perlapi-5.14.2_5.14.2_all.deb and install it following the <a href="http://shallowsky.com/blog/linux/install/blocking-deb-dependencies.html">instructions at Akkana Peck's blog</a>:
+</li>
+
+<pre>
+[alison@bonnet]$ sudo apt-get install equivs
+[alison@bonnet]$ equivs-control perlapi
+</pre>
+
+<li>Then edit perlapi file:
+</li>
+
+<pre>
+    Section: misc
+    Priority: optional
+    Standards-Version: 3.9.2
+
+    Package: perlapi-5.14.2
+    Version: 1:5.14.2
+    Maintainer: Alison Chaiken <alison@she-devel.com>
+    Architecture: all
+    Description: empty replacement for perlapi-5.14.2 needed by Tizen's gbs
+</pre>
+
+<li>Then
+</li>
+
+<pre>
+[alison@bonnet]$ equivs-build perlapi
+ dpkg-deb: building package `perlapi-5.14.2' in `../perlapi-5.14.2_5.14.2_all.deb'.
+[alison@bonnet]$ sudo dpkg -i perlapi-5.14.2_5.14.2_all.deb 
+[alison@bonnet]$  dpkg -l "perlapi*"
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                Version        Architecture   Description
++++-===================-==============-==============-===========================================
+ii  perlapi-5.14.2      1:5.14.2       all            empty replacement for perlapi-5.14.2 needed
+</pre>
+
+<li>Then</li>
+
+<pre>
+[alison@bonnet]$ sudo apt-get install libcrypt-ssleay-perl
+[alison@bonnet]$ sudo apt-get install gbs
+</pre>
+
+<li>Piece of cake!  My awesome <a href="perlapi-5.14.2_5.14.2_all.deb">perlapi-5.14.2_5.14.2_all.deb package</a> is attached for your convenience.</li>
+</ol>
+
+<div class="heading">Use "repo" to access Tizen repositories</div>
+
+<p>Hey! These <a
+href="https://source.tizen.org/documentation/developer-guide/cloning-tizen-source">instructions</a> worked without problem.</p>
+
+
+</body>
+</html>

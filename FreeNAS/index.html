@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Backing up Debian hosts with Bacula on FreeNAS Mini</title>
+  <link rel="stylesheet" type="text/css" href="pt_style.css" />
+  <link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+  <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+<!-- copied from Alexis Menard, http://darktears.fr/presentations/DevDays2011/HTML5/html5.html
+-->
+  <script type="text/javascript"
+  src="google-code-prettify/prettify.js"></script>
+<meta name="description" content= "how to create a robust backup
+system on FreeNAS and Debian with
+Bacula " />
+<meta name="keywords" content= "linux, Debian, FreeBSD, FreeNAS Mini,
+FreeNAS, Bacula, storage daemon, file daemon, director, configuration,
+ports tree" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+</head>
+
+<body onload="prettyPrint()">
+
+<hr />
+
+<div class="title">Backing up Debian hosts with Bacula on FreeNAS Mini</div>
+
+<div class="figure"><p>Prepared by <a
+href="mailto:alison@she-devel.com">Alison Chaiken<img height="20"
+src="../logo/she-devel_small.jpg" alt="she-devel logo"/></a>
+
+in December, 2015, and offered under <a href="
+http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" height="20" src="/icons1/by-sa.png" alt="Creative Commons logo" /></a>
+</p>
+</div>
+
+<hr />
+
+<div class="figure"><p>
+<a href="http://freebsd.org"><img src="logo-red.png" alt="FreeBSD logo"/></a>
+<a href="http://debian.org"><img src="Debian-OpenLogo.svg.png" alt="Debian logo"/></a>
+<a href="http://bacula.org"><img src="logo_bacula.png" alt="Bacula logo"/></a>
+</p>
+</div>
+
+<p><em>Goal</em>: robust, secure backup of both desktop and laptop computers at home</p>
+
+<h3><em>Hardware</em>:</h3> 
+<p>
+<a href="http://ixsystems.com/freenas-mini">iX Systems FreeNAS
+	  Mini</a> with four WDC WD20EFRX discs arranged in a four-disk RAID-Z
+	  ZFS pools.  Half of the space is for backup, and half is for
+	  a future <a href="http://owncloud.org">ownCloud</a>
+	  installation.  Disapointingly, the system arrived <a
+	  href="https://bugs.freenas.org/issues/9938">improperly
+	  cabled</a>, but once that minor problem was fixed, I've
+	  found it to be a truly nice piece of equipment.  Thanks to
+	  marbus90 and webdestroya for help in figuring this out.  The
+	  Mini has a lot of storage in a small space, runs cool, and
+	  is reasonably quiet.
+</p>
+
+<h3>Software</h3>
+
+<p><em>Why FreeNAS Mini?</em></p>
+<ul>
+<li>FreeNAS is a downstream distribution of FreeBSD, and the BSDs
+appear to have better security than Linux.</li>
+
+<li>Because it's quite simple to set-up FreeBSD "jails" on the FreeNAS
+host, FreeNAS actually has a lot of applications.</li>
+
+<li>FreeNAS, like FreeBSD, is open source.</li>
+
+<li>FreeNAS, like FreeBSD, has ongoing support and frequent
+updates.</li>
+
+<li>FreeNAS and FreeBSD have outstanding documentation, including even
+<a href="http://www.freenas.org/freenas-zfs-training">classes taught
+by Linda Kateley</a>, and a helpful IRC channel at freenode.</li>
+
+</ul>
+
+
+<p><em>Why <a href="http://bacula.org/">Bacula</a>?</em></p>
+<ul>
+<li>Bacula will push backups to remote via TCP and SSL rather than being
+           limited to NFS-mounted remotes like LuckyBackup and
+	   Duplicati.</li>
+
+<li>Bacula is a truly distributed and modular backup system, which allows the
+various daemons to all run on different hosts.</li>
+
+<li>There are Bacula clients for both FreeBSD and Linux.</li>
+
+<li>Bacula is open-source.</li>
+
+<li>Bacula has outstanding documentation and a helpful IRC channel
+	   at freenode.</li>
+
+<li>Bacula is fully automated, and is much faster than a tar+rsync solution, particularly for
+finding particular files in existing backups.   See the <a href="#restore">'restore'
+example below</a>.</li>
+
+</ul>
+
+
+<p><em>Why <a href="http://debian.org/">Debian</a>?</em></p>
+<ul>
+<li>Because Debian.</li>
+</ul>
+
+<p><em>What about cloud storage?</em><br />
+I also have my bits backed up at <a
+href="http://strongspace.com">Strongspace.com</a>, which:
+</p>
+
+<ul>
+<li>has an <a href="git://github.com/expandrive/strongspace-ruby.git">open source</a> Ruby CLI interface</li>
+<li>supports transfer of ZFS snapshots</li>
+<li>supports rsync transfer.</li>
+<li>TODO: implement automatic 'zfs send snapshot' from the FreeNAS host to Strongspace.</li>
+</ul>
+
+<div class="figure">
+<p><a
+href="http://www.bacula.org/7.0.x-manuals/en/main/What_is_Bacula.html#SECTION00220000000000000000g"><img
+src=" bacula-applications-labelled.png" alt="architecture of Bacula
+installation labelled with my machine names"/></a></p>
+<p><em>Architecture of a Bacula installation labelled with the names of my
+machines.   The machine names match those in the example configuration
+files linked below.</em></p>
+</div>
+
+<p>	On the FreeNAS box that has ip address 10.0.0.8, the bacula-sd
+	Storage Daemon is running inside a FreeBSD jail.  The jail has
+	a user bacula and its own ip address, 10.0.0.6.   The FreeNAS
+	box itself has a user bootstrapbackup who receives copies of the
+	Bacula bootstrap files via a 'RunScript' that may be found in
+	the <a href="bacula-dir.conf">bacula-dir.conf</a> file.  A
+	FreeNAS shell is available via SSH from the desktop.
+
+</p>
+
+<div class="figure">
+<p>
+<img width="800"
+src="Backup-Jail-Detail.jpg" alt="Detailed configuration of Backup
+jail on FreeNAS"/>
+</p>
+<p><em>The image above shows that the 'Backup' FreeBSD jail that is hosted by
+the FreeNAS has associated storage in a directory called '/bonnet' in its
+container-level file hierarchy.   The 'Shell' tooltip highlighted at
+the bottom of the screen shows where the button to access the jail's
+console is located, but it is only accessible when the jail number is
+highlighted (light blue in the figure).</em></p>
+</div>
+
+<div class="figure">
+<p>
+<img width="800"
+src="Backup-Jail-storage-users.jpg" alt="Detailed configuration of Backup
+jail on FreeNAS"/>
+</p>
+<p><em>The image above shows the '/bonnet' storage that is accessible to the 'Backup' jail
+looks from the FreeNAS side like the '/mnt/minivol/BonnetBackup'
+dataset that is part of the '/mnt/minivol' ZFS pool.  Note the
+'bootstrapbackup' FreeNAS user whose home directory receives Bacula
+'bootstrap' files that are scp'ed over from the desktop by the Bacula
+Director via a 'RunScript' defined in <a
+href="bacula-dir.conf">bacula-dir.conf</a>.   Note that FreeNAS
+doesn't know about the 'bacula' user, who has an account in the
+'Backup' FreeBSD jail, not in the FreeNAS system.</em></p> </div>
+
+<div class="figure">
+<p>
+<img width="800"
+src="FreeNAS-Backup-jail.jpg" alt="Above, a screenshot of FreeBSD jail console
+embedded in FreeNAS web dashboard"/></p>
+<p><em>One of the cool features of FreeNAS is the ability to attach to
+the console of jails from the web interface. The output shows that the
+Bacula Storage Daemon process is running as user bacula by reading the
+/usr/local/etc/bacula/bacula-sd.conf configuration file.  The bacula
+user account was created by via the 'adduser' command typed at this
+shell.</em></p> 
+
+<p>As Jens Heinrich helpfully pointed out via email, it's also
+possible to access the by ssh'ing to the FreeNAS host, running 'jls'
+to list the jails, and 'jexec &lt;jail-number&gt; /bin/sh'.   'jexec' is
+clearly FreeBSD's equivalent to Linux's 'chroot'.
+</p>
+
+</div>
+
+<div class="figure">
+<p>
+<img width="800"
+src="FreeNAS_shell_web_interface.png" alt="detail of web interface
+left menu"/>
+</p>
+<p><em>Detail of the left-hand FreeNAS web configurator menu showing
+a highlighted icon will allows access to the FreeNAS shell, not the jails'
+shells.   The shell available from the left menu duplicates the one
+available by SSH into the box.   There's little reason to use this
+shell, which is easily confused with the jails'.
+</em></p>
+</div>
+
+<h2><em>How</em></h2>
+
+<p>	I ended up compiling Bacula from source on both FreeBSD and
+	Debian because that was the simplest way to install compatible
+	recent versions.  The Bacula project does *not* employ
+	<a href="http://semver.org">semantic versioning</a>, and in fact versions 7.0.x and 7.2.x are
+	not compatible.    Therefore the Storage Daemon on the NAS
+	and the other Daemons on the desktop and laptop are all version
+	7.2.1 from bacula git.
+</p>
+
+<p>
+<em>How to tell if bacula-sd and bacula-dir are incompatible versions</em>:<br/>
+
+        The Storage Daemon and Director must be the same 
+        version.   If  the Director  is compiled from a more recent
+        release, it will successfully contact
+        the SD via the bconsole application, but the handshaking around volume creation
+	will fail.    A 'label' command will get an encouraging response from the
+	SD:
+</p>
+
+<pre>	
+	3000 OK label. VolBytes=193 VolABytes=0 VolType=1 Volume="Volume0" Device="BonnetFileStorage3" (/bonnet)
+</pre>
+
+<p>     but the Director will report</p>
+<pre>
+	Label command failed for Volume Volume0.
+	Do not forget to mount the drive!!!
+</pre>
+
+<p>     The reason is that the string returned by the SD is not in the format
+	that the Director expects.
+</p>
+
+
+<p><em>How to Compile and Install the Bacula Storage Daemon on FreeNAS</em>:<br/>
+
+	First I installed the <a href="
+	https://www.freebsd.org/doc/handbook/ports-using.html">FreeBSD
+	Ports tree</a> inside my FreeBSD jail using the jail's console
+	that is available via the FreeNAS web interface.  Then I
+	compiled and installed the bacula-server port that <a href="
+	http://svnweb.freebsd.org/ports/head/sysutils/bacula-server/">I
+	obtained from freebsd.org</a>.
+
+	Thanks to m0nkey at #freenas on Freenode IRC for suggesting
+	this approach!
+
+	I used standard CLI tools to create a bacula user and group
+	*inside the jail* and set bacula user as owner of the
+	directory that constitutes the Bacula Storage Daemon's Pool.
+
+	Inside the jail, the Bacula <a href="bacula-sd.conf">Storage
+	Daemon's config file</a> is kept at
+
+	/usr/local/etc/bacula/bacula-sd.conf
+
+	bacula-sd is restarted when the jail is restarted when the
+	jail is restarted because I added the following lines to <a
+	href="/etc/rc.conf.local">rc.conf.local</a> file that is
+	within the jail:
+</p>
+
+<pre>
+	bacula_sd_enable="YES"
+	bacula_sd_flags=" -u bacula -g bacula -v -c /usr/local/etc/bacula/bacula-sd.conf"
+</pre>
+
+
+
+
+<p><em>Compiling on Debian</em>:</p>
+
+<pre>
+	git clone http://git.bacula.org/bacula
+	git checkout -b Branch-7.2 origin/Branch-7.2
+	cd bacula/bacula
+	./<a href="config-me">config-me</a>
+	make; sudo make install
+</pre>
+
+<p>
+Also attached is a <a href="install_logwatch_files_Debian">shell
+script</a> that set ups inclusion of Bacula status summaries in the
+desktop Director-hosting system's syslog for Debian.  The upstream
+version that comes from Bacula's git repo only works for RedHat-like
+distributions.   Use the script from the bacula/bacula directory.
+</p>
+
+<p>On Jessie, using systemd, set the bacula-dir and bacula-fd daemons
+to start at boot via
+</p>
+
+<pre>
+	systemctl enable bacula-fd
+	systemctl enable bacula-dir
+	systemctl start bacula-fd
+	systemctl start bacula-dir
+</pre>
+
+
+<p><em>Configuring the Bacula Director and File Daemon</em><br/>
+
+Much of the Bacula documentation expects that the backups will go to
+tape, and figuring out how to tune the configuration for disk backup
+can be puzzling.  Happily there's some <a
+href="http://blog.bacula.org/whitepapers/CommunityDiskBackup.pdf">guide
+especially for disk backups</a>.
+</p>
+<p>
+Attached are the finale configuration files I ended up with for the
+Bacula <a href="bacula-dir.conf">Director</a>, <a
+href="bacula-fd.conf_bonnet">File Daemon on desktop</a>, <a
+href="bacula-fd.conf_hildesheim">File Daemon on laptop</a>, <a
+href="bconsole.conf">Console</a> and <a href="bat.conf">bat</a>.
+The point that confused me the most was the presence of the 'Pool' and
+'FileSet' properties in the 'Restore' job of the autogenerated
+bacula-dir.conf files.  These properties have no effect, and should be
+ignored.  Note that there are two File Daemon configuration files, one
+for each 'Client' and only one file of the other types, corresponding
+to just one daemon instance.   Immense thanks to optiz0r, dvl and
+mntbkr for all their advice about the setup.
+</p>
+<p>
+I've obfuscated the passwords in these files, but the figure below from
+<a href="http://www.bacula.org/7.2.x-manuals/en/problems/Bacula_Frequently_Asked_Que.html#SECTION00260000000000000000">bacula.org FAQ</a>
+explains completely how to set them up:
+</p>
+
+<div class="figure">
+<p><a href="http://www.bacula.org/7.2.x-manuals/en/problems/Bacula_Frequently_Asked_Que.html#SECTION00260000000000000000"><img width="400"
+src="Bacula_configuration_files_passwords.png" alt="how to set up
+Bacula's multiple passwords"/></a></p>
+<p>
+<em>How to set up Bacula's multiple passwords from <a href="http://www.bacula.org/7.2.x-manuals/en/problems/Bacula_Frequently_Asked_Que.html#SECTION00260000000000000000">bacula.org FAQ</a></em>
+</p>
+</div>
+
+<div class="figure">
+<p>
+<a href="bat-gui.jpg"><img width="800"
+src="bat-gui.jpg" alt="screenshot of bat GUI"/></a></p>
+<p><em>The Bacula 'bat' GUI dashboard displaying the Volumes in the
+two Pools that are set-up in <a
+href="bacula-dir.conf">bacula-dir.conf</a>.</em>   The bat GUI is
+featureful and easy to use, but suffers from the shortcoming that it
+must be run as root: not with 'sudo', but with root login.   The
+reason is that bat must be able to read the .conf files that are
+stored in the Bacula installation directory whose default permissions
+are 700.</p>
+</div>
+
+<h3><em><a name="singlerestore">Restoring Single Files</a></em>:</h3> 
+
+<p>One of the most compelling features of Bacula is that it
+efficiently stores data in logical volumes, including packing multiple
+backups into a single volume, and yet it allows fast retrieval of
+individual files.  The desired file may be specified by name, in which
+case the 'restore' command will display all paths from all the
+matching backups that contain a matching filename.  Should a file with the
+same complete path appear in multiple volumes, then the interface
+offers all the versions, implementing, in effect, a poor-man's version
+of version-control.
+</p>
+
+<div class="figure">
+<p>
+<a href="Bconsole_restore_cscope-dot-out.jpg"><img width="800"
+src="Bconsole_restore_cscope-dot-out.jpg" alt="screenshot of restore
+command processing in Bacula's bconsole interface"/></a></p>
+<p><em>The bconsole CLI processing a 'restore' command for a file
+named cscope.out.  All paths from all volumes with matching filenames
+are offered.</em></p>
+</div>
+
+<h3><em><a name="bulkrestore">Restoring a Failed Disk</a></em>:</h3>
+
+<p>Restoring gigabytes of files from a failed or failing disk requires a bit more thought.    For example, restoring a partition that's no longer present to its original pathname would require changes to /etc/fstab to mount that partition on a different UUID, which is inconvenient when the system is borked.   Instead, restore to a different partition name on a new disk, then rename that partition if everything looks okay.   The figure shows how I restored the files in /home/alison to /home2/alison on the new disk.   Bacula automagically located all the volumes which held the newest versions of files in that directory.
+</p>
+
+<div class="figure">
+<p>
+<a href="BulkRestore_Setup.png"><img width="800"
+src="BulkRestore_Setup.png" alt="setup for restoring an entire partition"/></a></p>
+<p><em>'strip_prefix' and 'add_prefix' allow an Admin to cleanly restore files to a new disk.</em></p>
+</div>
+
+<p>The files to be restored must now be selected from the list of candidates that the previous step created using the 'markdir' and 'mark' commands.   
+</p>
+
+<div class="figure">
+<p>
+<a href="BulkRestore_FileSelection.png"><img width="800"
+src="BulkRestore_FileSelection.png" alt="setup for restoring an entire partition"/></a></p>
+<p><em>'mark' and 'mark_dir' allow the Admin to select the files for restoration from the list.  The field 'RegexWhere' illustrates the requested relocation of the restoration in the previous command.</em></p>
+</div>
+
+    <p>
+
+      <a href="http://creativecommons.org/licenses/by-sa/3.0"><img width= "133"
+      height="25" src="/icons1/by-sa.png" alt= "offered under the Creative Commons
+      Attribution-ShareAlike 3.0 license"/></a>
+
+       <a href="http://validator.w3.org/check/referer"><img
+      src="/icons1/valid-xhtml10.png" alt="Valid XHTML 1.0!"
+      height="31" width="88" /></a>
+
+      <a href=
+      "http://jigsaw.w3.org/css-validator/check/referer"><img
+      src="/icons1/valid-css.png" alt="Valid CSS!" height="31" width=
+      "88" /></a><br />
+
+      <a href="mailto:alison@she-devel.com">alison@she-devel.com (Alison
+      Chaiken)</a><br />
+      
+    </p>
+
+<hr /> 
+
+</body>
+</html>

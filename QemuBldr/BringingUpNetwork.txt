@@ -1,0 +1,510 @@
+http://stackoverflow.com/questions/23106012/how-to-access-raspberry-pi-qemu-vm-via-network
+
+Bottom line:
+
+qemu-system-i386 -enable-kvm -boot c -hda ${ROOTDIR}/${HDNAME}.raw -m 2048 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ${VMNAME} -rtc base=localtime
+
+means that this works:
+
+ssh -p 6666 achaiken@127.0.0.1
+achaiken@127.0.0.1's password: 
+Welcome to Ubuntu 12.04.5 LTS (GNU/Linux 3.2.0-23-generic-pae i686)
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+	
+
+I have successfully setup a Raspberry PI VM on my Mac OS X via QEMU. Now I want to access the filesystem of this VM from my Mac.
+
+When I call ifconfig on my VM I get this. enter image description here
+
+And here the content of my /etc/network/interfaces file enter image description here
+
+On my Mac
+
+en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+    options=10b<RXCSUM,TXCSUM,VLAN_HWTAGGING,AV>
+    ether 3c:07:54:65:da:50 
+    inet6 fe80::3e07:54ff:fe65:da50%en0 prefixlen 64 scopeid 0x4 
+    inet6 fdbf:a879:6730::3e07:54ff:fe65:da50 prefixlen 64 autoconf 
+    inet6 fdbf:a879:6730::401e:56f5:f2f9:a236 prefixlen 64 autoconf temporary 
+    inet 192.168.1.119 netmask 0xffffff00 broadcast 192.168.1.255
+    nd6 options=1<PERFORMNUD>
+    media: autoselect (1000baseT <full-duplex,flow-control>)
+    status: active
+
+I think the reason is, that the VM uses some kind of Shared Network. Is there a way that the VM get the IP address from my router?
+linux osx raspberry-pi qemu
+share|improve this question
+	
+asked Apr 16 at 9:56
+Andi
+145212
+	
+   	 
+	
+How do you want to be able to access files and on which part (or all) of the filesystem? e.g. by using a web browser, or by FTP, or using scp, pr webdav, or (etc ...) ? –  6EQUJ5 Apr 16 at 12:00
+   	 
+	
+SMB or FTP. I think the problem is the network configuration. I can't reach (ping) the VM from my Mac Host. –  Andi Apr 16 at 17:22
+add a comment
+1 Answer
+active oldest votes
+up vote 0 down vote accepted
+	
+The easier method - less flexible but you don't need to muck around so much
+
+They way you have configured qemu appears to be the default host NAT network (aka. qemu -net nic -net user configuration)
+
+By default, your host (your Mac in this case) will be found on 10.0.2.2 when accessed from your guest. From inside your guest you can connect to services on your host (your MAC) at 10.0.2.2. But this is using NAT, so you can't go back the other way as easily.
+
+For example, if you decide to you want to connect to the SSH service and a web server running inside your guest, you will need to start qemu with modified options like the following:
+
+qemu -net nic -net user,hostfwd=tcp::2222-:22,hostfwd=tcp::22280-:80
+
+What this will do is route connections from port 22280 on your host (your MAC) to port 80 inside your qemu guest, (same for port 2222 --> port 22 in the guest)
+
+Which means you can browse to http://localhost:22280 on your Mac, to get to the web server in your virtual Raspberry Pi, etc.
+
+FTP and SMB will be more complicated to setup this way because of the different ports used and they way they are used, etc. although if you setup FTP to use PASV mode it wont be too much of a problem.
+The more complicated method
+
+This involves doing what you suggested, configuring the virtual machine quest to be able to get an IP address from your router. In this case, you need to make a bridge from your virtual machine onto your hosts network.
+
+This requires a lot more setup than can be quickly explained here, but essentially, you need to assign your NIC to a vlan and add a tap interface, for example:
+
+qemu -net nic,vlan=0 -net tap,ifname=tap0
+
+This however requires more setup on the host (initially, manual, as you figure out your own situation, but then, scriptable) to create a bridge and tap interface - which usually requires root access beyond that needed to simply run qemu. A bit of Googling brings up a variety of methods to do this, because it varies more depending on your setup. (I found an example setup script here: https://gist.github.com/EmbeddedAndroid/6572715 )
+
+    Note - network MAC addresses, network card models, etc. and other qemu options omitted for clarity.
+
+The SAMBA method
+
+Note: I have only tried this under Linux
+
+You can enable a samba server inside qemu:
+
+qemu -smb /path/to/files
+
+This creates a SMB share accessible from inside the guest at \10.0.2.4\qemu mapped from /path/to/files on the host.
+share|improve this answer
+	
+edited Apr 18 at 11:39
+
+	
+answered Apr 17 at 9:34
+6EQUJ5
+1,1301217
+	
+add a comment
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+http://wiki.libvirt.org/page/Networking#Host_configuration
+
+On new machine:
+
+[alison@hildesheim mel-scripts (merge_boottime)]$ sudo apt-get install libvirt0 dnsmasq dnsmasq-utils resolvconf
+
+[alison@hildesheim mel-scripts (merge_boottime)]$ ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 28:d2:44:54:7f:5a brd ff:ff:ff:ff:ff:ff
+    inet 134.86.178.160/23 brd 134.86.179.255 scope global dynamic eth0
+       valid_lft 31687sec preferred_lft 31687sec
+    inet6 fe80::2ad2:44ff:fe54:7f5a/64 scope link 
+       valid_lft forever preferred_lft forever
+3: wlan0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether 7c:7a:91:0d:ec:ab brd ff:ff:ff:ff:ff:ff
+[alison@hildesheim mel-scripts (merge_boottime)]$ sudo virsh net-define /etc/libvirt/qemu/networks/default.xml 
+error: Failed to define network from /etc/libvirt/qemu/networks/default.xml
+error: operation failed: network 'default' already exists with uuid 1aa3d682-a3f5-4065-b788-b03302ccb5f9
+
+[alison@hildesheim mel-scripts (merge_boottime)]$ sudo virsh net-autostart default
+Network default marked as autostarted
+
+[alison@hildesheim mel-scripts (merge_boottime)]$ sudo virsh net-start default
+Network default started
+
+[alison@hildesheim mel-scripts (merge_boottime)]$ ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 28:d2:44:54:7f:5a brd ff:ff:ff:ff:ff:ff
+    inet 134.86.178.160/23 brd 134.86.179.255 scope global dynamic eth0
+       valid_lft 31577sec preferred_lft 31577sec
+    inet6 fe80::2ad2:44ff:fe54:7f5a/64 scope link 
+       valid_lft forever preferred_lft forever
+3: wlan0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether 7c:7a:91:0d:ec:ab brd ff:ff:ff:ff:ff:ff
+5: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 82:7c:ac:76:38:75 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+[alison@hildesheim mel-scripts (merge_boottime)]$ 
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+
+[alison@hildesheim ~]$ sudo apt-get install libvirt0
+[sudo] password for alison: 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Suggested packages:
+  lvm2
+The following NEW packages will be installed:
+  libvirt0
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 831 kB of archives.
+After this operation, 4,852 kB of additional disk space will be used.
+Get:1 http://us.archive.ubuntu.com/ubuntu/ trusty-updates/main libvirt0 amd64 1.2.2-0ubuntu13.1 [831 kB]
+Fetched 831 kB in 18s (45.5 kB/s)                                              
+Selecting previously unselected package libvirt0.
+(Reading database ... 255091 files and directories currently installed.)
+Preparing to unpack .../libvirt0_1.2.2-0ubuntu13.1_amd64.deb ...
+Unpacking libvirt0 (1.2.2-0ubuntu13.1) ...
+Setting up libvirt0 (1.2.2-0ubuntu13.1) ...
+Processing triggers for libc-bin (2.19-0ubuntu6) ...
+[alison@hildesheim ~]$ lib
+lib-congress             libnetcfg                libtoolize
+libcrypto.so             libpng12-config          libvpnagentutilities.so
+libcurl.so.3.0.0         libpng-config            libvpnapi.so
+libgcrypt-config         librecad                 libvpncommoncrypt.so
+libgvc6-config-update    libreoffice              libvpncommon.so
+liblinear-predict        libssl.so                libvpnipsec.so
+liblinear-train          libtool                  
+[alison@hildesheim ~]$ lib
+lib-congress             libnetcfg                libtoolize
+libcrypto.so             libpng12-config          libvpnagentutilities.so
+libcurl.so.3.0.0         libpng-config            libvpnapi.so
+libgcrypt-config         librecad                 libvpncommoncrypt.so
+libgvc6-config-update    libreoffice              libvpncommon.so
+liblinear-predict        libssl.so                libvpnipsec.so
+liblinear-train          libtool                  
+[alison@hildesheim ~]$ sudo apt-get install libvirt-bin
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following extra packages will be installed:
+  augeas-lenses bridge-utils ebtables libaugeas0 libnetcf1
+Suggested packages:
+  augeas-doc augeas-tools radvd
+The following NEW packages will be installed:
+  augeas-lenses bridge-utils ebtables libaugeas0 libnetcf1 libvirt-bin
+0 upgraded, 6 newly installed, 0 to remove and 0 not upgraded.
+Need to get 2,585 kB of archives.
+After this operation, 14.4 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+Get:1 http://us.archive.ubuntu.com/ubuntu/ trusty/main augeas-lenses all 1.2.0-0ubuntu1 [229 kB]
+Get:2 http://us.archive.ubuntu.com/ubuntu/ trusty/main bridge-utils amd64 1.5-6ubuntu2 [29.2 kB]
+Get:3 http://us.archive.ubuntu.com/ubuntu/ trusty/main ebtables amd64 2.0.10.4-3ubuntu1 [77.5 kB]
+Get:4 http://us.archive.ubuntu.com/ubuntu/ trusty/main libaugeas0 amd64 1.2.0-0ubuntu1 [140 kB]
+Get:5 http://us.archive.ubuntu.com/ubuntu/ trusty/main libnetcf1 amd64 1:0.2.3-4ubuntu1 [44.4 kB]
+Get:6 http://us.archive.ubuntu.com/ubuntu/ trusty-updates/main libvirt-bin amd64 1.2.2-0ubuntu13.1 [2,065 kB]
+Fetched 2,585 kB in 1min 19s (32.7 kB/s)                                       
+Selecting previously unselected package augeas-lenses.
+(Reading database ... 255104 files and directories currently installed.)
+Preparing to unpack .../augeas-lenses_1.2.0-0ubuntu1_all.deb ...
+Unpacking augeas-lenses (1.2.0-0ubuntu1) ...
+Selecting previously unselected package bridge-utils.
+Preparing to unpack .../bridge-utils_1.5-6ubuntu2_amd64.deb ...
+Unpacking bridge-utils (1.5-6ubuntu2) ...
+Selecting previously unselected package ebtables.
+Preparing to unpack .../ebtables_2.0.10.4-3ubuntu1_amd64.deb ...
+Unpacking ebtables (2.0.10.4-3ubuntu1) ...
+Selecting previously unselected package libaugeas0.
+Preparing to unpack .../libaugeas0_1.2.0-0ubuntu1_amd64.deb ...
+Unpacking libaugeas0 (1.2.0-0ubuntu1) ...
+Selecting previously unselected package libnetcf1.
+Preparing to unpack .../libnetcf1_1%3a0.2.3-4ubuntu1_amd64.deb ...
+Unpacking libnetcf1 (1:0.2.3-4ubuntu1) ...
+Selecting previously unselected package libvirt-bin.
+Preparing to unpack .../libvirt-bin_1.2.2-0ubuntu13.1_amd64.deb ...
+Unpacking libvirt-bin (1.2.2-0ubuntu13.1) ...
+Processing triggers for man-db (2.6.7.1-1) ...
+Processing triggers for ureadahead (0.100.0-16) ...
+Setting up augeas-lenses (1.2.0-0ubuntu1) ...
+Setting up bridge-utils (1.5-6ubuntu2) ...
+Setting up ebtables (2.0.10.4-3ubuntu1) ...
+Setting up libaugeas0 (1.2.0-0ubuntu1) ...
+Setting up libnetcf1 (1:0.2.3-4ubuntu1) ...
+Setting up libvirt-bin (1.2.2-0ubuntu13.1) ...
+Adding group `libvirtd' (GID 134) ...
+Done.
+libvirt-bin start/running, process 6164
+Setting up libvirt-bin dnsmasq configuration.
+Processing triggers for ureadahead (0.100.0-16) ...
+Processing triggers for libc-bin (2.19-0ubuntu6) ...
+[alison@hildesheim ~]$ vir
+virsh                virtlockd            virt-pki-validate    
+virtfs-proxy-helper  virt-login-shell     virtuoso-t           
+virt-host-validate   virt_mail            virt-xml-validate    
+[alison@hildesheim ~]$ virsh net-list --all
+error: failed to connect to the hypervisor
+error: no valid connection
+error: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
+[alison@hildesheim ~]$ sudo apt-get install dnsmasq dnsmasq-utils
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following NEW packages will be installed:
+  dnsmasq dnsmasq-utils
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Need to get 22.9 kB of archives.
+After this operation, 184 kB of additional disk space will be used.
+Get:1 http://us.archive.ubuntu.com/ubuntu/ trusty/universe dnsmasq all 2.68-1 [14.9 kB]
+Get:2 http://us.archive.ubuntu.com/ubuntu/ trusty/main dnsmasq-utils amd64 2.68-1 [7,972 B]
+Fetched 22.9 kB in 4s (4,632 B/s)        
+Selecting previously unselected package dnsmasq.
+(Reading database ... 255714 files and directories currently installed.)
+Preparing to unpack .../dnsmasq_2.68-1_all.deb ...
+Unpacking dnsmasq (2.68-1) ...
+Selecting previously unselected package dnsmasq-utils.
+Preparing to unpack .../dnsmasq-utils_2.68-1_amd64.deb ...
+Unpacking dnsmasq-utils (2.68-1) ...
+Processing triggers for ureadahead (0.100.0-16) ...
+Processing triggers for man-db (2.6.7.1-1) ...
+Setting up dnsmasq (2.68-1) ...
+ * Starting DNS forwarder and DHCP server dnsmasq                             [ OK ] 
+/etc/resolvconf/update.d/libc: Warning: /etc/resolv.conf is not a symbolic link to /run/resolvconf/resolv.conf
+Setting up dnsmasq-utils (2.68-1) ...
+Processing triggers for ureadahead (0.100.0-16) ...
+[alison@hildesheim ~]$
+
+
+[alison@hildesheim ~]$ ls /usr/share/libvirt
+cpu_map.xml  libvirtLogo.png  schemas/
+
+[alison@hildesheim ~]$ locate default.xml | grep virt
+/etc/libvirt/qemu/networks/default.xml
+/etc/libvirt/qemu/networks/autostart/default.xml
+/var/lib/libvirt/network/default.xml
+
+[alison@hildesheim ~]$ virsh net-define /etc/libvirt/qemu/networks/default.xml 
+error: failed to connect to the hypervisor
+error: no valid connection
+error: Failed to connect socket to '/var/run/libvirt/libvirt-sock': Permission denied
+
+[alison@hildesheim ~]$ sudo virsh net-define /etc/libvirt/qemu/networks/default.xml 
+error: Failed to define network from /etc/libvirt/qemu/networks/default.xml
+error: operation failed: network 'default' already exists with uuid a3f2e4f4-661c-41e9-9735-11866e62d29b
+
+[alison@hildesheim ~]$ ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 28:d2:44:54:7f:5a brd ff:ff:ff:ff:ff:ff
+3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 7c:7a:91:0d:ec:ab brd ff:ff:ff:ff:ff:ff
+    inet 10.25.146.109/21 brd 10.25.151.255 scope global wlan0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::7e7a:91ff:fe0d:ecab/64 scope link 
+       valid_lft forever preferred_lft forever
+5: cscotun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1280 qdisc pfifo_fast state UNKNOWN group default qlen 500
+    link/none 
+    inet 172.30.7.61/19 brd 172.30.31.255 scope global cscotun0
+       valid_lft forever preferred_lft forever
+6: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 0e:7f:c1:d4:df:32 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+
+[alison@hildesheim ~]$ sudo virsh net-autostart default
+Network default marked as autostarted
+
+[alison@hildesheim ~]$ sudo virsh net-start default
+error: Failed to start network default
+error: Requested operation is not valid: network is already active
+
+[alison@hildesheim ~]$ brctl show
+bridge name     bridge id               STP enabled     interfaces
+virbr0          8000.000000000000       yes
+
+[alison@hildesheim ~]$ sudo emacs -nw /etc/sysctl.conf
+[uncomment 
+
+# Uncomment the next line to enable packet forwarding for IPv4
+net.ipv4.ip_forward=1
+
+[alison@hildesheim ~]$ sudo virsh list
+ Id    Name                           State
+----------------------------------------------------
+
+http://wiki.libvirt.org/page/Libvirtd_and_dnsmasq
+
+You have to change the global /etc/dnsmasq.conf as follows:
+Either:
+***interface=eth0
+or
+listen-address=192.168.0.1
+
+(Replace interface or listen-address with the interfaces or addresses
+you want your global dnsmasq to answer queries on).
+
+And uncomment this line to tell dnsmasq to only bind specific
+interfaces, not try to bind all interfaces:
+
+***bind-interfaces
+
+[alison@hildesheim BuildSystem]$ diff /etc/dnsmasq.conf /etc/dnsmasq.conf_dist
+106c106
+< interface=eth0
+---
+> #interface=
+124c124
+< bind-interfaces
+---
+> #bind-interfaces
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+[alison@hildesheim ~]$ ps axl | grep dnsmasq
+	4 65534  3064   884  20   0  31028  1536 poll_s S    ?          0:00 /usr/sbin/dnsmasq --no-resolv --keep-in-foreground --no-hosts --bind-interfaces --pid-file=/run/sendsigs.omit.d/network-manager.dnsmasq.pid --listen-address=127.0.1.1 --conf-file=/var/run/NetworkManager/dnsmasq.conf --cache-size=0 --proxy-dnssec --enable-dbus=org.freedesktop.NetworkManager.dnsmasq --conf-dir=/etc/NetworkManager/dnsmasq.d
+****	5   126  6390     1  20   0  28208   952 poll_s S    ?          0:00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf ****
+	5   104 10933  2188  20   0  31028   880 poll_s S    ?          0:00 /usr/sbin/dnsmasq -x /var/run/dnsmasq/dnsmasq.pid -u dnsmasq -r /var/run/dnsmasq/resolv.conf -7 /etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new
+
+
+Now ping works from laptop:
+
+[alison@hildesheim builder]$ ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 28:d2:44:54:7f:5a brd ff:ff:ff:ff:ff:ff
+3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 7c:7a:91:0d:ec:ab brd ff:ff:ff:ff:ff:ff
+    inet 10.25.146.109/21 brd 10.25.151.255 scope global wlan0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::7e7a:91ff:fe0d:ecab/64 scope link 
+       valid_lft forever preferred_lft forever
+5: cscotun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1280 qdisc pfifo_fast state UNKNOWN group default qlen 500
+    link/none 
+    inet 172.30.7.61/19 brd 172.30.31.255 scope global cscotun0
+       valid_lft forever preferred_lft forever
+6: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 0e:7f:c1:d4:df:32 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+[alison@hildesheim builder]$ ping 192.168.122.1
+PING 192.168.122.1 (192.168.122.1) 56(84) bytes of data.
+64 bytes from 192.168.122.1: icmp_seq=1 ttl=64 time=0.076 ms
+64 bytes from 192.168.122.1: icmp_seq=2 ttl=64 time=0.064 ms
+64 bytes from 192.168.122.1: icmp_seq=3 ttl=64 time=0.036 ms
+^C
+--- 192.168.122.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1998ms
+rtt min/avg/max/mdev = 0.036/0.058/0.076/0.018 ms
+
+[alison@hildesheim builder]$ nmap  192.168.122.1
+
+Starting Nmap 6.40 ( http://nmap.org ) at 2014-06-25 14:17 CEST
+Nmap scan report for localhost (192.168.122.1)
+Host is up (0.00027s latency).
+Not shown: 995 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+25/tcp   open  smtp
+53/tcp   open  domain
+111/tcp  open  rpcbind
+2049/tcp open  nfs
+
+Nmap done: 1 IP address (1 host up) scanned in 0.70 seconds
+
+
+Edit /etc/libvirt/qemu/networks/default.xml:
+<network>
+  <name>default</name>
+  <bridge name="virbr0"/>
+  <forward/>
+  <ip address="192.168.122.1" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.122.2" end="192.168.122.254"/>
+    </dhcp>
+  </ip>
+  <interface type='network'>                                                         
+    <source network='default'/>
+  </interface>
+</network>
+
+
+
+[alison@hildesheim builder]$ file /mnt/SSD/Ubuntu/builddisk.raw 
+/mnt/SSD/Ubuntu/builddisk.raw: x86 boot sector
+[1]+  Done                    ./run_builder
+[alison@hildesheim builder]$ sudo fdisk -l /mnt/SSD/Ubuntu/builddisk.raw 
+
+Disk /mnt/SSD/Ubuntu/builddisk.raw: 10.7 GB, 10737418240 bytes
+255 heads, 63 sectors/track, 1305 cylinders, total 20971520 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x0006563e
+
+                        Device Boot      Start         End      Blocks   Id  System
+/mnt/SSD/Ubuntu/builddisk.raw1   *        2048    16777215     8387584   83  Linux
+/mnt/SSD/Ubuntu/builddisk.raw2        16779262    20969471     2095105    5  Extended
+/mnt/SSD/Ubuntu/builddisk.raw5        16779264    20969471     2095104   82  Linux swap / Solaris
+
+----
+
+Compare Vista VP:
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1   *        2048       32767       15360    c  W95 FAT32 (LBA)
+/dev/sdb2           32768     8028159     3997696   83  Linux
+
+(* 512 32768)
+16777216
+
+[alison@hildesheim mnt]$ sudo mount -o loop,offset=16777216 SSD/3.8.13-ATP-fsl-imx6-image /mnt/loop/
+[alison@hildesheim mnt]$ ls /mnt/loop
+bin/   dev/  home/     lib/         media/  opt/   run/   sys/  usr/  www/
+boot/  etc/  hostbin/  lost+found/  mnt/    proc/  sbin/  tmp@  var/
+
+----
+
+Ubuntu Qemu:
+
+(* 2048 512)
+1048576
+
+Works!
+[alison@hildesheim builder]$ sudo mount -t auto -o loop,offset=1048576 /mnt/SSD/Ubuntu/builddisk.raw /mnt/loop
+[alison@hildesheim builder]$ ls /mnt/loop
+bin/    dev/   initrd.img@  media/  proc/  sbin/     sys/  var/
+boot/   etc/   lib/         mnt/    root/  selinux/  tmp/  vmlinuz@
+cdrom/  home/  lost+found/  opt/    run/   srv/      usr/
+[alison@hildesheim builder]$ cat /mnt/loop/home/achaiken/.ssh/id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC08WbO5LzARay+OJOBWPzIWRJ/3Yz+b4I8Rx05STfJzK/jujRFdhA2Bow60Za7/ZLYfaKuRNxdgDbL7d8vZCiFDviSkRGH8CYt055uNfoVcfO3UvUoCBaCae5rTJ6vQdDhQvuNTJE4cf2iwC3XI+CWHADYPGvQomQpwshgaEJdhD5yNyHA/Qaml7fMFgoPuvm2/QTMg9MER16x1EOA00pSWhIkao+44BBP+s2aT4SW+PyGoJCYTer1tEU43RIQZ5jxz3DkvSGxIVzzs4bTyqWK06wi8pi19RG7y89N9gi6d+A8DDyvXPLUJiGMnoCa7ybM2UaGWh5y8HIsFXsP/HIN achaiken@ubuntu-12
+
+[alison@hildesheim builder]$ cat ~/.ssh/id_rsa.pub >> /mnt/loop/home/achaiken/.ssh/authorized_keys
+[alison@hildesheim builder]$ cat /mnt/loop/home/achaiken/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArkd3PB6GVoY1b9/g9kDXrpvkDscOsxkT3mIQX8mDCG3NCcacv+ka4SflCOM59OXU6s49KQgYamcDy6vof60YYa6+vIYdfnbwgp0drpg8eFrlCsSuiPvLTeWxlbZvkI7lqN1rynyrPD1zM7vDvntYML4fmL15AWQaorT2vYT/ZmH96cUz4zaBJIWqhDF83Vx3H1ZlXPD3PSDF/zYgbgi0uG9CbcS7iBQXYdnUG/+QzjMc9u7pUHjONM8p6kOE3aOC2ps05WoeAwrOhvjqCW7oGENn8u/hH62JlcpZwrzMw5TK6G1KyhMrZi60bW1QHx/Q6PawC+HKDN90PrrIfHrotw== alison+20090803@bonnet.exerciseforthereader.org
+
+Then in VM,
+
+     ssh-add
+
+     ssh alison@10.0.2.2
+
+since

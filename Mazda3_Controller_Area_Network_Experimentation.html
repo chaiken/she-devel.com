@@ -1,0 +1,318 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Mazda 3 CAN Protocols</title>
+  <link rel="stylesheet" type="text/css" href="pt_style.css" />
+  <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+<!-- copied from Alexis Menard, http://darktears.fr/presentations/DevDays2011/HTML5/html5.html
+
+  <script type="text/javascript"
+  src="google-code-prettify/prettify.js"></script> -->
+<meta name="description" content= "technical documentation about
+  automotive firmware" />
+<meta name="keywords" content= "linux, IVI, infotainment, ECU,
+  controller area network, Mazda, OBDII, CAN, shop manual, Mazda 3, open source, free software,
+embedded" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style type="text/css">
+  img { max-width: 100%; height: auto; }
+</style>
+</head>
+
+<body onload="prettyPrint()">
+
+<hr />
+
+<div class="title">Figuring out Controller Area Network Protocols
+    for 2005 Mazda 3</div>
+
+<div class="figure"><p>Prepared by <a href="mailto:alison@she-devel.com">Alison Chaiken<img src="logo/she-devel_small.jpg" alt="she-devel logo"/></a>
+and offered under <a href="
+http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" src="/icons1/by-sa.png" alt="Creative Commons logo" /></a>
+</p>
+</div>
+
+<hr />
+
+<div class="heading">Goals</div>
+
+<menu>
+<li>Learn to interpret data transmitted over the vehicular controller
+  area networks ("CAN buses") by using my own car as laboratory.</li>
+
+<li>Use my car as a development and testing platform for <a href="http://wiki.openivi.org/index.php?title=Nobdy">nOBDy</a> and
+  <a href="http://icculus.org/obdgpslogger/">OBDGPSLogger</a>.</li>
+
+<li>Understand, optimize and control my vehicle better by analysis of
+  CAN data.</li>
+
+<li>[Wildy ambitious] Enable healthier living through better
+integrated transportation planning via mining of Big Data sets that
+include automatic, real-time vehicular inputs.  <a
+href="https://docs.google.com/document/d/1ay7kQdpC3SWZ06nK3JcCUH_wCtwm_tvl3S6G37bFkFI/edit">Starter
+list of ideas.</a></li>.
+
+</menu>
+
+<div class="heading">About OBDII and CAN Protocols</div>
+
+<ul>
+
+<li><p><a
+href="/home/alison/IVI/nobdy/EcuSim/mx_protocol_commands.pdf">OBDLink
+MX Protocol Commands</a> set by STN1110 chip, supports all CAN standards</p></li>
+
+<li><p><a
+href="http://www.boschdiagnostics.com/TESTEQUIPMENT/DIAGNOSTICS/SCANTOOLS/Pages/ScanTools.aspx">Link</a>
+to user's manuals for some Bosch commercial scan-tools (H/T Alan Maldonado)</p></li>
+
+<li>
+<p><a href="http://www.scantool.net/scantool/downloads/103/elm327dsh.pdf">ELM327 Protocols
+for OBDII</a> (doesn't support general CAN), p.23
+<pre>
+0 - Automatic
+1 - SAE J1850 PWM (41.6 kbaud)
+2 - SAE J1850 VPW (10.4 kbaud)
+3 - ISO 9141-2 (5 baud init, 10.4 kbaud)
+4 - ISO 14230-4 KWP (5 baud init, 10.4 kbaud)
+5 - ISO 14230-4 KWP (fast init, 10.4 kbaud)
+6 - ISO 15765-4 CAN (11 bit ID, 500 kbaud)
+7 - ISO 15765-4 CAN (29 bit ID, 500 kbaud)
+8 - ISO 15765-4 CAN (11 bit ID, 250 kbaud)
+9 - ISO 15765-4 CAN (29 bit ID, 250 kbaud)
+A - SAE J1939 CAN (29 bit ID, 250* kbaud)
+B - USER1 CAN (11* bit ID, 125* kbaud)
+C - USER2 CAN (11* bit ID, 50* kbaud)
+</pre>
+</p>
+</li>
+
+<li>
+<p>
+<a
+href="https://en.wikipedia.org/wiki/Controller_area_network">Wikipedia
+Controller Area Network article</a>
+<pre>
+There are several CAN physical layer standards:
+    ISO 11898-1: CAN Data Link Layer and Physical Signalling
+    ISO 11898-2: CAN High-Speed Medium Access Unit
+    ISO 11898-3: CAN Low-Speed, Fault-Tolerant, Medium-Dependent Interface
+    ISO 11898-4: CAN Time-Triggered Communication
+    ISO 11898-5: CAN High-Speed Medium Access Unit with Low-Power Mode
+    ISO 11898-6: CAN High-speed medium access unit with selective wake-up functionality
+    ISO 11992-1: CAN fault-tolerant for truck/trailer communication
+    ISO 11783-2: 250 kbit/s, Agricultural Standard
+    SAE J1939-11: 250 kbit/s, Shielded Twisted Pair (STP)
+    SAE J1939-15: 250 kbit/s, Unshielded Twisted Pair (UTP) (reduced layer)
+    SAE J2411: Single-wire CAN (SWC)
+<pre>
+</p>
+</li>
+
+
+<div class="heading">Set-up</div>
+
+<div class="figure"><p><a
+href="http://www.scantool.net/scan-tools/obdlink-mx.html"><img
+max-width=100% height=auto src="images/OBDLinkMX.jpg" alt="OBDLink MX scantool"
+/></p>
+
+<p>Scantool.net's OBDLink MX</a>, which is based on the <a
+href="http://www.scantool.net/scantool/downloads/102/stn1110_vs_elm327.pdf">STN1110
+interface chip</a>, not the well-known ELM327 they used in earlier
+products.</p></div>
+
+
+<div class="figure"><p><a href="OBDLinkMX_firmware_update.png"><img max-width=100% height=auto
+src="/images/OBDLinkMX_firmware_update_small.png" alt="OBDLink MX scantool"
+/></a></p>
+<p>Screenshot of a Windows 7 VM running on VMWare on top of Ubuntu
+that is reflashing the OBDLink MX's firmware (click for larger
+version).  In order to connect, I had to click on the tiny blue
+Bluetooth hardware device icons circled on the lower right corner,
+which caused Windows to query whether I wanted to install Bluetooth
+drivers.  Before the drivers were installed, Windows showed the icons
+with red X's through them.  There appeared to be no other way to
+install the drivers, not through the "network center" or "wireless
+device" control panel settings.  Once the drivers were installed, the
+larger and familiar Bluetooth connectivity icon appeared to the upper
+left of the Bluetooth hardware icons.
+</p></div>
+
+
+<p>For initial tests, I used a Debian or Ubuntu laptop with the <a
+href="https://en.wikipedia.org/wiki/Minicom">minicom</a> program to
+capture output from the Bluetooth-paired OBDLink MX scantool, which
+Linux offers as /dev/rfcomm0, a regular soft tty. (On Ubuntu 10.10,
+bluetooth-agent failed to handle random password, while
+blueman-assistant worked on the first try.)  <a
+href="http://wiki.openice.org/index.php?title=Nobdy">nOBDy's</a> <a
+href="http://wiki.openice.org/index.php?title=Genericobd2">genericbod2
+provider plugin</a> will log data from the OBDLink MX with no problem,
+but, at the moment, the underlying <a
+href="http://mikesshop.net/">libobd communication library</a> only
+supports the OBDII (15765-4) protocol.  The OBDLink MX is a bit
+expensive compared to many scantools, but most don't populate pins 3
+and 11 or read MS-CAN communications (see below).  </p>
+
+<div class="figure"><p><img max-width=100% height=auto src="/images/Mazda3_OBD_populated.png"
+ alt="DLC Mazda pinout" /></p><p>Identification of pins on Mazda 3's
+ Data Link Connector</p></div>
+
+<div class="heading">Mazda 3's CAN protocols</div>
+
+The 2005 Mazda 3 standard-transmission hatchback (VIN
+JM1BK3437XXXXXXXX) supports 3 communication protocols over the OBDII
+Data Link Connector as identified using a Scantool.net OBDLink MX
+scantool and a minicom connection.  [Note that Data Link Connector and
+CAN's Data Length Code are both interpretations of "DLC" in this
+context, just as "CAN" might refer to a variety of protocols.]  The
+standard protocol numbering scheme is documented in a download
+available from <a
+href="http://www.scantool.net/downloads/118/mx_protocol_commands.pdf">scantool.net</a>.
+
+<ol>
+
+<li>Auto-protocol for OBDII on pins 5, 6 and 14<br/>
+At minicom, I type: "ATSP0;ATDPN"<br/>
+Vehicle responds: "A6 [AT]"<br/>
+I type: "ATSP0;STRPRS"<br/>
+Vehicle responds: "AUTO, ISO 15765-4 (CAN 11/500) [AT]"<br/>
+</li>
+
+<li>HS CAN (ISO 11898, 11-bit Tx, 500kbps, var DLC) on pins 3, 11 and
+5 (?)<br/>
+I type: "STP31; STPRS"<br/>
+Vehicle responds: "HS CAN (ISO 11898, 500K/11B)"<br/>
+</li>
+
+<li> MS CAN (ISO 11898, 11-bit Tx, 125kbps, var DLC) on pins 3, 11 and
+5 (?)<br/>
+I type: "STP51;STPRS":<br/>
+Vehicle responds: "MS CAN (ISO 11898, 125K/11B)"<br/>
+</li>
+
+</ol>
+
+<div class="heading">Interpretation of Raw Mazda CAN Output</div>
+
+<p><a href="Mazda3_raw_CAN_monitor.txt">Sample Log file</a>
+ from Mazda 3 raw CAN monitoring session</p>
+
+<p>Compare <a
+href="http://www.madox.net/blog/projects/mazda-can-bus/">HS-CAN and
+MS-CAN data</a> from madox.net.  A quick comparison shows that a lot
+of the same IDs appear in my MS-CAN (protocol 51) data stream (201,
+265, 401, 433) and HS-CAN (protocol 31) data stream (200, 20F, 231,
+433, 4B0) although it's not obvious that the behavior matches that of
+madox's 2006 Mazda 3.  For example, in my vehicle, 20F PID appears to
+be a monotonically increasing counter in least-signicant byte, while
+madox identifies bytes 2 and 3 as speed.  Pinning down an
+interpretation of many of the parameters is clearly possible but will
+require investment of some time.</p>
+
+
+<div class="heading">OBDII-related info from Mazda 3 shop manual</div>
+
+<div class="heading2">About "Drive Modes" from p. 59:</div>
+
+<pre>
+080-11 DRIVE MODE[LF, L3]
+
+- Using the OBD-II drive mode, the monitoring item requested by OBD-II
+regulations can be easily diagnosed.
+- Performing the Drive Mode inspects the OBD-II system for proper
+operation and must be performed to ensure that no additional DTCs are
+present.
+- The OBD-II drive mode is divided into the specific drive mode and single drive mode.
+- For the specific drive mode, specified drive modes have been set for
+each individual monitoring item requested by OBD-II regulations, and
+they can be diagnosed individually. For the single drive mode, the
+entire monitoring item requested by OBD-II regulations can be diagnosed.
+- The following modes are in the specific drive mode. The applicable
+system is diagnosed by driVing in the following drive modes.
+
+  PCM (Powertrain Control Module): Adaptive Memory Produce Drive Mode
+  EGR (Exhaust Gas Recirculation): System Repair Verification Drive Mode
+  H02S heater, H02S, and TWC Repair: Verification Drive Mode
+  EVAP System Repair: Verification Drive Mode
+
+- The following systems are diagnosed with the single drive mode.
+
+  EGR system
+  Oxygen sensor (H02S)
+  Oxygen sensor heater
+  Catalytic converter (TWC)
+  Fuel, misfire and evaporative (EVAP) system
+
+
+PCM Adaptive Memory Production Drive Mode
+1.	 Start the engine and warm it up completely.
+2.	 Verify the following conditions and correct if necessary:
+- All accessory loads (AlC, headlights, blower fan, rear window defroster) are off.
+3.  Perform no load racing at the engine speed shown in the graph,
+then idle the engine for more than 60 s after the cooling fan has
+stopped. If possible, monitor RPM PID for engine speed during this
+procedure.
+
+</pre>
+
+<div class="heading2">Diagnostic Trouble Code numbers</div>
+
+<p>p. 63-71, shop manual, 9-page table including and associated fault
+ conditions.</p>
+
+<pre>
+DIAGNOSTIC MONITORING TEST RESULTS[LF, L3]
+The purpose of this test mode is to confirm the result of OBD-II
+monitor diagnostic test results. The result values stored when
+particular monitor is completed are displayed. If the monitor is not
+completed, initial value is displayed.
+</pre>
+ 
+<div class="heading2">How to clear DTC-indicated problems</div
+<p>Info continues to p. 609.  Tire-pressure monitoring, anti-lock
+brakes, and dynamic stability control all can be watched through
+OBDII, but I don't have them installed.</p.
+
+
+<p>Power steering can be read out, p 2125</p>
+
+<div class="heading2">Diagnostic Trouble Code (DTC) Table</div>
+<p>p. 2128:</p>
+
+<pre>
+ON-BOARD DIAGNOSTIC [ELECTRO HYDRAULIC POWER ASSIST STEERING (EHPAS)]
+B1238 EHPAS control module
+B1317 Battery power supply
+B1318 Battery power supply
+B1342 EHPAS control module
+B1352 Ignition power supply
+B2477 EHPAS control module configuration
+C1099 Electric power steering oil pump (motor)
+C1278 Steering angle sensor
+U0073 CAN bus communication error
+U0100 Lost communication with the PCM
+U2023 EHPAS control module
+B1317 DTC Fault received from other modules
+</pre>
+
+<div class="heading2">PID/DATA Monitor Table</div>
+<p>p. 2129</p>
+<pre>
+PID Name (Definition)
+MTR_AMP(Pump Motor Operation Current)
+RPM_ACT (Actual pump motor revolution per minutes)
+RPM_TGT (Target pump motor revolution per minutes)
+ENGRPM (Engine speed signal)
+STEER_RATE (Steering wheel rotation rate)
+TEMP_BOARD (Printed circuit board temperature)
+VPWR (Module supply voltage)
+VSS (Vehicle speed)
+</pre>
+
+</body>
+</html>

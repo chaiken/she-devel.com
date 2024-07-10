@@ -1,0 +1,8 @@
+#!/bin/bash
+ROOTDIR=/vol/ISOs/Fedora
+#ISO=ubuntu-11.10-desktop-i386.iso
+ISO=Fedora-16-i686-Live-KDE.iso
+HDNAME=fedora-i386-bldr
+#looks like Ubuntu uses 6666 for IRC?
+#qemu-system-i386 --enable-kvm -boot c -hda /fedora14/ubuntu_nobdy_bldr.raw -m 4096 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ubuntu_nobdy_bldr -localtime
+qemu-system-i386 --enable-kvm -boot c -hda ${ROOTDIR}/${HDNAME}.raw -m 4096 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ${HDNAME} -localtime

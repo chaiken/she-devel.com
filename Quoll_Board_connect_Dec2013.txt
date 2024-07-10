@@ -1,0 +1,486 @@
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_sabrelite.scr
+
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_bootchart.scr
+
+set bootargs $bootargs ftrace=function_graph_tracing_thresh=5000
+
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_sabrelite.scr
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+With Ubuntu 14.04, needed to change /etc/inetd.conf
+
+[ .  .   . ]
+
+#:BOOT: TFTP service is provided primarily for booting.  Most sites
+#       run this only on machines acting as "boot servers."
+tftp            dgram   udp     wait    nobody  /usr/sbin/tcpd  /usr/sbin/in.tftpd /tftpboot
+
+[ .  .   . ]
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+July 2, 2014:
+
+[achaiken@quoll mx6q]$ nslookup sabrelite-adk
+Server:         147.34.2.16  ****
+Address:        147.34.2.16#53  **** 
+
+Name:   sabrelite-adk.sje.mentorg.com
+Address: 134.86.173.228
+
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_sabrelite.scr
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_sabrelite.scr
+
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_vputest.scr
+
+source 100000; bootm $loadaddr - $dtbaddr
+
+
+[  130.040548] MX6QSABRELITE U-Boot > printenv
+[  148.664736] baudrate=115200
+[  148.667490] bootcmd=mmc dev ${mmcdev}; if mmc rescan; then if run loadbootscript; then run bootscript; fi; fi
+[  148.677408] bootdelay=1
+[  148.679844] bootscript=echo Running bootscript from mmc ...; source ${loadaddr}
+[  148.687152] ethact=FEC
+[  148.689501] ethaddr=00:19:b8:00:f6:ea
+[  148.693154] ethprime=FEC
+[  148.695678] loadaddr=0x10007fc0
+[  148.698810] loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};
+[  148.706379] mmcdev=0
+[  148.708555] mmcpart=2
+[  148.710816] script=boot.scr
+[  148.713600] stderr=serial
+[  148.716210] stdin=serial
+[  148.718733] stdout=serial
+[  148.721346] 
+[  148.722822] Environment size: 442/8188 bytes
+[  148.727089] MX6QSABRELITE U-Boot > fatls mmc 0:2
+[  155.131026]       384   boot.scr 
+[  155.134259] 
+[  155.135736] 1 file(s), 0 dir(s)
+[  155.138868] 
+[  155.140354] MX6QSABRELITE U-Boot > 
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+How to disconnect from quoll's terminal concentrator:
+
+"[achaiken@quoll ~]$ ssh -e ^ -p 3005 csl@serial8-cs
+
+sets "^" as the escape character.    Then
+
+^. 
+
+disconnects, per "man ssh":
+
+    ESCAPE CHARACTERS
+    When a pseudo-terminal has been requested, ssh supports a number of func‐
+    tions through the use of an escape character.
+
+    A single tilde character can be sent as ~~ or by following the tilde by a
+    character other than those described below.  The escape character must
+    always follow a newline to be interpreted as special.  The escape charac‐
+    ter can be changed in configuration files using the EscapeChar configura‐
+    tion directive or on the command line by the -e option.
+
+    The supported escapes (assuming the default ‘~’) are:
+
+    ~.      Disconnect.
+
+    ~^Z     Background ssh.
+
+    ~#      List forwarded connections.
+
+    ~&      Background ssh at logout when waiting for forwarded connection /
+    X11 sessions to terminate.
+
+    ~?      Display a list of escape characters.
+
+    ~B      Send a BREAK to the remote system (only useful for SSH protocol
+    version 2 and if the peer supports it).
+
+Note that "~." causes exit from quoll!
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+How to get rid of root-password requirement for login to NFS-mounted drive:
+put no_root_squash in /etc/exports.
+
+Old /etc/exports on quoll which required password for root:
+/tftpboot     sabrelite-adk(rw,sync,no_subtree_check)
+
+New /etc/exports which requires no password:
+/tftpboot     sabrelite-adk(rw,sync,no_subtree_check,no_root_squash)
+
+When changing /etc/exports, don't forget to restart the server:
+
+sudo service nfs-kernel-manager restart
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+About no_root_squash, from "man exports" (part of nfs-kernel-server package)
+
+User ID Mapping
+
+nfsd bases its access control to files on the server machine on the
+uid and gid provided in each NFS RPC request. The normal behavior a
+user would expect is that she can access her files on the server just
+as she would on a normal file system. This requires that the same uids
+and gids are used on the client and the server machine. This is not
+always true, nor is it always desirable.
+
+Very often, it is not desirable that the root user on a client machine
+is also treated as root when accessing files on the NFS server. To
+this end, uid 0 is normally mapped to a different id: the so-called
+anonymous or nobody uid. This mode of operation (called `root
+squashing') is the default, and can be turned off with no_root_squash.
+
+By default, exportfs chooses a uid and gid of 65534 for squashed
+access. These values can also be overridden by the anonuid and anongid
+options.  Finally, you can map all user requests to the anonymous uid
+by specifying the all_squash option.
+
+       Here's the complete list of mapping options:
+
+root_squash 
+Map requests from uid/gid 0 to the anonymous uid/gid. Note that this
+does not apply to any other uids or gids that might be equally
+sensitive, such as user bin or group staff.
+
+no_root_squash
+Turn off root squashing. This option is mainly useful for diskless clients.
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+
+https://help.ubuntu.com/12.04/serverguide/network-file-system.html
+
+sudo apt-get install nfs-kernel-server nfswatch
+Setting up nfs-kernel-server (1:1.2.5-3ubuntu3.1) ...
+Creating config file /etc/exports with new version
+Creating config file /etc/default/nfs-kernel-server with new version
+ * Exporting directories for NFS kernel daemon... [ OK ] 
+ * Starting NFS kernel daemon  [ OK ] 
+Setting up nfswatch (4.99.11-1) ...
+
+/etc/exports:
+
+# /etc/exports: the access control list for filesystems which may be exported
+#               to NFS clients.  See exports(5).
+#
+# Example for NFSv2 and NFSv3:
+# /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
+#
+# Example for NFSv4:
+# /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
+# /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
+#
+/tftpboot       sabrelite-adk(rw,sync,no_subtree_check)
+
+[achaiken@quoll ~]$ sudo service nfs-kernel-server restart
+ * Stopping NFS kernel daemon                                                                 [ OK ] 
+ * Unexporting directories for NFS kernel daemon...                                           [ OK ] 
+ * Exporting directories for NFS kernel daemon...                                             [ OK ] 
+ * Starting NFS kernel daemon          
+
+
+
+
+[achaiken@quoll ~]$ nc serial8-cs.sje.mentorg.com 4005
+^C
+
+
+June 2014:
+http://pdu19.sje.mentorg.com/logon.htm worked, not https://
+
+https://pdu19.sje.mentorg.com/logon.htm
+apc, apc
+
+
+http://confluence.alm.mentorg.com:8090/display/TI/Quick+Reference+Target+Boards+Table
+
+sabrelite-adk	134.86.173.228	serial8-cs/5	pdu19/17	Freescale Sabrelite IMX6Q	2440
+
+http://confluence.alm.mentorg.com:8090/display/TI/Fremont+Board+Lab#FremontBoardLab-SerialPortServers
+
+
+[alison@bonnet HRdocs]$ nc serial8-cs.sje.mentorg.com 4005
+mx6q ttymxc1
+Mentor Embedded Automotive Technology Platform 2013.03 mx6q ttymxc1
+mx6q login: 
+mx6q login: root
+root
+root@mx6q:~# uname -a
+uname -a
+Linux mx6q 3.5.7.14-03681-g3649c58 #1 SMP PREEMPT Tue Jul 2 11:37:45 MST 2013 armv7l GNU/Linux
+root@mx6q:~# 
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+Hello Alison,
+ 
+I believe just closed the window is fine. I always use this to connect to the serial port in the lab.
+ 
+You can login to the serial port with below procedure:
+Login to build1-lucid-cs
+ssh -p 3005 csl@serial8-cs ( if the serial port of the target board is connecting to serial8-cs port#5)
+ 
+Password: type csl
+ 
+Hit enter key and you should see the lmx6q login prompt:
+     
+mx6q login:
+ 
+Thanks,
+Danny Nguyen
+
+
+Yes, you are correct . Needed to hit CR
+nc and ssh -p 3005 are the same.
+ 
+DN
+
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+[achaiken@quoll linux-meibp (PDtiming)]$ ssh -p 3005 csl@serial8-cs
+Password: 
+mx6q ttymxc1
+Mentor Embedded Automotive Technology Platform 2013.03 mx6q ttymxc1
+mx6q login: 
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+[achaiken@quoll ~]$ nslookup sabrelite-adk
+Server:         134.86.188.11
+Address:        134.86.188.11#53
+
+Non-authoritative answer:
+Name:   sabrelite-adk.sje.mentorg.com
+Address: 134.86.173.228
+
+[achaiken@quoll ~]$ ip addr list
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP qlen 1000
+    link/ether 00:25:64:ca:af:3a brd ff:ff:ff:ff:ff:ff
+    inet 134.86.173.5/24 brd 134.86.173.255 scope global eth0
+    inet6 fe80::225:64ff:feca:af3a/64 scope link 
+       valid_lft forever preferred_lft forever
+
+
+[achaiken@sneaker ~]$ ls /etc/xinetd.d
+chargen  daytime  discard  echo  tftp  time
+[achaiken@sneaker ~]$ cat /etc/xinetd.d/tftp 
+service tftp
+     {
+          protocol      = udp
+          port           = 69
+          socket_type      = dgram
+          wait           = yes
+          user           = nobody
+          server           = /usr/sbin/in.tftpd
+          server_args      = /tftpboot
+          disable      = no
+     }
+
+
+setenv ipaddr 134.86.173.228; setenv serverip 134.86.173.5; tftp 100000 /tftpboot/achaiken/mx6q/fmt_sabrelite.scr
+
+source 100000; bootm $loadaddr - $dtbaddr
+
+
+[   11.772430] MX6QSABRELITE U-Boot > setenv ipaddr 134.86.173.228
+[   60.072394] MX6QSABRELITE U-Boot > setenv serverip 134.86.173.5
+[  135.069533] MX6QSABRELITE U-Boot > tftp 100000 /tftpboot/achaiken/mx6q/fmt_sabrelite.scr
+[  178.935287] Using FEC device
+[  178.938087] TFTP from server 134.86.173.5; our IP address is 134.86.173.228
+[  178.945045] Filename '/tftpboot/achaiken/mx6q/fmt_sabrelite.scr'.
+[  178.951136] Load address: 0x100000
+[  178.954528] Loading: #
+[  178.958709]   286.1 KiB/s
+[  178.961319] done
+[  178.963151] Bytes transferred = 586 (24a hex)
+[  178.967537] MX6QSABRELITE U-Boot > source 100000
+[  180.403414] ## Executing script at 00100000
+[  180.508108] Using FEC device
+[  180.510910] TFTP from server 134.86.173.5; our IP address is 134.86.173.228
+[  180.517866] Filename '/tftpboot/achaiken/mx6q/sabreai.dtb'.
+[  180.523435] Load address: 0x20000000
+[  180.527000] Loading: #######
+[  180.538389]   3.5 MiB/s
+[  180.540825] done
+[  180.542656] Bytes transferred = 32912 (8090 hex)
+[  180.647468] Using FEC device
+[  180.650269] TFTP from server 134.86.173.5; our IP address is 134.86.173.228
+[  180.657226] Filename '/tftpboot/achaiken/mx6q/uImage-imx6'.
+[  180.662795] Load address: 0x10800000
+[  180.666360] Loading: #################################################################
+[  180.737304]   #################################################################
+[  180.800905]   #################################################################
+[  180.862990]   #################################################################
+[  180.925740]   #################################################################
+[  180.988891]   #################################################################
+[  181.050226]   #################################################################
+[  181.111024]   #################################################################
+[  181.174732]   #####################################################
+[  181.228250]   5 MiB/s
+[  181.230512] done
+[  181.232345] Bytes transferred = 2928712 (2cb048 hex)
+[  181.239132] baudrate=115200
+[  181.241842] bootargs=console=ttymxc1,115200 ip=dhcp rootwait root=/dev/nfs nfsroot=134.86.173.5:/tftpboot/achaiken/mx6q/fsl_imx6,v3,tcp
+[  181.254022] bootcmd=mmc dev ${mmcdev}; if mmc rescan; then if run loadbootscript; then run bootscript; fi; fi
+[  181.263940] bootdelay=1
+[  181.266376] bootscript=echo Running bootscript from mmc ...; source ${loadaddr}
+[  181.273684] console=ttymxc1
+[  181.276468] dtb=/tftpboot/achaiken/mx6q/sabreai.dtb
+[  181.281340] dtbaddr=0x20000000
+[  181.284385] ethact=FEC
+[  181.286734] ethaddr=00:19:b8:00:f6:ea
+[  181.290388] ethprime=FEC
+[  181.292911] fdt_high=0xffffffff
+[  181.296043] fileaddr=10800000
+[  181.299001] filesize=2CB048
+[  181.301785] gatewayip=134.86.151.254
+[  181.305352] ipaddr=134.86.173.228
+[  181.308658] kernel=/tftpboot/achaiken/mx6q/uImage-imx6
+[  181.313791] loadaddr=0x10800000
+[  181.316923] loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};
+[  181.324492] mmcdev=0
+[  181.326667] mmcpart=2
+[  181.328929] rootfs=/tftpboot/achaiken/mx6q/fsl_imx6
+[  181.333801] script=boot.scr
+[  181.336585] serverip=134.86.173.5
+[  181.339891] stderr=serial
+[  181.342501] stdin=serial
+[  181.345024] stdout=serial
+[  181.347637] 
+[  181.349113] Environment size: 871/8188 bytes
+[  181.353394] MX6QSABRELITE U-Boot > 
+
+
+
+
+Hello Alison,
+ 
+IT is done with my request. You can configure Uboot of sabrelite-adk board with 134.86.173.228 IP address and it should work now.
+gateway 134.86.173.254
+netmask 255.255.255.0
+Let me know if you are still have issue.
+Thanks,
+Danny Nguyen
+
+-- Worked a bit with Danny Nguyen to finish setup of the SabreLite board in the Fremont Board Lab.    Details are under sabrelite-adk at in table at http://confluence.alm.mentorg.com:8090/display/MEIP/Hardware    I haven't been able to get the board to NFS-mount its rootfs using a static IP.    If anyone has a set of u-boot environment variables that works with static IP, please send me a copy.   I have been trying 
+
+setenv bootargs "console=${console},${baudrate} ip=${ipaddr} rootwait root=/dev/nfs nfsroot=${serverip}:${rootfs},v3,tcp"
+
+with ipaddr a static IP and appropriate variable settings but the kernel reports:
+
+[   61.418263] IP-Config: Guessing netmask 255.255.0.0
+[   61.423340] IP-Config: Complete:
+[   61.426618]      device=eth0, hwaddr=00:19:b8:00:f6:ea, ipaddr=134.86.173.228, mask=255.255.0.0, gw=255.255.255.255
+[   61.437125]      host=134.86.173.228, domain=, nis-domain=(none)
+[   61.443196]      bootserver=255.255.255.255, rootserver=134.86.173.5, rootpath=
+[  156.529084] VFS: Unable to mount root fs via NFS, trying floppy.
+[  156.535550] VFS: Cannot open root device "nfs" or unknown-block(2,0): error -6
+[  156.542867] Please append a correct "root=" boot option; here are the available partitions:
+
+
+Nguyen, Danny
+Friday, December 13, 2013 3:29 PM
+
+Below is the uboot configuration of one of the sabrelite target that in the lab. Hope it can help.
+
+MX6Q SABRELITE U-Boot > printenv
+bootdelay=3 
+baudrate=115200 
+netmask=255.255.255.0 
+loadaddr=0x10800000 
+rd_loadaddr=(0x10800000 + 0x300000) 
+netdev=eth0 
+ethprime=FEC0 
+uboot=u-boot.bin 
+kernel=uImage 
+nfsroot=/opt/eldk/arm 
+bootargs=console=ttymxc1,115200 
+bootcmd_base= 
+bootargs_nfs=setenv bootargs ${bootargs} root=/dev/nfs ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp 
+bootcmd_net=run bootcmd_base bootargs_nfs; tftpboot ${loadaddr} ${kernel}; bootm 
+bootcmd=run bootcmd_mmc 
+clearenv=sf probe 1 && sf erase 0xc0000 0x2000 && echo restored environment to factory default 
+upgradeu=for disk in 0 1 ; do mmc dev ${disk} ;for fs in fat ext2 ; do ${fs}load mmc ${disk}:1 10008000 /6q_upgrade && source 10008000 ; done ; done 
+ethact=FEC0 
+ipaddr=134.86.173.58 
+serverip=134.86.173.11 
+gatewayip=134.86.173.254 
+bootargs_base=setenv bootargs console=ttymxc1,115200 
+bootargs_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p1 rootwait rw video=mxcfb1:dev=ldb,LDBXGA, if=RGB666 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 ip=dhcp 
+bootcmd_mmc=run bootargs_base bootargs_mmc;mmc dev 1;mmc read ${loadaddr} 0x800 0x2000;bootm 
+stdin=serial 
+stdout=serial 
+stderr=serial 
+  
+Environment size: 1114/8188 bytes 
+MX6Q SABRELITE U-Boot >
+
+
+[   26.121228] Sending DHCP requests ., OK
+[   26.141872] IP-Config: Got DHCP answer from 134.86.173.11, my address is 134.86.173.228
+[   26.150256] IP-Config: Complete:
+[   26.153584]      device=eth0, hwaddr=00:19:b8:00:f6:ea, ipaddr=134.86.173.228, mask=255.255.255.0, gw=134.86.173.254
+[   26.164169]      host=sabrelite-adk, domain=sje.mentorg.com, nis-domain=sje.mentorg.com
+[   26.172231]      bootserver=134.86.173.11, rootserver=134.86.173.5, rootpath=
+[   26.179209]      nameserver0=134.86.188.11, nameserver1=134.86.188.57
+[  121.242059] VFS: Unable to mount root fs via NFS, trying floppy.
+[  121.248529] VFS: Cannot open root device "nfs" or unknown-block(2,0): error -6
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Quoll webcams RTSP setup
+
+[achaiken@quoll linux-meibp (3.8fastmap)]$ dlocate v4lctl
+xawtv: /usr/bin/v4lctl
+
+[achaiken@quoll linux-meibp (3.8fastmap)]$ v4lctl -c /dev/video0 list
+attribute  | type   | current | default | comment
+-----------+--------+---------+---------+-------------------------------------
+norm       | choice | (null)  | (null)  |
+input      | choice | Camera  | Camera  | Camera 1
+bright     | int    |       0 |       0 | range is -64 => 64
+contrast   | int    |      13 |      13 | range is 0 => 30
+color      | int    |      38 |      38 | range is 0 => 127
+hue        | int    |       0 |       0 | range is -16000 => 16000
+White Bala | bool   | on      | on      |
+Gamma      | int    |     100 |     100 | range is 20 => 250
+Power Line | choice | 60 Hz   | 60 Hz   | Disabled 50 Hz 60 Hz
+White Bala | int    |    5000 |    5000 | range is 2800 => 6500
+Sharpness  | int    |      35 |      35 | range is 0 => 100
+Backlight  | int    |       0 |       0 | range is 0 => 1
+[achaiken@quoll linux-meibp (3.8fastmap)]$ v4lctl -c /dev/video1 list
+attribute  | type   | current | default | comment
+-----------+--------+---------+---------+-------------------------------------
+norm       | choice | (null)  | (null)  |
+input      | choice | Camera  | Camera  | Camera 1
+bright     | int    |       0 |       0 | range is -64 => 64
+contrast   | int    |      13 |      13 | range is 0 => 30
+color      | int    |      38 |      38 | range is 0 => 127
+hue        | int    |       0 |       0 | range is -16000 => 16000
+White Bala | bool   | on      | on      |
+Gamma      | int    |     100 |     100 | range is 20 => 250
+Power Line | choice | 60 Hz   | 60 Hz   | Disabled 50 Hz 60 Hz
+White Bala | int    |    5000 |    5000 | range is 2800 => 6500
+Sharpness  | int    |      35 |      35 | range is 0 => 100
+Backlight  | int    |       0 |       0 | range is 0 => 1

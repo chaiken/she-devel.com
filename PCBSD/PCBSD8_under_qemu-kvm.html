@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="keywords" content= "open source, free software,
+GPL, PCBSD, qemu, Linux, qemu-kvm, kvm, qemu-gl, virtualization" />
+<meta name="generator" content="GNU Emacs 23.2.1 (x86_64-redhat-linux-gnu, GTK+ Version 2.20.1) of 2010-05-13 on x86-07.phx2.fedoraproject.org"/>
+<link rel="icon" href="/images/she-devel_favicon_16.jpg" type= "image/png" />
+<link rel="stylesheet" href="chaiken.css" type="text/css"/>
+<title>PCBSD under qemu-kvm</title>
+</head>
+<body>
+<h1 class="title">Running PCBSD and MeeGo under qemu-kvm</h1>
+
+<div class="center">
+<p>Prepared by <a href="mailto:alchaiken@gmail.com">Alison Chaiken</a><br/>
+October 3, 2010<br/>
+Offered under <a href="http://creativecommons.org/licenses/by-sa/2.0/">cc-by-sa</a>.</p>
+</div>
+
+
+<div class="center">
+<img src="PCBSD_desktop.png" alt="PCBSD desktop in VM" height="400">
+ <div class="caption">
+   PCBSD desktop running under qemu-kvm on Fedora 13.
+ </div>
+</div>
+
+<h3>Motivation</h3>
+
+<p>The qemu emulator and kvm virtual machine are two of the hottest,
+  slickest technologies on the Linux platform.  The qemu-kvm
+  combination provides the user with significant support for hardware
+  virtualization.   An OS running under qemu-kvm can interact with
+  and even control devices installed in the host computer.</p>
+
+<p>Why would an ordinary desktop user who doesn't run a datacenter
+care about virtualization?   A few reasons are apparent to me:
+</p>
+
+<ol>
+<li>Virtualization is potentially an even more convenient route to test-driving
+  a new piece of software than a LiveCD.   For example, changes to the
+  virtual hard disk during a qemu-kvm session will be saved, meaning
+  that configurations and preferences need only be entered once.
+  Also, according to Chris Wright of RedHat, qemu-kvm should run at
+  80% of native speed, much faster than any LiveCD application.
+</li>
+
+<li>Unlike a LiveCD session, a qemu instance can run applications
+  meant for different hardware.    Cross-platform emulation, after
+  all, was the original purpose of qemu.
+</li>
+
+<li>A qemu-kvm session is contained in a regular desktop window, which
+  can be iconified, paused, sent signals, etc.  Thus a user can chat
+  using his/her regular IRC client in one window while running a
+  non-native OS in another.  As Greg Marsden pointed out in
+  a <a href="http://www.penlug.org/twiki/pub/Home/MeetingAgenda20100825/2010.08.25-PenLUG-Linux_Diagnostics.pdf">recent
+  presentation</a>, profiling and testing an OS running under qemu is
+  easier than when it's running on bare metal.
+</li>
+
+</ol>
+
+<h3>General instructions for qemu-kvm</h3>
+
+<pre>
+alison@tomales ;-) ifconfig virbr0
+virbr0    Link encap:Ethernet  HWaddr 6E:7E:E9:82:3F:0E  
+          inet addr:192.168.122.1  Bcast:192.168.122.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:11 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:2640 (2.5 KiB)
+</pre>
+
+<p>Begin by installing qemu, qemu-img, qemu-kvm and libvirt.  When
+  libvirtd is running, the virbr0 device is created.  (See above.)  In
+  order to have access to the network,
+  modify <a href="http://wiki.libvirt.org/page/Networking">/etc/sysctl.conf</a>
+  to allow NAT or bridged networking for your guest system.</p>
+
+<h3>How to get Qemu monitor</h3>
+
+<ul>
+
+<li>Ctrl-Alt-2 (all at once)</li>
+
+<li>How to switch back to graphical desktop: Ctrl-Alt-1</li>
+
+<li>How to get /dev/console:
+Ctrl-Alt-2 (switch to qemu monitor/console)<br/>
+sendkey ctrl-alt-f1 (switch screen 1 to /dev/console)<br/>
+Ctrl-Alt-1 (switch to screen 1 to view /dev/console)<br/>
+Ctrl-Alt-2 (switch back to qemu monitor/console)<br/>
+sendkey ctrl-alt-f9 (switch screen 1 back to graphical desktop)<br/>
+Ctrl-Alt-1 (switch to screen 1 to view graphical desktop)<br/>
+</li>
+</ul>
+
+<h3>Running MeeGo Netbook Image under qemu-gl using pre-built image</h3>
+
+<div class="center">
+<img src="MeeGoScreenshot.png" alt="MeeGo desktop in VM" height="400">
+ <div class="caption">
+   As befits a netbook OS, MeeGo takes up less screen real estate.
+ </div>
+</div>
+
+
+<p>Installation of the prebuilt MeeGo qemu image is almost too easy
+following
+the <a href="http://wiki.meego.com/MeeGo_SDK_with_QEMU#Setup_QEMU-based_MeeGo_Emulator">detailed
+instructions.</a>  Note the use of a special installation method for
+qemu-gl:
+
+<pre>
+sudo yum localinstall qemu-gl-0.12.4-5.1.i386-fc12.rpm --nogpgcheck
+</pre>
+
+<p>Also, on Fedora 13 I had to install libvirt in addition to the
+  packages specified on the MeeGo site.  libvirt is what provides
+  access to the network.  Some <a
+  href="http://wiki.libvirt.org/page/Networking">configuration of
+  libvirt</a> is necessary using virtsh.</p>
+
+<pre>
+sudo qemugl -name MeeGo -m 1024 -boot c -net nic,model=e1000 -net hostfwd=tcp:127.0.0.1:6666-:22 /
+-enable-kvm -vga std -enable-gl -device virtio-gl-pci -hda /
+/opt/meego/meego-netbook-ia32-1.0.80.12.20100727.1-sdk-pre0901.raw
+</pre>
+
+<p>The pre-built MeeGo image starts up remarkably quickly.  The fact
+  that the image is running the 2.6.35 kernel (as of October 2010) is
+  impressive, but instead of the much vaunted btrfs filesystem, the
+  prebuilt image has the creaky old ext3.  The chromium browser
+  segfaults, perhaps because without forwarding port 80 there's no HTTP connection.</p>
+
+<div class="center">
+<img src="MeeGoNetConnection.png" alt="MeeGo bridged network connection" height="400">
+ <div class="caption">
+With forwarding of port 22 and an active SSH connection, MeeGo VM reports UDP  and TCP connections.
+</div>
+ </div>
+
+<p>Ssh connections via 
+</p>
+
+<pre>
+ssh meego@127.0.0.1 -p 6666 
+</pre>
+
+<p>do work as the documentation suggests.</p>
+
+<h3>Running <a href="http://meego.com/downloads/releases/1.0.80.8/meego-handset-day1-developer-preview">MeeGo Handset Preview</a> under qemu</h3>
+
+<p><em>CORRECTION after <a href="http://conference2010.meego.com/">11/2010 MeeGoCon</a>: qflasher is in fact <a
+href="http://repo.meego.com/MeeGo/builds/trunk/daily/non-oss/repos/ia32/packages/i586/qflasher-21-1.1.i586.rpm">publicly
+available</a> without an IMEI, if challenging to find. (Thanks, <a href="http://meego.com/users/leinir">Leinir</a>!) See these <a
+href="http://comments.gmane.org/gmane.comp.handhelds.meego.devel/2807">helpful
+instructions</a>.</em> As far as I can make out, there's no way to
+boot even the <a
+href="http://repo.meego.com/MeeGo/releases/1.0/core/images/">"open"
+handset images</a> without owning an N900 and having access to a valid
+IMEI.  (The situation with the IVI images appears to be similar.)  The
+.ubiimg flash image is available but without the bootloader.  Without
+the bootloader or the qflasher utility, there's no way to create a
+bootable image.  Presumably access to these files is restricted
+because they contain propietary firmware for the Bluetooth, video and
+wireless.  Following the <a
+href="http://wiki.meego.com/ARM/Meego_on_Qemu">instructions</a> leads
+to the error message
+</p>
+
+<pre>
+qemu: fatal: Trying to execute code outside RAM or ROM at 0x00018020
+</pre>
+
+<p><em>NOTE: see CORRECTION above.</em> There is a qflasher <a
+href="http://repo.meego.com/MeeGo/builds/1.0.90/1.1.80.1.20101012.1/non-oss/repos/source/">source
+rpm available</a> but it doesn't create a qflasher executable.  As
+far as I can make out, users who want to test-drive the handset
+preview must build from source and use their own flash filesystem
+creator and bootloader to create a bootable image.  Even this option
+<a href="http://wiki.meego.com/Image_Creation">may not be
+available</a> to all users:
+</p>
+
+<pre>  
+Usage Requirements
+To be able to use MIC2, your host machine to run mic2 must have Intel(r) Atom(tm)
+or Intel(r) Core(tm) 2 CPU (support for SSSE3), this is a hard requirement (ARM image is exceptional)
+</pre>
+
+<h3>Running MeeGo Netbook Image under qemu-gl using installer</h3>
+
+<p>I also tried installing MeeGo using a method similar to PCBSD
+  (below).   First create a "hard disk":</p>
+
+<pre>
+alison@bonnet ;-) sudo qemu-img create -f raw /opt/meego/meego1.0-netbook.raw 4G
+Formatting '/opt/meego/meego1.0-netbook.raw', fmt=raw size=4294967296 
+
+alison@bonnet ;-) file /opt/meego/meego1.0-netbook.raw 
+/opt/meego/meego.raw: x86 boot sector; partition 1: ID=0x83, active,
+starthead 1, startsector 63, 512002 sectors; partition 2: ID=0x83,
+starthead 223, startsector 512065, 7349579 sectors; partition 3:
+ID=0x82, starthead 93, startsector 7861644, 524286 sectors, code
+offset 0xb8
+</pre>
+
+<p>Then run the installer from the "cdrom":</p>
+
+<pre>
+alison@bonnet ;-) sudo qemugl -m 1024 -enable-kvm -boot d -hda
+/opt/meego/meego1.0-netbook.raw -cdrom /opt/meego/meego-netbook-chromium-ia32-1.0-20100524.1.img -vga std -usb -net nic,model=e1000 -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name meego1.0-netbook -localtime
+</pre>
+
+
+<p>Then boot from the hard disk:</p>
+
+<pre>
+alison@bonnet ;-) sudo qemugl -name MeeGo -m 1024 -boot c -net nic,model=e1000 -enable-kvm -vga std -enable-gl -device virtio-gl-pci -hda /opt/meego/meego.raw -localtime -no-reboot
+</pre>
+
+<p>
+Unfortunately a lovely wallpaper comes up, but the image doesn't
+appear to boot all the way.
+</p>
+
+<h3>Set-up of PCBSD 8.1 under qemu-kvm</h3>
+
+<p>Note: requires at least <em>14 GB</em> of disk space.</p>
+
+<p>qemu-kvm has no man page, so use </p>
+
+<pre>qemu-kvm --help</pre>
+
+<p>Begin by downloading the 3.6
+  GB <a href="http://www.pcbsd.org/content/view/169/11/#DVD-64">PCBSD
+  8.1 iso image</a> to INSTALLDIR:</p>
+
+<pre>
+INSTALLDIR=/opt
+cd $INSTALLDIR
+wget ftp://mirrors.isc.org/pub/pcbsd/8.1/amd64/PCBSD8.1-x64-DVD.iso
+</pre>
+
+<p>Now create a virtual disk drive image for your new OS to use.
+  The PCBSD bootloader doesn't appear to recognize qemu's native
+  qcow2 format, so use raw.  Unfortunately, while a qcow2 image is
+  growable, the raw image is 10 GB in size immediately.   The PCBSD
+  installer demands a disk at least this large.
+</p>
+
+<pre>
+alison@tomales ;-) sudo qemu-img create -f raw $INSTALLDIR/pcbsd.raw 10G
+Formatting '//pcbsd.raw', fmt=raw size=10737418240
+alison@tomales ;-) file $INSTALLDIR/pcbsd.raw
+/opt/pcbsd.raw: x86 boot sector; partition 1: ID=0xee, active, starthead 1, startsector 1, 20971519 sectors, code offset 0x31
+</pre>
+
+<p>Now boot your ISO and begin the installation:</p>
+
+<pre>
+qemu-kvm --cdrom $INSTALLDIR/PCBSD8.1-x64-DVD.iso -hda //
+$INSTALLDIR/pcbsd.raw -boot d -m 4096 -vga std -name PCBSD8.1 //
+-localtime -no-reboot
+</pre>
+
+<p>Here we're provisioning the VM with 4 GB of memory, electing to
+  boot from the CDROM, choosing the standard VGA graphics driver and
+  telling the installer to write to the "disk" image pcbsd.raw.
+  Unless I specified the standard vga, the system defaulted to
+  "cirrus," which did not work.
+</p>
+
+<div class="center">
+<img src="PCBSDinstaller.png" alt="PCBSD installer">
+ <div class="caption">
+   The PCBSD installer starting up.
+ </div>
+</div>
+
+<p>Just wait and let the bootloader timeout so that the default
+  installer will run.  A series of choices will be presented as with
+  most Linux installers.  I elected to install all the options (jails,
+  krb, etc.) that were unfamiliar from Fedora 13 with Gnome.
+  Installation took about four hours on a dual-core AMD x86_64 system.
+  The interface in qemu has some oddities, notably that it's necessary
+  to move the cursor away from installer soft buttons to release them.
+  Apparently a button-up event doesn't occur when the mouse button is
+  released, only cursor is moved away.  Also, the qemu window will
+  grab the cursor and prevent it from being moved outside the VM
+  window.  To release the cursor, the user must press <em>and
+  release</em> the Ctrl-Alt keys.
+</p>
+
+<p>  When the installation is finished, open a terminal window using the
+  launcher in the lower left-hand corner and halt the machine using
+  the new root account.
+
+</p>
+
+<p>
+For subsequent boots, forget about the "cdrom" and boot
+directly from the new disk image:
+</p>
+
+<pre>
+qemu-kvm -snapshot -hda $INSTALLDIR/pcbsd.raw -boot c -m 4096 -usb //
+-soundhw all -net nic,model=e1000 -vga std -net //
+user,hostfwd=tcp:127.0.0.1:6666-:22 -name PCBSD8.1 -localtime //
+-no-reboot
+</pre>
+
+
+<div class="center">
+<img src="PCBSDbootloader.png" alt="PCBSD bootloader">
+ <div class="caption">
+   The bootloader with its options.
+ </div>
+</div>
+
+<p>
+For some reason, my PCBSD image is very slow, much slower than the
+MeeGo one.   I'm still investigating why this might be.
+</p>
+
+</body>
+</html>

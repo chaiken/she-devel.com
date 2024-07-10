@@ -1,0 +1,10 @@
+alison@bonnet ;-) sudo qemu-img create -f raw /opt/meego/meego.raw 4G
+Formatting '/opt/meego/meego.raw', fmt=raw size=4294967296 
+alison@bonnet ;-) file /opt/meego/meego.raw 
+/opt/meego/meego.raw: x86 boot sector; partition 1: ID=0x83, active, starthead 1, startsector 63, 512002 sectors; partition 2: ID=0x83, starthead 223, startsector 512065, 7349579 sectors; partition 3: ID=0x82, starthead 93, startsector 7861644, 524286 sectors, code offset 0xb8
+
+[runs the installer]
+alison@bonnet ;-) sudo qemugl -name MeeGo -m 1024 -boot d -net nic,model=e1000 -enable-kvm -vga std -enable-gl -device virtio-gl-pci --cdrom /opt/meego/meego-netbook-chromium-ia32-1.0-20100524.1.img -hda /opt/meego/meego.raw -localtime
+
+[boots new "hard disk" image]
+alison@bonnet ;-) sudo qemugl -name MeeGo -m 1024 -boot c -net nic,model=e1000 -enable-kvm -vga std -enable-gl -device virtio-gl-pci -hda /opt/meego/meego.raw -localtime -no-reboot

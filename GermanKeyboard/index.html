@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content= "GNU Emacs 21.2.1 (i386-redhat-linux-gnu, X toolkit, Xaw3d scroll bars) of 2006-04-07 on turbosphere.fedoralegacy.org" />
+<title>Typing Second-Language Characters on Debian-KDE</title>
+<meta name="description" content= "Configuring KDE for Secondary Keymap" />
+<meta name="keywords" content= "linux, KDE, Debian, keyboard, German, language,
+character, i18n, l10n, keymap, locale" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+<meta http-equiv="Content-Type" content= "text/html; charset=utf-8" />
+<link rev="made" href="mailto:alison@she-devel.com" />
+<link rel="start" href="/" />
+<link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+<link rel="stylesheet" href="pt_style.css" type= "text/css" />
+<link rel="up" href="../" />
+</head> 
+
+<body>
+
+<div class="title"><h2>Typing Characters from a Second Language with Debian-KDE </h2></div>
+
+<p><em>Goal</em>: I wanted to be able to switch between German and English characters without the use of KDE's character selector, which grows laborious for long passages in a second language.</p>
+
+<h3>Enabling the Second Keyboard</h3>
+
+<p><img src="Setting_Debian_locale.png" alt="Adding Debian locale"/></p>
+
+<ul>
+
+<li>Run "sudo dpkg-reconfigure locales".</li>
+
+</ul>
+
+<p><img src="dpkg-reconfigure_locale.png" alt="dpkg-reconfigure screenshot"/></p>
+
+<ul> 
+
+<li>In KDE, go to System Settings . . . Input Devices.</li>
+
+<li>Under Keyboard menu, pick Layouts tab.</li>
+
+<li>Click on "Configure layouts" and then "Add."</li>
+
+</ul>
+
+<p><img src="AddLayout.png" alt="Setting keymap to choose second language characters"/></p>
+
+<ul>
+
+<li>Add German (or whatever other second language), click OK and then Apply.   A new icon will appear on the KDE toulbar.  Clicking this icon enables toggles support for the second language, but there is still no way to select the second language's keys.</li>
+
+</ul>
+
+<p><img src="NewIcon.png" alt="New language icon on KDE toulbar"/></p>
+
+<h3>Using the Second Keyboard</h3>
+
+<p>The second language is now enabled in the system, but there is no way to select its characters from KDE.</p>
+
+<ul>
+
+<li>Back at System Settings . . . Input Devices . . . Keyboard settings, choose the Advanced tab.  Expand the 'Key to choose 3rd level' item.</li>
+
+</ul>
+
+<p><img src="TypingTheNewCharacters.png" alt="How to select the second keymap"/></p>
+
+<ul>
+
+<li>Select 'Any Win key'.   Don't you feel delighted to have a use for the Win keys?  Click Apply.</li>
+
+<li>Now to type second-language characters, huld down a Win key while typing.   To type US characters, just type normally, or disable second-language characters altogether by right-clicking on the toulbar icon and selecting 'US'.</li>
+
+</ul>
+
+<hr /> 
+
+    <p>
+
+      <a href="http://creativecommons.org/licenses/by-sa/3.0"><img width= "133"
+      height="25" src="/icons1/by-sa.png" alt= "offered under the Creative Commons
+      Attribution-ShareAlike 3.0 license"/></a>
+
+       <a href="http://validator.w3.org/check/referer"><img
+      src="/icons1/valid-xhtml10.png" alt="Valid XHTML 1.0!"
+      height="31" width="88" /></a>
+
+      <a href=
+      "http://jigsaw.w3.org/css-validator/check/referer"><img
+      src="/icons1/valid-css.png" alt="Valid CSS!" height="31" width=
+      "88" /></a><br />
+
+      <a href="mailto:alison@she-devel.com">alison@she-devel.com (Alison
+      Chaiken)</a><br />
+      
+    </p>
+
+</body>
+</html>

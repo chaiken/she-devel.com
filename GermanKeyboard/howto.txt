@@ -1,0 +1,25 @@
+How to get German and English keyboard layouts under Debian-KDE:
+
+Enabling the German Keyboard
+
+0. Run "sudo dpkg-reconfigure locales".
+
+1. In KDE, go to System Settings . . . Input Devices.
+
+2. Under Keyboard menu, pick Layouts tab.
+
+3. Click on "Configure layouts" and then "Add."
+
+4. Add German, click OK and then Apply.   A new icon will appear on the KDE toolbar.  Clicking this icon enables German language, but there is still no way to select German keys.
+
+Using the Germany Keyboard
+
+5.  Back at System Settings . . . Input Devices . . . Keyboard settings, choose the Advanced tab.  Expand the 'Key to choose 3rd level' item.
+
+6. Select 'Any Win key'.   Don't you feel delighted to have a use for the Win keys?  Click Apply.
+
+7. Now to type German characters, hold down a Win key while typing.   To type US characters, just type normally, or disable German characters altogether by right-clicking on the toolbar icon and selecting 'US'.
+
+
+
+

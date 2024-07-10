@@ -1,0 +1,4 @@
+#!/bin/bash
+ROOTDIR=/mnt/VMs/
+HDNAME=fedora-x86_64-bldr
+qemu-system-x86_64 --enable-kvm -boot c -hda ${ROOTDIR}/${HDNAME}.raw -m 4096 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ${HDNAME} -localtime

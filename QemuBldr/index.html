@@ -1,0 +1,296 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content= "the almighty emacs" />
+<title> Bringing up Qemu</title>
+<meta name="description" content= "Qemu networking on Linux" />
+<meta name="keywords" content= "linux, open source, free software,
+Qemu, KVM, Fedora, Debian, virtualization, container, lxc, docker,
+bridge network, libvirt" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+<meta http-equiv="Content-Type" content= "text/html; charset=utf-8" />
+<meta name="GENERATOR" content="GNU Emacs 23.2.1 (x86_64-redhat-linux-gnu, GTK+ Version 2.21.4) of 2010-07-08 on x86-10.phx2.fedoraproject.org"/>
+<link rev="made" href="mailto:alison@she-devel.com" />
+<link rel="start" href="/" />
+<link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+<link rel="stylesheet" href="/pt_style.css" type= "text/css" />
+<link rel="up" href="../" />
+</head> 
+
+<body> 
+<div class="title">Installing and running guest operating systems in Qemu on Linux</div>
+<hr /> 
+
+<div class="figure">
+<p>
+<img width= "1024" height="576" alt=""
+src="/images/Fedora_on_Debian.png"/></p>
+<p><em>Fedora GNOME desktop on top of Debian KDE desktop</em></p></div>
+
+<h2>Motivation</h2>
+
+<p>Would you like to try running the latest release of <a
+href="http://pcbsd.org/">PCBSD</a>? Or perhaps you want to check out
+<a href="http://freedesktop.org/wiki/Software/systemd">systemd</a> in the latest <a
+href="http://fedoraproject.org/wiki/Architectures/ARM/">Fedora-ARM</a>
+release?  Or maybe you need a clean build environment for packaging?
+Perhaps you want to learn to use gparted to repartition a disk, but
+don't want to practice on your real disk?
+
+<a href="http://wiki.qemu.org/">Qemu</a> is a simple and safe way to
+run a different operating system for your host architecture (with the
+<a href="http://wiki.qemu.org/KVM">KVM</a> hypervisor) or for a
+different one (plain Qemu without KVM).  In the first case, Qemu
+environments allow a much richer experience than live-booting a USB
+stick or CD.  In the cross-architecture case, Qemu is one of few
+open-source emulator alternatives.</p>
+
+<p>Right now, Docker is all the rage, but Docker is based on Linux's
+<a href="http://linuxcontainers.org/">lxc containers</a>.  Lxc
+containers share a kernel and thus do not allow cross-arch testing.
+On the other hand, Qemu virtual machines running a different kernel
+are much slower than containers.</p>
+
+<div class="figure">
+<p>
+<img width= "1024" height="576" alt=""
+src="/images/Virtual_and_real_CPUs.png"/></p>
+<p><em>Host's physical CPU and guest's virtual one differ</em>, as the "model
+name" strings from /proc/cpuinfo show.   Here the virtual CPU is
+single-core, unlike the quad core that the laptop possesses.   The
+vCPU can also have a different architecture than the host.</p></div>
+
+
+<h3>Disclaimer</h3>
+
+<p>There are probably better ways to perform the following steps than
+I outline here, and I'm happy to receive corrections or suggestions.
+These instructions have worked for me, and are distilled from a large
+amount of sometimes confusing and lengthy documentation.</p>
+
+<p><em>Note:</em> in what appears below, "hildesheim" is my laptop and
+"localhost" is the QEMU-encapsulated guest.</p>>
+
+<ol>
+
+<li><p><em>Install needed software packages</em></p>
+
+<p>On Debian Testing,</p>
+
+<pre>
+apt-get install dnsmasq-utils dnmasq resolvconf libvirt0 qemu qemu-kvm qemu-system-arm qemu-user bridge-utils libvirt-bin libvirt0
+</pre>
+
+</li>
+
+
+<li><p><em>Install the guest OS on a virtual disk</em></p>
+
+<p>Virtual machines are big fun!  But they can be space hogs.  I
+recommend installing them on an old spare drive mounted in a USB
+enclosure.</p>
+
+<p>Example: here's a bash script that uses an ISO image downloaded from fedoraproject.org to install Fedora 21 in a Qemu-kvm VM.   The "--enable-kvm" switch will work only if the host and image architectures are the same.   Similarly, qemu-system-x86_64 is for x86-on-x86 guests.</p>
+
+<pre>
+#!/bin/bash
+#run with "sudo -u alison ~alison/bin/install_Ubuntu_IVI_Qemu"
+#Without -u, xauth error:
+#"Could not initialize SDL(No available video device) - exiting"
+ROOTDIR=/mnt/VMs/
+ISO=Fedora-Live-Desktop-x86_64-20-1.iso
+HDNAME=fedora-x86_64-bldr
+sudo qemu-img create -f raw ${ROOTDIR}/${HDNAME}.raw 100G
+sudo chown alison ${ROOTDIR}/${HDNAME}.raw
+#installs from "cdrom" onto "hard disk a"
+qemu-system-x86_64 --enable-kvm --cdrom ${ROOTDIR}/${ISO} -boot d -hda ${ROOTDIR}/${HDNAME}.raw -m 2048 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ${HDNAME} -localtime -no-reboot 
+</pre>
+
+<p>The ROOTDIR is where the virtual disk of the VM is located.  Note that the script specifies a "raw" image of size 100 GB.   See the man page for qemu-img for more information.</p>
+
+<div class="figure">
+<p>
+<img width= "1024" height="576" alt=""
+src="/images/partitions_and_files.png"/></p>
+<p><em>Mounting virtual disk on host and examining its contents.</em>   Note
+the offset number 1048576 = (* 2048 512) to mount /boot and
+2672820224 = (* 5220352 512) to mount /. </p></div>
+
+<p>The figure above shows the default partition table and filesystems created
+by the Fedora installer.    Loop-mounting the .raw disk allows the
+user to create a different partition table before installation, or to
+directly copy files in and out of the VM without booting it.   Loop
+mounts are therefore useful for VM backup or cloning.
+</p>
+
+<p>The "chown" is necessary if you want to be able to boot the VM
+without root permission.   The "m" switch allocates memory from your
+host to the VM.   The "-no-reboot" allows switching from installer
+script above to the normal starter one below.</p>
+
+</li>
+
+<li><p><em>Run the guest OS</em></p>
+
+<pre>
+#!/bin/bash
+ROOTDIR=/mnt/VMs/
+HDNAME=fedora-x86_64-bldr
+qemu-system-x86_64 --enable-kvm -boot c -hda ${ROOTDIR}/${HDNAME}.raw -m 4096 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ${HDNAME} -localtime
+</pre>
+
+<p>Note that this script specifies 4 GB of virtual RAM while the one above specified 2 GB.   In fact these parameters are freely specifiable at boot time.   Similarly, features like audio or network can be changed at every boot.
+</p>
+</li>
+
+<li><p>Also see OpenEmbedded's fine <a
+href="http://openembedded.org/wiki/Testing_with_QEMU">Testing with
+QEMU</a> page, especially the runqemu command.</p></li>
+
+<li><p><em>Set up networking</em></p>
+
+<p>Reference: <a href="http://wiki.libvirt.org/page/Networking#Host_configuration">libvirt.org</a>.</p>
+
+<p>The option "-net user,hostfwd=tcp:127.0.0.1:6666-:22" means that
+port 22 on the guest is forwarded to port 6666 on the host.   Thus it
+is possible to remotely login to the guest from the host via sessions
+like: </p>
+
+<pre>
+ssh -p 6666 username@127.0.0.1
+username@127.0.0.1's password: 
+</pre>
+
+or from the guest to the host with
+
+<pre>
+ssh username@10.0.2.2
+</pre>
+
+<p>I don't know where "10.0.2.2" configuration is specified.</p>
+
+
+<p>Start by configuring the host machine to allow bridge networking.   Begin by installing the packages listed at the top of this page.   
+</p>
+
+<pre>
+[alison@localhost ~]$ sudo virsh net-define /etc/libvirt/qemu/networks/default.xml 
+error: Failed to define network from /etc/libvirt/qemu/networks/default.xml
+error: operation failed: network 'default' already exists with uuid a3f2e4f4-661c-41e9-9735-11866e62d29b
+
+[alison@localhost ~]$ sudo virsh net-autostart default
+Network default marked as autostarted
+
+[alison@localhost ~]$ sudo virsh net-start default
+Network default started
+</pre>
+
+<p>Now the virbr0 network interface is available from the host:</p>
+
+
+<pre>
+[alison@@hildesheim ~]$ ip addr list
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default 
+
+[ . . . ]
+
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+
+[ . . . ]
+
+3: wlan0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN group default qlen 1000
+
+[ . . . ]
+
+5: virbr0: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 82:7c:ac:76:38:75 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+
+
+[alison@@hildesheim ~] brctl show
+bridge name     bridge id               STP enabled     interfaces
+virbr0          8000.000000000000       yes
+</pre>
+
+<div class="figure">
+<p>
+<img width= "1024" height="576" alt=""
+src="/images/VM_networking.png"/></p>
+<p><em>Fedora guest interfaces and "yum update"</em></p></div>
+
+<p>Then set up packet-forwarding to the guest via the host:</p>
+
+<pre>
+[alison@hildesheim ~]$ sudo emacs -nw /etc/sysctl.conf
+# Uncomment the next line to enable packet forwarding for IPv4
+net.ipv4.ip_forward=1
+</pre>
+
+<p>
+And <a href="http://wiki.libvirt.org/page/Libvirtd_and_dnsmasq">set up
+the dnsmasq DNS server on host</a> by changing the global
+/etc/dnsmasq.conf as follows:
+</p>
+
+<p>Either:</p>
+
+<pre>
+interface=eth0
+</pre>
+
+<p>or</p>
+
+<pre>
+listen-address=192.168.0.1
+</pre>
+
+<p>
+(Replace interface or listen-address with the interfaces or addresses
+on which you want your global dnsmasq to answer.) Uncomment the
+following line to tell dnsmasq to only bind specific interfaces, not
+try to bind all interfaces:
+</p>
+
+<pre>
+bind-interfaces
+</pre>
+
+</li>
+</ol>
+
+<hr /> 
+
+
+
+<p></p>
+
+
+    <p>
+
+      <a href="http://creativecommons.org/licenses/by-sa/3.0"><img width= "133"
+      height="25" src="/icons1/by-sa.png" alt= "offered under the Creative Commons
+      Attribution-ShareAlike 3.0 license"/></a>
+
+
+      <a href="http://gnu.org/licenses/gpl.html"><img width= "83"
+      height="31" src="/icons1/gplv3-88x31.png" alt= "offered under
+      the Gnu Public License v3"/></a>
+
+       <a href="http://validator.w3.org/check/referer"><img
+      src="/icons1/valid-xhtml10.png" alt="Valid XHTML 1.0!"
+      height="31" width="88" /></a>
+
+      <a href=
+      "http://jigsaw.w3.org/css-validator/check/referer"><img
+      src="/icons1/valid-css.png" alt="Valid CSS!" height="31" width=
+      "88" /></a><br />
+
+      <a href="mailto:alison@she-devel.com">alison@she-devel.com (Alison
+      Chaiken)</a><br />
+      
+    </p>
+</body>
+
+</html>

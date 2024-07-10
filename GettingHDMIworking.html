@@ -1,0 +1,326 @@
+<html>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content= "HTML Tidy for NetBSD (vers 1st March
+2002), see www.w3.org" />
+<title>HDMI Out on Linux ExoPC Atom Slate</title>
+<meta name="description" content= "Alison Chaiken's embedded Linux web site" />
+<meta name="keywords" content= "linux, open source, free software,
+embedded" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+<meta http-equiv="Content-Type" content= "text/html; charset=utf-8" />
+<meta name="GENERATOR" content="GNU Emacs 23.2.1 (x86_64-redhat-linux-gnu, GTK+ Version 2.21.4) of 2010-07-08 on x86-10.phx2.fedoraproject.org"/>
+<link rev="made" href="mailto:alison@she-devel.com" />
+<link rel="start" href="/" />
+<link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+<link rel="stylesheet" href="/pt_style.css" type= "text/css" />
+<link rel="up" href="../" />
+</head> 
+
+<body>
+<div class="title"><h1>Getting HDMI Out Working on ExoPC Vibe</h1></div>
+
+<p>
+<img src="HDMI_projector_MeeGoIVI.jpg">
+Before fixing sync problem
+</p>
+
+<h3>Equipment</h3>
+
+<ol>
+
+<li><a href="http://wiki.meego.com/Devices/ExoPC">ExoPC Vibe Atom
+Slate</a> with N450 CPU and i915 graphics chip. (Thanks to Intel for
+the donation.) The ExoPC is based on the same Pegatron motherboard as the <a href="http://wetab.mobi/product/">WeTab slate</a>.</li>
+
+<li>Epson H361A projector</li>
+
+<li>HDMI to mini-HDMI cable</li>
+
+</ol>
+
+<h3>Resources</h3>
+
+<menu>
+
+<li><a
+href="http://build.meego.com/package/show?package=chrontel&project=home%3Abrendan">MeeGo
+Chrontel RPM</a> from Brendan Arfoll.  With a multiboot system, I simply
+copied the files Ubuntu needed from the MeeGo partition.</a></li>
+
+<li>instructions available from <a href="http://www.wetab-community.com/index.php?/topic/12074-hdmi-ausgang/">4Tiitoo</a>.</li>
+</menu>
+
+
+<h3>Instructions</h3>
+
+<ol>
+
+<li>Tested on: <a href="http://wiki.meego.com/In-vehicle">MeeGo-IVI 1.2.0.5</a> and stock Ubuntu 11.10 both running ubuntu
+3.0.0-12-generic kernel:
+
+<p>[alison@meego-ivi hdmi_out]$ uname -a<br/>
+Linux meego-ivi.exerciseforthereader.org 3.0.0-12-generic #20-Ubuntu SMP Fri Oct 7 14:50:42 UTC 2011 i686 i686 i386 GNU/Linux</p>
+</li>
+
+<li>MeeGo: sudo rpm -ivh chrontel-1.0-2.1.i586.rpm<br/>
+Ubuntu: copy files from RPM-based machine after extracting
+</li>
+
+<li>Plug Epson H361A projector into ExoPC using HDMI to mini-HDMI cable.  
+   Samsung SyncMaster 740B DVI monitor with HDMI-DVI adapter does not work:<br/>
+
+<pre>
+	EDID data not valid: Ignore HPD since EDID not valid just after firmware load
+	Could not find a useful resolution. Maybe hardware problem.
+</pre>
+
+This problem is likely fixable by using <a
+href="http://www.polypux.org/projects/read-edid/">read-edid</a> to
+discover correct display settings.    MeeGo didn't have the needed libx86.so.1, so I copied it from the Ubuntu partition.
+</li>
+
+<li>sudo modprobe -i i2c-i801<br/>
+which creates /dev/hdmi:<br/>
+<pre>
+   lrwxrwxrwx 1 root root 6 2011-12-23 02:34 /dev/hdmi -> i2c-14
+</pre>
+</li>
+
+<li>sudo modprobe -i i2c-dev</li>
+
+<li>Check drivers:
+<pre>
+lsmod | grep i2c
+
+   i2c_i801               17346  0 
+   i2c_dev                13199  0 
+   i2c_algo_bit           13199  1 i915
+</pre>
+</li>
+
+<li>sudo /usr/bin/tiitoo-hdmi.sh</l>
+
+<li>Projector should now show the expected image.</li>
+
+</ol>
+
+<h3>Notes</h3>
+
+<p>What's in the chrontel rpm?</p>
+
+<pre>
+   rpm -qil chrontel
+
+    Name        : chrontel                     Relocations: (not relocatable)
+    Version     : 1.0                               Vendor: meego
+    Release     : 2.1                           Build Date: Mon 15 Aug 2011 04:52:56 PM EEST
+    Install Date: Thu 22 Dec 2011 10:39:05 PM EET      Build Host: build18
+    Group       : System/Daemon                 Source RPM: chrontel-1.0-2.1.src.rpm
+    Size        : 84225                            License: Public Domain
+    Signature   : DSA/SHA1, Mon 15 Aug 2011 04:53:04 PM EEST, Key ID 0bc7bec479fc1f8a
+    Summary     : Control Tool for Chrontel CH7036 HDMI chip
+    Description :
+    Control Tool from Google Chromium Project for Chrontel CH7036 HDMI chip
+    /etc/dbus-1/system.d/com.tiitoo.HDMI.conf
+    /etc/modprobe.d/chrontel_i2c.conf
+    /etc/udev/rules.d/10-kernel-chrontel.rules
+    /etc/xdg/autostart/tiitoo-hdmi.desktop
+    /lib/firmware/chrontel/fw7036.bin
+    /usr/bin/tiitoo-hdmi-daemon
+    /usr/bin/tiitoo-hdmi.sh
+</pre>
+
+<p>What's the 7306 chip? From spectrah.com:</p>
+
+<p>Chrontel 7306 is an SDVO ADD2 card that plugs in PCIe and receives
+SDVO signals from mainboards integrated in Intel SDVO chipsets like
+945G/965G and also transfer SDVO signal to digital signals for LCD
+panels.
+</p>
+
+<p> and Wikipedia:</p>
+
+<p>Wikipedia: Serial Digital Video Out is a proprietary Intel technology
+introduced with their 9xx-series of motherboard chipsets.  SDVO makes
+it possible to use a 16-line PCIe slot add additional video signalling
+interfaces such as VGA and DVI monitor outputs, SDTV and HDTV
+television outputs, or TV tuner inputs to a system board containing an
+integrated Intel 9xx-series graphics processor.  SDVO adapters are
+variously designated as ADD2 (advanced digital display, 2nd
+generation)
+</p>
+
+
+<p>The i801 chip provides the System Management Bus, which sits on PCI:</p>
+
+<pre>
+grep i801 /var/log/messages:
+Dec 23 02:34:18 meego-ivi klogd: [ 2467.442742] i801_smbus 0000:00:1f.3: PCI INT C -> GSI 18 (level, low) -> IRQ 18
+</pre>
+
+<p>lshw output about SMBus:</p>
+<pre>
+        *-serial
+             description: SMBus
+             product: 82801H (ICH8 Family) SMBus Controller
+             vendor: Intel Corporation
+             physical id: 1f.3
+             bus info: pci@0000:00:1f.3
+             version: 04
+             width: 32 bits
+             clock: 33MHz
+             configuration: driver=i801_smbus latency=0
+             resources: irq:18 memory:fe404000-fe4040ff ioport:f000(size=32)
+</pre>
+
+<p>xrandr output isn't changed by kernel driver loading:</p>
+
+<pre>
+    Screen 0: minimum 320 x 200, current 1366 x 768, maximum 4096 x 4096
+    LVDS1 connected 1366x768+0+0 (normal left inverted right x axis y axis) 256mm x 144mm
+    1366x768       60.0*+
+    1024x768       60.0  
+    800x600        60.3     56.2  
+    640x480        59.9  
+    VGA1 disconnected (normal left inverted right x axis y axis)
+</pre>
+
+<p>tiitoo-hdmi-daemon produces verbose output:</p>
+
+<pre>
+Simple mixer control 'IEC958',0
+  Capabilities: pswitch pswitch-joined penum
+  Playback channels: Mono
+  Mono: Playback [on]
+Simple mixer control 'IEC958 Default PCM',0
+  Capabilities: pswitch pswitch-joined penum
+  Playback channels: Mono
+  Mono: Playback [on]
+[alison@meego-ivi ~]$ Found device ID 0x56
+Found revision ID 0x81
+Mode 1366x768 (43)
+1366x768, dot clock 76850000  -Hsync -Vsync
+H: start 1414, end 1446, skew 0, total 1560
+V: start 771, end 783, total 821
+State: 0
+Firmware size = 3295 bytes.
+State: 2
+State: 3
+---------------- BASE EDID RAW DATA ---------------------
+ 0x0000:  00 ff ff ff ff ff ff 00 4c a3 03 a6 01 01 01 01 
+ 0x0010:  26 14 01 03 80 a0 5a 78 0a de 50 a3 54 4c 99 26 
+ 0x0020:  0f 50 54 21 08 00 a9 40 90 40 81 80 81 40 81 c0 
+ 0x0030:  01 01 01 01 01 01 02 3a 80 18 71 38 2d 40 58 2c 
+ 0x0040:  45 00 40 84 63 00 00 1e 9e 20 00 90 51 20 1f 30 
+ 0x0050:  48 80 36 00 40 84 63 00 00 1c 00 00 00 fd 00 17 
+ 0x0060:  55 0f 5c 11 00 0a 20 20 20 20 20 20 00 00 00 fc 
+ 0x0070:  00 45 50 53 4f 4e 20 50 4a 0a 20 20 20 20 01 a6 
+---------------- Extended EDID RAW DATA ---------------------
+ 0x0080:  02 03 28 f6 51 90 1f 20 22 05 14 04 13 03 02 12 
+ 0x0090:  11 07 06 16 15 01 23 09 07 07 83 01 00 00 66 03 
+ 0x00a0:  0c 00 10 00 80 e2 00 fd 01 1d 80 18 71 1c 16 20 
+ 0x00b0:  58 2c 25 00 40 84 63 00 00 9e 01 1d 80 d0 72 1c 
+ 0x00c0:  16 20 10 2c 25 80 40 84 63 00 00 9e 01 1d 00 72 
+ 0x00d0:  51 d0 1e 20 6e 28 55 00 40 84 63 00 00 1e 8c 0a 
+ 0x00e0:  d0 8a 20 e0 2d 10 10 3e 96 00 40 84 63 00 00 18 
+ 0x00f0:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 3a 
+-------------------- EDID information --------------------------
+Manufacturer ID SEC, product ID 0xa603
+Manufactured wk 38 of 2010. Edid version 1.3
+Input: digital, vid level 0, Blank to black, Separate Composite On-green Serration V sync, 160x90cm, Gamma 2.200000
+Features:    colour non-std-cspace preferred-timing default-GTF
+Established Timing:
+640x480@60
+800x600@60
+1024x768@60
+Standard timing:
+0: 1600x1200@60
+1: 1400x1050@60
+2: 1280x1024@60
+3: 1280x960@60
+4: 1280x720@60
+Descriptor blocks:
+1920x1080p@60.00, dot clock 148500000  +Hsync +Vsync
+H: start 2008, end 2052, total 2200
+V: start 1084, end 1089, total 1125
+Size 1600x900mm, Border 0x0 pixels
+1280x800p@59.81, dot clock 83500000  -Hsync +Vsync
+H: start 1352, end 1480, total 1680
+V: start 803, end 809, total 831
+Size 1600x900mm, Border 0x0 pixels
+Range V 23 - 85 Hz, H 15 - 92 kHz, Pel <= 170 MHz
+Name: EPSON PJ
+EDID contains 1 extensions
+Found CEA EDID Timing Extension rev 3
+Block has 6 DTDs starting at offset 40 (thus 36 bytes of DBCs)
+Support: underscan, basic audio, YCrCb 4:4:4, YCrCb 4:2:2
+Video: Code 16 (native)
+Video: Code 31 
+Video: Code 32 
+Video: Code 34 
+Video: Code 5 
+Video: Code 20 
+Video: Code 4 
+Video: Code 19 
+Video: Code 3 
+Video: Code 2 
+Video: Code 18 
+Video: Code 17 
+Video: Code 7 
+Video: Code 6 
+Video: Code 22 
+Video: Code 21 
+Video: Code 1 
+Audio: 1 channel LPCM: 48k 44k 32k 24-bit 20-bit 16-bit
+Speakers: Front L/R 
+HDMI Vendor block (CEC @0x0010):
+Support: AI 
+Max TMDS Frequency 1130MHz
+Unknown Data Block with type tag 0x7, length 0x2
+1920x540i@60.05, dot clock 74250000  +Hsync +Vsync
+H: start 2008, end 2052, total 2200
+V: start 542, end 547, total 562
+Size 1600x900mm, Border 0x0 pixels
+1920x540i@50.04, dot clock 74250000  +Hsync +Vsync
+H: start 2448, end 2492, total 2640
+V: start 542, end 547, total 562
+Size 1600x900mm, Border 0x0 pixels
+1280x720p@60.00, dot clock 74250000  +Hsync +Vsync
+H: start 1390, end 1430, total 1650
+V: start 725, end 730, total 750
+Size 1600x900mm, Border 0x0 pixels
+720x480p@59.94, dot clock 27000000  -Hsync -Vsync
+H: start 736, end 798, total 858
+V: start 489, end 495, total 525
+Size 1600x900mm, Border 0x0 pixels
+Undecoded descriptor block type 0x0
+Undecoded descriptor block type 0x0
+----------------------------------------------------------------
+------------------------------------------------------------------
+Resolution choosen because: preferred/native resolution requested in EDID
+GenTableCH7036 Timing of external Display timing set to:
+    148500,
+    0x10000,
+    1, 1, 1,
+    2200, 1920, 88, 44, 1125, 1080, 4, 5,
+    0x0000,
+GenTableCH7036 Timing of internal Display timing set to:
+    76850,
+    0x00000,
+    0, 0, 1,
+    1560, 1366, 48, 32, 821, 768, 3, 12,
+    0x0000,
+Restore defaults:
+... Restored 0 registers
+Program registers:
+Change SDTIME1 from 0x20 to 0x20
+CH7036Control:speakerOff(): Error: Couldn't set volume:  "The name com.tiitoo.SystemInfo was not provided by any .service files" 
+CH7036Control:speakerOff(): oldVolume: 0 
+Sound is On
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+#
+# Default  Bacula File Daemon Configuration file
+#
+#  For Bacula release 7.0.6 (21 November 2014) -- debian 8.2
+#
+# There is not much to change here except perhaps the
+# File daemon Name to
+#
+
+#
+# List Directors who are permitted to contact this File daemon
+#
+Director {
+  Name = bonnet-dir
+#matches Client node in bacula-dir.conf
+  Password = "suppressed"          # password for FileDaemon
+}
+
+#
+# Restricted Director, used by tray-monitor to get the
+#   status of the file daemon
+#
+Director {
+  Name = bonnet-mon
+  Password = "suppressed"
+  Monitor = yes
+}
+
+#
+# "Global" File daemon configuration specifications
+#
+FileDaemon {                          # this is me
+  Name = hildesheim-fd
+  FDport = 9102                  # where we listen for the director
+  WorkingDirectory = /usr/local/bacula/bin/working
+  Pid Directory = /usr/local/bacula/bin/working
+  Maximum Concurrent Jobs = 2
+# Plugin Directory = /usr/lib
+}
+
+# Send all messages except skipped files back to Director
+Messages {
+  Name = Standard
+  director = bonnet-dir = all, !skipped, !restored
+}

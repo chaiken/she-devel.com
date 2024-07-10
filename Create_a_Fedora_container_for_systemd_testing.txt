@@ -1,0 +1,272 @@
+***THIS IS A GRIEVOUS HACK. Follow Debian container instructions in
+Create_a_Fedora_container_for_systemd_testing.txt instead.***
+
+0. "machinectl pull" not yet supported on Debian Testing (as of Aug 2015):
+
+[alison@localhost tmp]$ sudo machinectl pull-raw  http://download.fedoraproject.org/pub/fedora/linux/releases/22/Cloud/x86_64/Images/Fedora-Cloud-Base-22-20150521.x86_64.raw.xz fedora
+Failed transfer image: The name org.freedesktop.import1 was not provided by any .service files
+
+
+1. Fallback to wget.   Takes ~ 15 minutes 
+
+[alison@localhost tmp]$ cd /tmp; wget http://download.fedoraproject.org/pub/fedora/linux/releases/22/Cloud/x86_64/Images/Fedora-Cloud-Base-22-20150521.x86_64.raw.xz
+
+2. su; cd /var/lib/machines (won't work with sudo)
+
+3. unxz /tmp/Fedora-Cloud-Base-22-20150521.x86_64.raw.xz
+
+(May need to install xz-utils package first.)
+
+     [alison@bonnet ~]$ sudo machinectl show-image fedora
+     Name=fedora
+     Path=/var/lib/machines/fedora
+     Type=directory
+     ReadOnly=no
+     Usage=18446744073709551615
+     Limit=18446744073709551615
+     UsageExclusive=18446744073709551615
+     LimitExclusive=18446744073709551615
+
+4. Build systemd from source:
+
+   git clone https://github.com/systemd/systemd.git
+   cd systemd
+   ./autogen.sh
+   ./configure CFLAGS='-g -O0 -ftrapv' --enable-compat-libs --enable-kdbus --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib  --with-rootprefix=/ --with-rootlibdir=/lib
+   make
+
+5. 'Install' the newly compiled systemd-container features by consulting systemd-container.install script at
+
+   http://anonscm.debian.org/cgit/pkg-systemd/systemd.git/commit/?id=9191dc92c
+
+Perform same steps manually:
+
+   sudo cp systemd-import /lib/systemd/
+   sudo cp systemd-pull /lib/systemd
+   sudo cp units/org.freedesktop.import1.busname /lib/systemd/system
+   sudo ln -s /lib/systemd/system/org.freedesktop.import1.busname /lib/systemd/system/busnames.target.wants/
+   sudo cp src/import/org.freedesktop.import1.conf /etc/dbus-1/system.d
+   sudo cp src/import/org.freedesktop.import1.service /usr/share/dbus-1/system-services/
+
+6.  It works!
+
+    [alison@localhost ]$ sudo machinectl list-images
+    NAME                                 TYPE      RO  USAGE  CREATED MODIFIED                   
+    Fedora-Cloud-Base-22-20150521.x86_64 raw       no  516.6M n/a     Thu 2015-05-21 17:13:18 PDT
+
+    [alison@localhost systemd (master)]$ sudo systemd-nspawn -M Fedora-Cloud-Base-22-20150521.x86_64
+    Spawning container Fedora-Cloud-Base-22-20150521.x86_64 on /var/lib/machines/Fedora-Cloud-Base-22-20150521.x86_64.raw.
+
+    [root@Fedora-Cloud-Base-22-20150521 ~]# cat /etc/os-release
+    NAME=Fedora
+    VERSION="22 (Twenty Two)"
+    ID=fedora
+    VERSION_ID=22
+    PRETTY_NAME="Fedora 22 (Twenty Two)"
+    CPE_NAME="cpe:/o:fedoraproject:fedora:22"
+    HOME_URL="https://fedoraproject.org/"
+    VARIANT="Cloud Edition"
+    VARIANT_ID=cloud
+
+
+7. Add another user:
+
+   [root@Fedora-Cloud-Base-22-20150521 ~]# adduser jack
+   [root@Fedora-Cloud-Base-22-20150521 ~]# passwd jack
+     Changing password for user jack.
+
+8. Add user to systemd-journal group:
+
+   [root@Fedora-Cloud-Base-22-20150521 ~]# usermod -a -G systemd-journal jack
+
+9. Boot machine (takes several minutes):
+
+   [alison@localhost]$ sudo systemd-nspawn -bM Fedora-Cloud-Base-22-20150521.x86_64
+   Spawning 
+   Detected virtualization systemd-nspawn.
+   Detected architecture x86-64.
+
+   Welcome to Fedora 22 (Twenty Two)!
+
+   Set hostname to <localhost.localdomain>.
+   Failed to install release agent, ignoring: File exists
+   Overwriting existing symlink /run/systemd/generator.late/network.service with real service
+   Overwriting existing symlink /run/systemd/generator.late/netconsole.service with real service
+   Running in a container, ignoring fstab device entry for /dev/disk/by-uuid/01bc7316-b1f4-45c9-a23a-00c5a2336ef2.
+   Configuration file /usr/lib/systemd/system/auditd.service is marked world-inaccessible. This has no effect as configuration data is accessible via APIs without restrictions. Proceeding anyway.
+   Cannot add dependency job for unit tmp.mount, ignoring: Unit tmp.mount is masked.
+   [  OK  ] Reached target Remote File Systems.
+   [  OK  ] Reached target Swap.
+   [  OK  ] Created slice Root Slice.
+   [  OK  ] Listening on Journal Socket (/dev/log).
+   [  OK  ] Created slice System Slice.
+   [  OK  ] Created slice system-getty.slice.
+   [  OK  ] Created slice User and Session Slice.
+   [  OK  ] Reached target Slices.
+   [  OK  ] Reached target Encrypted Volumes.
+   [  OK  ] Listening on Delayed Shutdown Socket.
+   [  OK  ] Listening on /dev/initctl Compatibility Named Pipe.
+   [  OK  ] Listening on Journal Socket.
+   Starting Remount Root and Kernel File Systems...
+   Mounting Huge Pages File System...
+   Starting Journal Service...
+   Mounting POSIX Message Queue File System...
+   Mounting FUSE Control File System...
+   [  OK  ] Mounted POSIX Message Queue File System.
+   [  OK  ] Mounted Huge Pages File System.
+   [  OK  ] Mounted FUSE Control File System.
+   systemd-remount-fs.service: main process exited, code=exited, status=1/FAILURE
+   [FAILED] Failed to start Remount Root and Kernel File Systems.
+   See "systemctl status systemd-remount-fs.service" for details.
+   Unit systemd-remount-fs.service entered failed state.
+   systemd-remount-fs.service failed.
+   Starting Configure read-only root support...
+   [  OK  ] Reached target Local File Systems (Pre).
+   Starting Show Plymouth Boot Screen...
+   [  OK  ] Started Journal Service.
+   Starting Flush Journal to Persistent Storage...
+   [  OK  ] Started Configure read-only root support.
+   [  OK  ] Reached target Local File Systems.
+   Starting Tell Plymouth To Write Out Runtime Data...
+   Starting Restore /run/initramfs on shutdown...
+   Starting Load/Save Random Seed...
+   [  OK  ] Started Restore /run/initramfs on shutdown.
+   [  OK  ] Started Show Plymouth Boot Screen.
+   [  OK  ] Started Load/Save Random Seed.
+   [  OK  ] Reached target Paths.
+   [  OK  ] Started Tell Plymouth To Write Out Runtime Data.
+   [  OK  ] Started Flush Journal to Persistent Storage.
+   Starting Create Volatile Files and Directories...
+   [  OK  ] Started Create Volatile Files and Directories.
+   Starting Security Auditing Service...
+   [  OK  ] Started Security Auditing Service.
+   Starting Update UTMP about System Boot/Shutdown...
+   [  OK  ] Started Update UTMP about System Boot/Shutdown.
+   [  OK  ] Reached target System Initialization.
+   [  OK  ] Listening on D-Bus System Message Bus Socket.
+   [  OK  ] Reached target Sockets.
+   [  OK  ] Reached target Timers.
+   [  OK  ] Reached target Basic System.
+   [  OK  ] Started D-Bus System Message Bus.
+   Starting D-Bus System Message Bus...
+   Starting Login Service...
+   Starting Initial cloud-init job (pre-networking)...
+   Starting LSB: Bring up/down networking...
+   Starting dnf makecache...
+   Starting Cleanup of Temporary Directories...
+   [  OK  ] Started Login Service.
+   [  OK  ] Started Cleanup of Temporary Directories.
+   [2236540.050600] cloud-init[38]: Cloud-init v. 0.7.6 running 'init-local' at Fri, 28 Aug 2015 06:04:59 +0000. Up 2236540.01 seconds.
+   [  OK  ] Started dnf makecache.
+   [  OK  ] Started Initial cloud-init job (pre-networking).
+   [  OK  ] Started LSB: Bring up/down networking.
+
+
+   Ooops, fails: 
+   [2236316.063703] cloud-init[285]: 2015-08-28 06:01:13,560 - url_helper.py[WARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' failed [50/120s]: request error [HTTPConnectionPool(host='169.254.169.254', port=80): Max retries exceeded with url: /2009-04-04/meta-data/instance-id (Caused by ConnectTimeoutError(<requests.packages.urllib3.connection.HTTPConnection object at 0x7f34c3c72650>, 'Connection to 169.254.169.254 timed out. (connect timeout=50.0)'))]
+
+   Ah, kill openconnect, try again!
+   
+   [  OK  ] Reached target Network is Online.
+   Starting Initial cloud-init job (metadata service crawler)...
+
+   [2236799.584022] cloud-init[275]: 2015-08-28 06:09:18,921 - DataSourceCloudStack.py[CRITICAL]: Giving up on waiting for the metadata from ['http://10.0.2.2/latest/meta-data/instance-id'] after 126 seconds
+   Starting Hostname Service...
+   [  OK  ] Started Hostname Service.
+   [  OK  ] Started Initial cloud-init job (metadata service crawler).
+   Starting Permit User Sessions...
+   [  OK  ] Reached target Cloud-config availability.
+   Starting Apply the settings specified in cloud-config...
+   Starting OpenSSH Server Key Generation...
+   [  OK  ] Started Permit User Sessions.
+   Starting Terminate Plymouth Boot Screen...
+   Starting Wait for Plymouth Boot Screen to Quit...
+   [  OK  ] Started Command Scheduler.
+   Starting Command Scheduler...
+   [2236800.328470] cloud-init[316]: Cloud-init v. 0.7.6 running 'modules:config' at Fri, 28 Aug 2015 06:09:19 +0000. Up 2236800.24 seconds.
+   [2236800.818278] cloud-init[360]: Cloud-init v. 0.7.6 running 'modules:final' at Fri, 28 Aug 2015 06:09:20 +0000. Up 2236800.73 seconds.
+   ci-info: no authorized ssh keys fingerprints found for user fedora.
+   [2236800.831668] cloud-init[360]: ci-info: no authorized ssh keys fingerprints found for user fedora.
+   <14>Aug 28 06:09:20 ec2:
+   <14>Aug 28 06:09:20 ec2: #############################################################
+   <14>Aug 28 06:09:20 ec2: -----BEGIN SSH HOST KEY FINGERPRINTS-----
+   <14>Aug 28 06:09:20 ec2: 256 SHA256:MRzjK4u9F25jDImC6W/K11eOcAYk8CQfQHcADlLtN/Y /etc/ssh/ssh_host_ecdsa_key.pub (ECDSA)
+   <14>Aug 28 06:09:20 ec2: 256 SHA256:Bp/ZAqvNyAc8bmMAJBAZ42jVC3wvcHkhNuL0D+7fIV4 /etc/ssh/ssh_host_ed25519_key.pub (ED25519)
+   <14>Aug 28 06:09:20 ec2: 2048 SHA256:2NC5ueJPYXsnSOr47aZyJX0hVg/M9V9QPLREgADk0Bo /etc/ssh/ssh_host_rsa_key.pub (RSA)
+   <14>Aug 28 06:09:20 ec2: -----END SSH HOST KEY FINGERPRINTS-----
+   <14>Aug 28 06:09:20 ec2: #############################################################
+   -----BEGIN SSH HOST KEY KEYS-----
+   ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLy6wm9h0bPzsPYViEQ5y+RbogizkzzRt3aTSfR293Dtz6F7rEi9mvA05t7UVreqSxqO9RG4vfMrE7csVAhcuso=
+   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDLR9GFZthdFzexOH9CCr/bX+IhHre/Xk6L/HjlRIqfA
+   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA38ebqLdhlEPfZUJCXFKhGM7rp5JhKlun8NASxJpLoQXhRhCbG/yKSjy8R/dfuMs4HzbRpbyFdB+PYlWEklQnq/0OH4bhXRafJYB7ceERSObzLBsQzs6tVt8upNp3QNoeW+vp+Pra7sDw8RoZrYHSTsx2xZ1XAXqh/wcrjqtHP+TvsL/bWAWDtdzbh4NRlPpaWbJFbu4O3YAfBUfUmoIBTR+gbpbOjroQ5N2upjn6escZuj19T6Uy8nzdu6AW1PGqeME+UP5Wb+9u/fMISqq+yNytKDy5vfB1MgzEGmFdHOTGF0PcDiNcBmWfspw2rUsUF3WCyhiQAIU8XGZyQD7P
+   -----END SSH HOST KEY KEYS-----
+   [2236800.862141] cloud-init[360]: 2015-08-28 06:09:20,199 - templater.py[WARNING]: Cheetah not available as the default renderer for unknown template, reverting to the basic renderer.
+   [2236800.863247] cloud-init[360]: Cloud-init v. 0.7.6 finished at Fri, 28 Aug 2015 06:09:20 +0000. Datasource DataSourceNone.  Up 2236800.86 seconds
+   [2236800.863452] cloud-init[360]: 2015-08-28 06:09:20,200 - cc_final_message.py[WARNING]: Used fallback datasource
+
+   Fedora release 22 (Twenty Two)
+   Kernel 4.0.0-2-amd64 on an x86_64 (console)
+
+   localhost login: jack
+   Password:
+   [jack@localhost ~]$ systemctl status
+   ● localhost.localdomain.localdomain
+   State: degraded
+   Jobs: 0 queued
+   Failed: 2 units
+   Since: Fri 2015-08-28 06:04:58 UTC; 6min ago
+   CGroup: /machine.slice/machine-Fedora\x2dCloud\x2dBase\x2d22\x2d20150521.x86_64.scope
+   ├─1 /usr/lib/systemd/systemd
+   ├─system.slice
+   │ ├─dbus.service
+   │ │ └─36 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+   │ ├─crond.service
+   │ │ └─320 /usr/sbin/crond -n
+   │ ├─systemd-journald.service
+   │ │ └─15 /usr/lib/systemd/systemd-journald
+   │ ├─systemd-logind.service
+   │ │ └─37 /usr/lib/systemd/systemd-logind
+   │ └─network.service
+   │   └─198 /sbin/dhclient -H localhost -q -lf /var/lib/dhclient/dhclient--eth0.lease -pf /var/run/dhc
+   └─user.slice
+   └─user-1000.slice
+   ├─user@1000.service
+   │ ├─378 /usr/lib/systemd/systemd --user
+   │ └─379 (sd-pam)
+   └─session-4454.scope
+   ├─325 login -- jack
+   ├─381 -bash
+   ├─405 systemctl status
+   └─406 less
+
+   [jack@localhost ~]$
+
+
+10. Render system usable!
+
+    [root@Fedora-Cloud-Base-22-20150521 ~]# dnf install emacs
+    Fedora 22 - x86_64 - Updates                                                   545 kB/s |  14 MB     00:25 
+
+    [ . . . ]
+
+    Complete!
+    [root@Fedora-Cloud-Base-22-20150521 ~]#
+
+11. Add new user to /etc/sudoers and change /etc/hostname.
+
+12. Login again.   sudo works, but sshd fails:
+
+-- Unit sshd.service has begun starting up.
+Aug 28 06:25:18 fedoracloud.localhost.localdomain sshd[336]: error: Bind to port 22 on 0.0.0.0 failed: Address already in use.
+Aug 28 06:25:18 fedoracloud.localhost.localdomain sshd[336]: error: Bind to port 22 on :: failed: Address already in use.
+Aug 28 06:25:18 fedoracloud.localhost.localdomain sshd[336]: fatal: Cannot bind any address.
+Aug 28 06:25:18 fedoracloud.localhost.localdomain systemd[1]: sshd.service: main process exited, code=exited, status=255/n/a
+Aug 28 06:25:18 fedoracloud.localhost.localdomain systemd[1]: Unit sshd.service entered failed state.
+
+13. Login from a second terminal to booted container:
+
+   [alison@localhost]$ sudo machinectl login Fedora-Cloud-Base-22-20150521.x86_64
+   Connected to machine Fedora-Cloud-Base-22-20150521.x86_64. Press ^] three times within 1s to exit session.
+   Fedora release 22 (Twenty Two)
+   Kernel 4.0.0-2-amd64 on an x86_64 (pts/1)
+   fedoracloud login: 

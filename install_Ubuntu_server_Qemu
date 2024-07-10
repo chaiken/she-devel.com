@@ -1,0 +1,6 @@
+#!/bin/bash
+ROOTDIR=/fedora14/bonnet_f14/opt/opt/Ubuntu
+sudo qemu-img create -f raw ${ROOTDIR}/ubuntu_debian.raw 10G
+sudo chown alison ${ROOTDIR}/ubuntu_debian.raw 
+#installs from "cdrom" onto "hard disk a"
+qemu-system-i386 --cdrom ${ROOTDIR}/ubuntu-server_11.10_i386.iso -boot d -hda ${ROOTDIR}/ubuntu_debian.raw -m 2048 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga vmware -name ubuntu_debian -localtime -no-reboot 

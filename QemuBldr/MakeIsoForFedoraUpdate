@@ -1,0 +1,42 @@
+#!/bin/sh
+###############################################################################
+##                                                                           ##
+##      File:     mkiso                                                      ##
+##      Author:   Wolfgang S. Rupprecht <wolfgang@wsrcc.com>                 ##
+##      Created:  Tue Nov 25 09:30:36 PST 2008                               ##
+##      Contents: wrapper for dvd/cdrom creation from an iso file            ##
+##                                                                           ##
+##      Copyright (c) 2008 Wolfgang S. Rupprecht.                            ##
+##      All rights reserved.                                                 ##
+##                                                                           ##
+##      $Id$                                                                 ##
+###############################################################################
+
+# probably needs to be run as root so that it can write to the raw cd
+# drive
+
+set -x
+
+if [ -z "$1" ]
+then
+       usage "$0 name.iso"
+       exit 1;
+fi
+
+ISO="$1"
+
+# linux/fedora
+RAWCD=/dev/dvd
+
+# openbsd
+# RAWCD=/dev/rcd0c
+#
+# or:
+# netbsd
+# RAWCD=/dev/rcd0d
+
+eject -t cdrom
+time growisofs -Z $RAWCD=$ISO
+eject cdrom
+
+# end

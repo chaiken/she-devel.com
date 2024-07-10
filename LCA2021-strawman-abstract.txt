@@ -1,0 +1,44 @@
+Up to 500 words
+
+Fair Trade, Ecosystem Services and FLOSS
+
+FLOSS licenses are a mechanism with which developer communities have attempted
+to encourage if not compel participation and back-contribution from the
+consumers of software.  There is general agreement that these attempts have met
+with mixed success.
+
+Ecosystem services are the economic and ecological benefits that the natural
+environment produces, often in a manner that is taken for granted.  These
+services typically go unnoticed until accumulated degradation causes them to
+fail, sometimes suddenly and spectacularly.  In the realm of FLOSS software and
+hardware, the projects protected under the auspices of the Linux Foundation's
+Core Infrastructure Initiative are arguably analogous to ecosystem services.
+CII is an attempt to preserve the viability of these crucial but sometimes
+obscure projects.  However, CII focuses (sensibly) on cybersecurity and does not
+consider the vast array of other libraries and applications.  Biodiversity is
+another concept from environmental sciences that has a direct analog in
+software.  Multiple library and application providers with similar functionality
+make the software distributions and embedded products that rely on them more
+resilient to single-point failures.
+
+According to the Fairtrade Labeling Organization, "Fair trade is a trading
+partnership, based on dialogue, transparency, and respect, that seeks greater
+equity in international trade."  Why shouldn't this principle also apply to
+software developers?  FLOSS software is arguably both "artisanal" and
+"hand-made," but a claim that FLOSS is "ethically produced" would have to rely
+on guidelines to which software should adhere.  Such standards could include
+features like easier-to-understand user agreements, transparent and granular
+control of data, use of standard APIs to prevent vendor lock-in, support of
+diversity and education, and internationalization support.  We live in era of
+growing suspicion about the trustworthiness of large, multinational
+corporations that produce many commonly used applications.  Might FLOSS
+supporters make the case that socially responsible investors and consumers
+should care about ethically produced software?
+
+What lessons can FLOSS take away from the environmental and Fair Trade movements
+about novel funding models?  The environmental sustainability movement has found
+some success by striking development deals with former enemies that make use of
+the concept of "credits" and "offsets."  Often credits and offsets are
+resellable and tradeable. The most striking feature of these agreement is that
+business and environmental-preservation communities who do not share many values
+can make common cause in order to achieve goals that serve both.

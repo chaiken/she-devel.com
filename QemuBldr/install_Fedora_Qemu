@@ -1,0 +1,11 @@
+#!/bin/bash
+#run with "sudo -u alison ~alison/bin/install_Ubuntu_IVI_Qemu"
+#Without -u, xauth error:
+#"Could not initialize SDL(No available video device) - exiting"
+ROOTDIR=/mnt/VMs/
+ISO=Fedora-Live-Desktop-x86_64-20-1.iso
+HDNAME=fedora-x86_64-bldr
+sudo qemu-img create -f raw ${ROOTDIR}/${HDNAME}.raw 20G
+sudo chown alison ${ROOTDIR}/${HDNAME}.raw
+#installs from "cdrom" onto "hard disk a"
+qemu-system-x86_64 --enable-kvm --cdrom ${ROOTDIR}/${ISO} -boot d -hda ${ROOTDIR}/${HDNAME}.raw -m 2048 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ${HDNAME} -localtime -no-reboot 

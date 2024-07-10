@@ -1,0 +1,222 @@
+<html>
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content= "HTML Tidy for NetBSD (vers 1st March
+2002), see www.w3.org" />
+<title>Installing Ubuntu-IVI Remix</title>
+<meta name="description" content= "Alison Chaiken's embedded Linux web site" />
+<meta name="keywords" content= "linux, open source, free software,
+embedded, IVI, Ubuntu, automotive, cars, tablet, Atom, x86, navigation, GPS, maps, OBD, OBDII" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+<meta http-equiv="Content-Type" content= "text/html; charset=utf-8" />
+<meta name="GENERATOR" content="GNU Emacs 23.2.1 (x86_64-redhat-linux-gnu, GTK+ Version 2.21.4) of 2010-07-08 on x86-10.phx2.fedoraproject.org"/>
+<link rev="made" href="mailto:alison@she-devel.com" />
+<link rel="start" href="/" />
+<link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+<link rel="stylesheet" href="/pt_style.css" type= "text/css" />
+<link rel="up" href="../" />
+</head> 
+
+<body>
+
+<div class="title"><h1>Running Ubuntu-IVI Remix Natively on ExoPC Atom Slate</h1><h2>and in Qemu on Debian</h2></div>
+
+<p>
+<img src="screenshots/Ubuntu-IVI_ExoPC_Navit_emacs_obdsim2.jpg" alt="native Ubuntu IVI Remix on ExoPC">
+Ubuntu IVI Remix natively installed on an ExoPC Atom slate tablet.
+<a href="http://icculus.org/obdgpslogger/obdsim.html">obdsim</a> (part of <a href="http://icculus.org/obdgpslogger/">obdgpslogger</a>) is running in the background right
+xterm, but is not talking to Navit (yet).  The mighty emacs on the
+upper left shows the <a
+href="http://nobdy.wikia.com/wiki/Nobdy_wiki">nobdy</a> config file.
+Thanks very much to Intel for the equipment donation!
+</p>
+
+<h2>The Ubuntu-IVI installer writes over the entire hard disk!  Do not
+use the installer on a system that has data that you want to keep.
+The instructions below are for running in a virtual machine.</h2>
+
+<p>
+<img src="/images/Ubuntu_IVI_Remix_arch.png" height="400" alt="Ubuntu IVI Remix architecture diagram">
+</p>
+
+<h2>Running natively on an ExoPC Atom Slate</h2>
+
+<p>I installed from a CD drive connected via USB, as I couldn't get
+installation directly from USB to work for some reason.</p>
+
+<p>The i386 ISO produces an installation which works similarly to the
+VM one, although I can't get the WiFi to associate stably with an
+access point despite concerted effort with wpa-supplicant, jockey-gtk,
+Gnome applets, etc.  MeeGo and Ubuntu Maverick desktop image wireless
+connectivity work fine.</p>
+
+<h2>In a Qemu-KVM Virtual Machine</h2>
+
+
+<h3>First steps</h3> 
+
+<ol>
+
+<li>Read the <a
+href="https://oem-share.canonical.com/share/ivi-remix/release-beta2-dec2011/Ubuntu_IVI_Remix_Datasheet.pdf">datasheet</a> and <a href="https://oem-share.canonical.com/share/ivi-remix/release-beta2-dec2011/html/">release notes</a>.</li>
+
+<li>Get the ISO from <a
+href="https://oem-share.canonical.com/share/ivi-remix/release-beta2-dec2011/">Launchpad</a>.
+I chose falmouth-natty-x86-iso-20111219-2.iso. </li>
+
+<li>Check the md5sum.</li>
+
+</ol>
+
+<h3>Install the ISO image into a Qemu-kvm instance</h3>
+
+<p>The following presumes that your ISO is in the directory
+/opt/Ubuntu and that you have the Qemu and kvm tools installed.  Most
+Linux distros provide them.  libvirt and libguestfs are useful as
+well.</p>
+
+<p>
+<img src="/images/Ubuntu_IVI_Remix_Qemu1.png" height="400" alt="Ubuntu IVI Remix first installation screen">
+</p>
+
+<p><em>Installation on Fedora 14:</em></p>
+
+<p> In order to install followed by shutdown, run the following bash script as 
+
+<pre>
+sudo -u $USER install_Ubuntu_IVI_Qemu
+</pre>
+
+Without the -u setting, the script exits with the puzzling "Could not
+initialize SDL(No available video device) - exiting" error, which is
+actually from xauth.
+
+<pre>
+
+#!/bin/bash
+sudo qemu-img create -f raw /opt/ubuntu_ivi_natty.raw 10G
+sudo chown alison /opt/ubuntu_ivi_natty.raw 
+qemu-kvm --cdrom /opt/Ubuntu/falmouth-natty-x86-iso-20111219-2.iso -boot d -hda /opt/ubuntu_ivi_natty.raw -m 2048 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_ivi -localtime -no-reboot 
+
+</pre>
+
+</p>
+
+<p><em>Running post-installation on Fedora 14: </em>
+
+<pre>
+#!/bin/bash
+qemu-kvm -boot c -hda /opt/ubuntu_nobdy_bldr.raw -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_nobdy_bldr -localtime
+</pre>
+
+</p>
+
+<p><em>Installation on Debian Wheezy</em>. (As noted above, run the script with "sudo -u $USER".)
+
+<pre>
+#!/bin/bash
+
+#Without -u, xauth error:
+ROOTDIR=/fedora14/bonnet_f14/opt/opt/Ubuntu
+sudo qemu-img create -f raw ${ROOTDIR}/ubuntu_ivi_natty.raw 10G
+sudo chown $USER ${ROOTDIR}/ubuntu_ivi_natty.raw 
+qemu-system-i386 --enable-kvm --cdrom ${ROOTDIR}/falmouth-natty-x86-iso-20111219-2.iso -boot d -hda ${ROOTDIR}/ubuntu_ivi_natty.raw -m 4096 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ubuntu_ivi_natty -localtime -no-reboot
+</pre>
+
+</p>
+
+<p><em>Running post-installation on Debian Wheezy:</em> 
+
+<pre>
+
+#!/bin/bash
+qemu-system-i386 --enable-kvm -boot c -hda /fedora14/ubuntu_ivi_natty.raw -m 4096 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ubuntu_ivi_natty -localtime
+
+</pre>
+
+</p>
+
+<p>Note this <a
+href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=614252#25">bug
+report on Wheezy</a>: 
+
+<pre>
+If I do not specify VGA driver at all, meaning I do not use "vga=std"
+or "vga=vmware", things work as expected needing no change in any
+other parameter. So, it really was the VGA driver the one making "qemu
+-enable-kvm" not to work.  </pre>
+
+</p>
+
+<p>I gave the VM 10GB of real disk space.  If your disk doesn't have
+that much space, you can allot less.  What the minimum reasonable
+amount might be, I don't know.</p>
+
+<p>The installer is a fairly typical Linux one except that IT WRITES
+OVER THE WHOLE DISK WITHOUT ASKING.  Now I warned you twice!</p>
+
+<p>Note that I said "-no-reboot".  When the installation finishes, the
+VM will shut down. That way you can watch the reboot or start with
+different settings for normal operation.</p>
+
+<h3>Run the ISO image in the Qemu</h3>
+
+
+<p>I allotted the VM 2 GB of real memory.  Once again, if this chokes
+your system, allot the VM less.</p>
+
+<p>By default, the image comes with no GUI.  Nonetheless, booting into
+it with the script above takes the user to vt7, where nothing is
+running.  In Fedora 14's Qemu, switch to vt1 by typing "alt-f1", not
+"ctl-alt-f1", since "ctl-alt" is a Qemu keyboard shortcut to free the
+mouse cursor. On Debian Wheezy, follow the instructions under <a
+href="http://exerciseforthereader.org/PCBSD/PCBSD8_under_qemu-kvm.html">"How
+to get Qemu monitor"</a> to switch to the console.</p>
+
+<p>As with any new installation, type "apt-get update."   Note that the datasheet says:</p>
+
+<pre>
+The IVI Remix does not include a user interface or HMI by
+default. A sample user experience using Unity2d (based on
+Qt) and including UbuntuOne support and several sample
+applications is available for installation.
+</pre>
+
+<p>Read the <a href="https://oem-share.canonical.com/share/ivi-remix/release-beta2-dec2011/html/#demometapkgs">"Demo Ubuntu IVI packages" section</a> in the Release Notes.
+In fact, "apt-cache pkgnames | grep unity" shows 9 packages with
+"unity-2d" in the name. "apt-get install unity-2d-head" pulls most of
+these packages.  Be sure to choose "unity-2d-head" rather than
+"unity-2d," which does not pull down gdm, resulting in a black blank
+screen on vt7 upon reboot.  You might also want to install other
+utilities like emacs, mlocate and man, while you're at it.</p>
+
+<p>Also install ivi-demo, as otherwise this whole exercise is
+pointless.  It's another giant installation.</p>
+
+<p>Reboot again.   gdm should come up.</p>
+
+<p>
+<img src="/images/Ubuntu_IVI_Remix_gdm.png" height="400" alt="gdm screen of Ubuntu IVI Remix">
+</p>
+
+<p>That's better.  As promised by the datasheet, the Ubuntu IVI Remix
+doesn't have a lot of software in it.  The kernel is 2.6.38-8,
+presumably because the basis is the older 11.04 release.</p>
+
+<p>
+<img src="/images/Ubuntu_IVI_Remix_Unity.png" height="400" alt="Unity-2d interface in Ubuntu-IVI Remix">
+</p>
+
+<h3>Installing and Running <a href="http://nobdy.wikia.com/wiki/Nobdy_Wiki">nobdy</a></h3>
+
+<p>For a VM, follow the <a
+href="http://nobdy.wikia.com/wiki/Nobdy_Wiki">wiki instructions</a>
+under "Simpler Example invocation method 2 for systems with a network
+connection."  The "without a network connection" instructions work on
+the ExoPC hardware.</p>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+News about Free Software in Cars
+
+Familiar battles over privacy, security and (alas!) DRM will pop-up
+next in the automotive space.  To date, software innovation in the
+automotive arena has been slow due to conservatism motivated
+by over-riding safety concerns plus the high expense and long
+lifecycle of products.  Now the advent of wireless connectivity in
+vehicles has dragged them into the 21st Century, where standards such
+as 1991's Controller Area Network 2.0 bus protocol are showing their
+age.  The CAN protocol has little security, as befits a hardwired
+network optimized for robustness and low cost that is accessed only by
+trusted individuals.  Wireless exploits against CAN by an academic
+collaboration (http://autosec.org) show the urgent need for the
+adoption of best practices exemplified by the Internet Protocol.
+Unfortunately, calls instead for security-by-obscurity in vehicles are
+already being voiced.
+
+The Right to Repair movement is an example of a new natural ally for
+Free Software.  Right to Repair
+(http://www.righttorepair.org/about/default.aspx) "would require
+automakers to provide the same service information and tools to
+independent auto and maintenance shops, as well as to consumers, that
+the automaker dealership service centers receive."  In Massachusetts,
+the State Senate has approved the bill
+(http://articles.boston.com/2012-05-19/business/31764257_1_repair-data-repair-coalition-legislation)
+although the auto industry "worries that the proposed legislation
+threatens intellectual property rights, and could compromise online
+security of the data, putting consumers at risk."  The advent of
+issues like Right to Repair presents Free Software with the
+opportunity to address the concerns of a new audience of stakeholders
+like auto mechanics whose level of interest in traditional desktop
+software may be low.
+
+In April, Jason Wacha of MontaVista Software and Claus-Peter Wiedemann
+of Bearing Point gave an important presentation called "Motivations
+and Challenges for the Use of FOSS in the Automotive Industry" at the
+FSF-Europe Free Software Legal and Licensing Workshop.  The authors
+argue that the GPLv3 "Requirement to deliver certificates/keys which
+normally protect car infrastructure from being tampered with" prevents
+use of GPLv3 in vehicles since it "has no exception for
+safety-critical operations."  Might the free-software community
+consider an exception to the "anti-tivoization" clause for
+safety-critical devices like cars or medical devices? Could we
+contemplate, for example, a governmental body managing a
+certificate/key escrow?
+
+The Defective-By-Design campaign in its 2011 "Holiday Buying Guide"
+(http://www.defectivebydesign.org/holiday) called out the problems
+with the MyFord Touch software created by Microsoft.  Now with the
+shipment of the Chevy Volt and three new models running the "Cadillac
+User
+Experience"(http://www.wired.com/autopia/2012/05/2013-cadillac-xts/),
+buyers have the opportunity to purchase a car that is still
+locked, but at least is running a lot of familiar software
+underneath, like the Linux kernel and the X11 client-server.  General
+Motors' website now features a corresponding Offer of Source
+(http://www.oss.gm.com/).  Ford Motor Company, meanwhile, is backing
+the OpenXC Platform (http://openxcplatform.com) which "runs on a
+combination of the Arduino and Android platforms", meaning support not
+only for open-source software but hardware as well.  Internationally,
+the 160+-member GENIVI Alliance is promoting Linux-based common
+standards for cars, and is expressing an interest in "fostering a
+vibrant open-source IVI community."  Here "IVI" stands for "in-vehicle
+infotainment," a somewhat outdated term that has come to refer to
+applications like driver-drowsiness detection and instrument-cluster
+software as well as the more traditional navigation and music programs.
+
+Government regulatory bodies are growing interested in the safety
+implications of new vehicular software.  Notably, the US National
+Highway Transportation Safety Agency has advocated mandatory Event
+Data Recorders
+(http://www.wired.com/autopia/2011/12/feds-want-to-take-your-phone-out-of-your-car/)
+that raise obvious privacy concerns; has proposed an in-vehicle
+mobile-phone ban
+(http://www.wired.com/autopia/2011/12/feds-want-to-take-your-phone-out-of-your-car/)
+that would limit device use models; and considered mandatory backup
+cameras that would show video with 2 seconds of power-on
+(https://www.nytimes.com/2012/02/29/business/rule-on-rearview-cameras-for-cars-is-delayed-for-review.html),
+which is a real challenge for underlying operating systems.
+
+Both opportunity and peril for free software abound in the rapidly
+evolving automotive sector.  By listening carefully, with open minds,
+to the very real safety and security concerns of sympathetic parties
+within the industry, advocates can engage new allies and have a
+positive impact on the environmentally and economically critical
+transportation sector.
+

@@ -1,0 +1,5 @@
+#!/bin/bash
+#qemu-kvm -boot c -hda /opt/ubuntu_11.10.raw -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_11.10 -localtime
+#looks like Ubuntu uses 6666 for IRC?
+#qemu-kvm -boot c -hda /opt/ubuntu_nobdy_tstr.raw -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_11.10 -localtime
+qemu-kvm -boot c -hda /opt/ubuntu_nobdy_tstr.raw -m 2048 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_11.10 -localtime

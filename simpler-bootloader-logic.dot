@@ -1,0 +1,74 @@
+/*
+  Source for bootloader state machine diagram
+  Transform with the 'dot' executable from the Graphviz Debian package:
+  dot -Tpng bootload-logic.dot -O
+  Dot User Guide: http://graphviz.org/Documentation/dotguide.pdf
+
+  Alison Chaiken, alison@peloton-tech.com
+*/
+
+digraph G  {
+fontname="sans";
+fontsize="28";
+labelloc=t;
+nodesep=0.2;
+ranksep=0.1;
+node [style=filled, shape=box, fontsize="14", fontname="sans"];
+edge [labelfontsize="20", fontsize="20", fontname="Times-Bold",fontcolor=darkgreen,labelloc="t"];
+rankdir=LR;
+style=filled;
+color=black;
+
+
+/* states */
+uboot [label="u-boot at POR",shape=circle,color=pink];
+swupdate [label="swupdate OTA\nclient",shape=circle,color=orange];
+boot [label="Successful boot",shape=octagon,color=green];
+boot_failure [label="FAILED",shape=octagon,color=red];
+
+candidate_kernel_found [label="Candidate\nkernel\nfound?",shape=diamond,fontcolor=blue];
+rename_candidate_uboot [label="Rename 'candidate'\nfailed'"];
+choose_rootfs -> boot -> rename_candidate_userspace -> reboot;
+reboot -> uboot;
+
+/* normal path */
+subgraph normal {
+  primary_kernel_found [label="Primary\nkernel\nfound?",shape=diamond,fontcolor=blue];
+  rename_candidate_userspace [label="Systemd: rename\n'candidate' 'primary'"];
+
+  rename_primary_uboot [label="Rename 'primary'\n'candidate'"];
+  choose_rootfs [label="Autoselect rootfs &\nLoad kernel"];
+
+  candidate_kernel_found -> primary_kernel_found [label="no"];
+  primary_kernel_found -> rename_primary_uboot [label="yes"];
+  rename_primary_uboot -> choose_rootfs;
+}
+
+/* Failed boot detection */
+subgraph failed  {
+  heartbeat_reset [label="Heartbeat reset"];
+  backup_kernel_found [label="Backup\nkernel\nfound?",shape=diamond,fontcolor=blue];
+  rename_backup_uboot [label="Rename 'backup'\n'candidate'"];
+
+  boot_failure -> heartbeat_reset -> uboot;
+  uboot -> candidate_kernel_found;
+  candidate_kernel_found -> rename_candidate_uboot [label="yes"];
+  rename_candidate_uboot -> primary_kernel_found;
+  primary_kernel_found -> backup_kernel_found [label="no"];
+  backup_kernel_found -> rename_backup_uboot -> choose_rootfs;
+}
+
+/* swupdate */
+subgraph swupdate  {
+
+  rename_primary_userspace [label="Rename 'primary\n 'backup'"];
+  rename_backup_userspace [label="Rename 'backup'\n 'primary'"];
+  swupdate -> rename_primary_userspace -> rename_backup_userspace -> reboot;
+}
+
+{rank = same; rename_primary_userspace; rename_backup_userspace; swupdate; rename_candidate_userspace}
+{rank = same; primary_kernel_found; backup_kernel_found}
+{rank = same; rename_primary_uboot; rename_backup_uboot;}
+{rank = same; candidate_kernel_found; rename_candidate_uboot}
+}
+

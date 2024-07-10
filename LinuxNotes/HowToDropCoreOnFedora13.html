@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="GNU Emacs 23.2.1 (x86_64-redhat-linux-gnu, GTK+ Version 2.20.1) of 2010-05-13 on x86-07.phx2.fedoraproject.org"/>
+<meta name="keywords" content="fedora, linux, development, software, tools, gdb, core, tips, howto, reference, configuration, abrt, tutorial, system administration, coredump" />
+<link rel="stylesheet" href="chaiken.css" type="text/css"/>
+<title>Dropping Core on Fedora 13</title>
+</head>
+<body>
+<h1>How to restore core dumps on Fedora 13</h1>
+
+<p>Prepared by <a href="mailto:alchaiken@gmail.com">Alison Chaiken</a>
+and offered under <a href="
+http://creativecommons.org/licenses/by-sa/3.0/">cc-by-sa</a><p>
+
+<h3>Motivation</h3>
+
+<p>Using tools
+    like <a href="https://github.com/dneary/linux-devel-tools-tutorial/blob/master/Linux%20Devtools.odp">gdb
+    to examine core files</a> can be extremely useful in debugging
+    shaky programs on Linux.  (My other favorite tools besides gdb for
+    diagnosing crashes are strace and ltrace, which I learned about
+    from <a href="http://www.amazon.com/Embedded-Linux-Primer-Practical-Real-World/dp/0137017839/ref=pd_sim_b_1">Christopher
+    Hallinan</a>.)  Frustratingly core files disappeared when abrtd
+    appeared in <a href="http://www.fedoraproject.org/">Fedora</a>, in
+    release 12 if I recall correctly.  According
+    to <a href="http://blogs.gnome.org/bolsh/">Dave Neary</a>, the
+    traditional and simple "ulimit -c unlimited" is still all that's
+    required to restore core files on Ubuntu, but Fedora expects more
+    of their users.</p>
+
+<h3>The source of the problem</h3>
+
+<p>abrt <a href="http://fedoraproject.org/wiki/Features/ABRT">is a
+Fedora system</a> which
+
+<pre>
+semi-automatically provides information about defects and crashes on
+user system. It collects necessary data about the crash, generates a
+report with all information and based on user interaction sends it to
+some bug reporting system.
+</pre>
+
+The problem is, abrtd intercepts user-generated core files, even for
+the programs the user writes him- or herself.  I have no problem with
+abrtd catching Gnome or Firefox core files, but the fact that my
+programs don't drop core in directories of my choice is simply
+unacceptable.  Also, I find it very annoying that abrtd requires
+creation of yet another new account with new credentials.  After all,
+I'm already logged into localhost; why not offer me the choice of
+sending my username and IP address?  Fundamentally, abrtd is simply
+unacceptable to me, as much as I want to support Fedora debugging.
+Out it goes.
+</p>
+
+<h3>The situation before steps below</h3>
+
+<pre>
+[alison@bonnet ~]$ ulimit -c unlimited
+-bash: ulimit: core file size: cannot modify limit: Operation not permitted
+[alison@bonnet ~]$ sudo set ulimit -c unlimited
+sudo: set: command not found
+</pre>
+
+<h3>Step-by-step restoration of core on Fedora 13</h3>
+
+<ol>
+
+<li>Get rid of that annoying abrtd:
+<pre>
+sudo service abrtd stop
+</pre>
+</li>
+
+<li>Just go away abrtd and don't trouble me any more:
+<pre>
+sudo chkconfig --del abrtd
+</pre>
+</li>
+
+<li>Edit /etc/sysctrl.conf and change
+<pre>
+kernel.core_pattern = |/usr/libexec/abrt-hook-ccpp /var/spool/abrt %p %s %u %c
+</pre>
+to
+<pre>
+kernel.core_pattern = core
+</pre>
+</li>
+
+<li>Edit /etc/security/limits.conf and add the line
+<pre>
+*  soft  core  unlimited
+</pre>
+
+(Yeah, "soft core".   Actually "hard core" is legal too.)
+</li>
+
+<li>Finally, edit /etc/init.d/functions if necessary:
+<pre>
+	# make sure it doesn't core dump anywhere unless requested
+	corelimit="ulimit -S -c ${DAEMON_COREFILE_LIMIT:-0}"
+</pre>
+That step appears to be unnecessary.
+</li>
+
+<li>
+<p>Now create a program that drops core.  (I assume that the reader
+already knows how.)
+</li>
+
+</ol>
+
+<h3>After steps above</h3>
+
+<pre>
+[alison@bonnet ~]$ ulimit -c unlimited
+[alison@bonnet kernel_char]$ ./bit_palindrome
+Segmentation fault (core dumped)
+</pre>
+
+<p>Finally!  A file called core.$PID will be dropped in $CWD.  Now the
+user can "gdb $EXECUTABLE $CORE" to heart's content.</p>
+
+</body>
+</html>

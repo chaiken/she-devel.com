@@ -1,0 +1,50 @@
+http://wiki.libvirt.org/page/Networking
+
+Loaded plugins: auto-update-debuginfo, presto, refresh-packagekit
+Installed Packages
+libvirt.x86_64                   0.8.2-1.fc13              @updates             
+libvirt-client.x86_64            0.8.2-1.fc13              @updates             
+libvirt-python.x86_64            0.8.2-1.fc13              @updates             
+perl-Sys-Virt.x86_64             0.2.3-1.fc13              @fedora              
+python-virtinst.noarch           0.500.4-1.fc13            @updates             
+python-virtkey.x86_64            0.50-6.fc12               @released/$releasever
+virt-manager.noarch              0.8.5-1.fc13              @updates             
+virt-viewer.x86_64               0.2.1-1.fc13              @fedora              
+
+
+alison@tomales ;-) virsh net-list --all
+Name                 State      Autostart
+-----------------------------------------
+
+alison@tomales ;-) virsh net-define /usr/share/libvirt/networks/default.xml 
+Network default defined from /usr/share/libvirt/networks/default.xml
+
+alison@tomales ;-) virsh net-autostart default
+Network default marked as autostarted
+
+alison@tomales ;-) virsh net-start default
+error: Failed to start network default
+error: internal error Network 192.168.122.1/255.255.255.0 is already in use by interface virbr0
+
+alison@tomales ;-) virsh net-list --all
+Name                 State      Autostart
+-----------------------------------------
+default              inactive   yes       
+
+alison@tomales ;-) brctl show
+bridge name	bridge id		STP enabled	interfaces
+pan0		8000.000000000000	no		
+virbr0		8000.000000000000	yes		
+alison@tomales ;-) grep ipv4 /etc/sysctl.conf
+#net.ipv4.ip_forward = 0
+net.ipv4.ip_forward = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.default.accept_source_route = 0
+alison@tomales ;-) ping 192.168.122.1
+PING 192.168.122.1 (192.168.122.1) 56(84) bytes of data.
+64 bytes from 192.168.122.1: icmp_seq=1 ttl=64 time=0.140 ms
+64 bytes from 192.168.122.1: icmp_seq=2 ttl=64 time=0.106 ms
+64 bytes from 192.168.122.1: icmp_seq=3 ttl=64 time=0.114 ms
+
+sudo qemugl -name MeeGo -m 1024 -boot c -net nic,model=e1000 -net user,hostfwd=tcp:127.0.0.1:6666-:22 -enable-kvm -vga std -enable-gl -device virtio-gl-pci -hda /opt/meego/meego-netbook-ia32-1.0.80.12.20100727.1-sdk-pre0901.raw
+

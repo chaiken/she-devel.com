@@ -1,0 +1,56 @@
+#!/bin/bash
+#http://www.sysresccd.org/Sysresccd-manual-en_How_to_install_SystemRescueCd_on_an_USB-stick
+VERSION=x86-3.7.0
+#Figure out your USB drive my using "dmesg | tail".
+USBSTICK=/dev/sd<my_USB_Stick>
+ISODIR=/tmp/cdrom
+ISOFILE=/vol/opt/SystemRescueCD/systemrescuecd-$VERSION.iso
+set -e
+
+echo  "Mounting SystemRescueCD ISO."
+if [ ! -d $ISODIR ]; then
+   sudo mkdir $ISODIR
+fi
+sudo mount -o loop -o exec $ISOFILE $ISODIR
+cd $ISODIR
+echo "Contents of SystemRescueCD ISO:"
+ls
+
+echo "Installing to USB stick . . . "
+if [ ! -z `mount | grep $USBSTICK` ]; then
+   sudo umount $USBSTICK  # in case of auto-mounting
+fi
+cd /tmp/cdrom
+sudo bash ./usb_inst.sh #ncurses installer
+cd -
+echo "Wrote SystemRescueCD contents to USB stick." #delay!
+
+sudo umount $ISODIR
+sudo mount $USBSTICK /mnt
+echo "Contents of new SystemRescueCD USB stick:"
+ls
+sudo umount /mnt
+sync
+echo "SystemRescueCD USB stick is ready to use."
+
+# If usb_inst.sh is successful, it ends with 
+#Success
+#Installation successfully completed            │  
+#
+# Why usb_inst.sh may fail: 
+#
+#1. SystemRescueCD wants an empty partition table on its target USB drive.
+#If SystemRescueCD fails by failing silently to copy files, 
+#use fdisk to delete any existing partitions and try again.
+#
+#Afterwards:
+#[alison@bonnet ~]$ sudo fdisk -l /dev/sdc
+#Disk /dev/sdc: 8086 MB, 8086618112 bytes
+#37 heads, 13 sectors/track, 32836 cylinders, total 15794176 sectors
+#   Device Boot      Start         End      Blocks   Id  System
+#/dev/sdc1   *           1    15794175     7897087+   c  W95 FAT32 (LBA)
+#
+#This partition is created by SystemRescueCD.   Do not create by hand!
+#
+#2. Do not mount the ISO on /mnt/, as that's where usb_inst.sh mounts the
+#USB stick.   Instead mount the ISO on /tmp/cdrom.

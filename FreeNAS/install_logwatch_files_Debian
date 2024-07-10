@@ -1,0 +1,16 @@
+#!/bin/bash
+
+CONFDIR=/etc/logwatch/conf
+SCRIPTDIR=/usr/share/logwatch/
+cp -p scripts/logwatch/bacula $SCRIPTDIR/scripts/services/bacula
+cp -p scripts/logwatch/applybaculadate $SCRIPTDIR/scripts/shared/applybaculadate
+cp -p scripts/logwatch/logfile.bacula.conf-debian $CONFDIR/logfiles/bacula.conf
+cp -p scripts/logwatch/services.bacula.conf $CONFDIR/services/bacula.conf
+chmod 755 $SCRIPTDIR/scripts/services/bacula
+chown root:root $SCRIPTDIR/scripts/services/bacula
+chmod 755 $SCRIPTDIR/scripts/shared/applybaculadate
+chown root:root $SCRIPTDIR/scripts/shared/applybaculadate
+chmod 644 $CONFDIR/logfiles/bacula.conf
+chown root:root $CONFDIR/logfiles/bacula.conf
+chmod 644 $CONFDIR/services/bacula.conf
+chown root:root $CONFDIR/services/bacula.conf

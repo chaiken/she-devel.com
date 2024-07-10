@@ -1,0 +1,169 @@
+SabreSD Board and laptop are connected via two random ports on the
+back of the Linksys Cable/DSL router.
+
+Important u-boot parameters:
+bootdelay=10
+bootargs_net=console=ttymxc0,115200 ip=172.17.0.1 root=/dev/nfs nfsroot=172.17.0.5:/tftpboot/sabresd/fsl_imx6w
+fdt_addr=0x18000000
+fdt_high=0xffffffff
+ip_dyn=no
+ipaddr=172.17.0.1
+loadaddr=0x12000000
+netboot=setenv bootargs console=ttymxc0,115200 ip=172.17.0.1 root=/dev/nfs nfsroot=172.17.0.5:/tftpboot/sabresd/fsl_imx6,v3,tcp rootwait rw;run netload;bootm 0x12000000 - 0x18000000
+netload=tftp 0x18000000 sabresd/sabreai.dtb;tftp 0x12000000 sabresd/uImage-imx6
+nfsroot=/tftpboot/sabresd/fsl_imx6
+serverip=172.17.0.5
+
+On laptop, following 'Man nmcli-example':
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ nmcli con add con-name SabreSD ifname eth0 type ethernet ip4 172.17.0.5/16
+
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ nmcli con show SabreSD                       connection.id:                          SabreSD
+connection.uuid:                        5b6b850a-7bb6-449f-9ced-b61a529d30c4
+connection.interface-name:              eth0
+connection.type:                        802-3-ethernet
+connection.autoconnect:                 yes
+connection.timestamp:                   1420006649
+connection.read-only:                   no
+connection.permissions:                 
+connection.zone:                        --
+connection.master:                      --
+connection.slave-type:                  --
+connection.secondaries:                 
+connection.gateway-ping-timeout:        0
+802-3-ethernet.port:                    --
+802-3-ethernet.speed:                   0
+802-3-ethernet.duplex:                  --
+802-3-ethernet.auto-negotiate:          yes
+802-3-ethernet.mac-address:             --
+802-3-ethernet.cloned-mac-address:      --
+802-3-ethernet.mac-address-blacklist:   
+802-3-ethernet.mtu:                     auto
+802-3-ethernet.s390-subchannels:        
+802-3-ethernet.s390-nettype:            --
+802-3-ethernet.s390-options:            
+ipv4.method:                            manual
+ipv4.dns:                               
+ipv4.dns-search:                        
+ipv4.addresses:                         { ip = 172.17.0.5/16, gw = 0.0.0.0 }
+ipv4.routes:                            
+ipv4.ignore-auto-routes:                no
+ipv4.ignore-auto-dns:                   no
+ipv4.dhcp-client-id:                    --
+ipv4.dhcp-send-hostname:                yes
+ipv4.dhcp-hostname:                     --
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.dns:                               
+ipv6.dns-search:                        
+ipv6.addresses:                         
+ipv6.routes:                            
+ipv6.ignore-auto-routes:                no
+ipv6.ignore-auto-dns:                   no
+ipv6.never-default:                     no
+ipv6.may-fail:                          yes
+ipv6.ip6-privacy:                       -1 (unknown)
+ipv6.dhcp-hostname:                     --
+GENERAL.NAME:                           SabreSD
+GENERAL.UUID:                           5b6b850a-7bb6-449f-9ced-b61a529d30c4
+GENERAL.DEVICES:                        eth0
+GENERAL.STATE:                          activated
+GENERAL.DEFAULT:                        no
+GENERAL.DEFAULT6:                       no
+GENERAL.VPN:                            no
+GENERAL.ZONE:                           --
+GENERAL.DBUS-PATH:                      /org/freedesktop/NetworkManager/ActiveConnection/23
+GENERAL.CON-PATH:                       /org/freedesktop/NetworkManager/Settings/4
+GENERAL.SPEC-OBJECT:                    --
+GENERAL.MASTER-PATH:                    --
+IP4.ADDRESS[1]:                         ip = 172.17.0.5/16, gw = 0.0.0.0
+IP6.ADDRESS[1]:                         ip = fe80::2ad2:44ff:fe54:7f5a/64, gw = ::
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ 
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ nmcli con down Wired\ connection\ 1
+[alison@hildesheim sabresd]$ nmcli con up SabreSD            
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/19)
+
+/etc/exports:
+# /etc/exports: the access control list for filesystems which may be exported
+#		to NFS clients.  See exports(5).
+/tftpboot       172.17.0.1(rw,sync,no_subtree_check,no_root_squash)
+
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ sudo systemctl restart nfs-kernel-server
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ sudo systemctl restart nfs-kernel-common
+
+U-Boot > ping 172.17.0.5
+Using FEC device
+host 172.17.0.5 is alive
+U-Boot > 
+
+U-boot doesn't answer pings:
+[alison@hildesheim linux-meibp-38 (local_upstream)]$ ping 172.17.0.1
+PING 172.17.0.1 (172.17.0.1) 56(84) bytes of data.
+^C
+--- 172.17.0.1 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1008ms
+
+
+
+
+All u-boot parameters:
+U-Boot 2013.04 (Dec 08 2014 - 00:58:41)
+CPU:   Freescale i.MX6Q rev1.2 at 792 MHz
+CPU:   Temperature 34 C, calibration data: 0x59a4fc7d
+Reset cause: POR
+Board: MX6Q/SDL-SabreSD
+I2C:   ready
+DRAM:  1 GiB
+MMC:   FSL_SDHC: 0, FSL_SDHC: 1, FSL_SDHC: 2
+No panel detected: default to Hannstar-XGA
+Display: Hannstar-XGA (1024x768)
+In:    serial
+Out:   serial
+Err:   serial
+Found PFUZE100! deviceid=10,revid=11
+mmc1 is current device
+Net:   FEC [PRIME]
+Normal Boot
+U-Boot > printenv
+baudrate=115200
+bootargs=console=ttymxc0,115200 ip=dhcp root=/dev/nfs nfsroot=192.168.1.101:/tftpboot/sabresd/fsl_imx6,v3,tcpw
+bootargs_base=console=ttymxc0,115200 ip=dhcp
+bootargs_mmc=setenv bootargs console=ttymxc0,115200 ip=dhcp root=/dev/mmcblk0p2 rootwait rw
+bootargs_net=console=ttymxc0,115200 ip=172.17.0.1 root=/dev/nfs nfsroot=172.17.0.5:/tftpboot/sabresd/fsl_imx6w
+bootcmd_mfg=run mfgtool_args;bootm ${loadaddr} ${initrd_addr} ${fdt_addr};
+bootcmd_mmc=run bootargs_mmc;ext2load mmc 1:1 0x12000000 uImage_3.10.45;ext2load mmc 1:1 0x18000000 3.10.45.d0
+bootdelay=10
+console=ttymxc0
+ethact=FEC
+ethaddr=00:04:9f:02:b7:1c
+ethprime=FEC
+fdt_addr=0x18000000
+fdt_file=sabresd/sabreai.dtb
+fdt_high=0xffffffff
+fileaddr=12000000
+filesize=539868
+initrd_addr=0x12C00000
+initrd_high=0xffffffff
+ip_dyn=no
+ipaddr=172.17.0.1
+loadaddr=0x12000000
+loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};
+loadfdt=ext2load mmc 1:1 0x18000000 3.10.45.dtb
+loaduimage=ext2load mmc 1:1 0x12000000 uImage_3.10.45
+mfgtool_args=setenv bootargs console=ttymxc0,115200 rdinit=/linuxrc g_mass_storage.stall=0 g_mass_storage.rem 
+mmcargs=setenv bootargs console=${console},${baudrate} ${smp} root=${mmcroot}
+mmcdev=1
+mmcpart=1
+mmcroot=/dev/mmcblk0p2 rootwait rw
+netargs=setenv bootargs console=${console},${baudrate} ${smp} root=/dev/nfs ip=dhcp nfsroot=${serverip}:${nfsp
+netboot=setenv bootargs console=ttymxc0,115200 ip=172.17.0.1 root=/dev/nfs nfsroot=172.17.0.5:/tftpboot/sabre0
+netload=tftp 0x18000000 sabresd/sabreai.dtb;tftp 0x12000000 sabresd/uImage-imx6
+nfsroot=/tftpboot/sabresd/fsl_imx6
+root=/dev/mmcblk0p2 rootwait rw
+script=boot.scr
+serverip=172.17.0.5
+uimage=sabresd/uImage-imx6
+
+Environment size: 2028/8188 bytes
+U-Boot > 
+

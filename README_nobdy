@@ -1,0 +1,51 @@
+The tar archive includes 7 packages that were built on an Ubuntu 11.10
+i386 system:
+
+nobdy_1.0.0-10_i386.deb
+nobdy-dev_1.0.0-10_i386.deb
+genericobd2_1.0.0-6_i386.deb
+libobd_1.0.0-5_i386.deb
+libobd-dev_1.0.0-5_i386.deb
+libqjson0_0.7.1+git20111204d_i386.deb
+libqjson-dev_0.7.1+git20111204d_i386.deb
+
+They require Qt 4.7 so, while they constitute less than
+1 MB total, additional downloads to support them may require
+considerable space if you do not already have the latest Qt installed.
+
+The packages have only been tested on Ubuntu 11.10.  Please let me
+know if you run them successfully on other Debian-derived
+distributions.    Of course, please als
+
+To install, first unpack the archive:
+
+   tar xjf nobdy_debs_jan92012.tar.bz2
+
+Install the packages using apt or dpkg:
+
+   dpkg -i *.deb
+
+You should now have a binary executable, /usr/bin/nobdy, and some configuration files in /etc/nobdy.   Learn how to run nobdy by reading the wiki:
+
+Nobdy documentation: http://nobdy.wikia.com/wiki/Nobdy_Wiki
+libobd documentation: http://libobd.wikia.com/wiki/Libobd_Wiki?cb=8608
+
+Primary authors of these packages:
+
+nobdy, genericobd2 -- tripzero
+libobd -- mal2073
+libqjson -- the upstream QJson team
+
+You may also want to try the related OBD GPS Logger tools: http://icculus.org/obdgpslogger/
+
+Note: the QJson included with nobdy is a more recent version than the
+one packaged with Ubuntu 11.10.  Based on reading the commit logs, I
+believe that installing it is unlikely to make other binaries that
+link to QJson fail.  Please let me know if this is not the case.
+
+Coming improvements: as of today (Jan 9, 2012) there are versions of
+all these packages built on Launchpad, but they are not properly
+linked to QJson in the Launchpad build.  Yet.  I also intend to
+produce RPMs and maybe BSD ports for nobdy.
+
+-- Alison Chaiken, alchaiken@gmail.com, http://she-devel.com

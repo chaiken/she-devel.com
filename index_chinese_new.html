@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!--This file was converted to xhtml by LibreOffice - see http://cgit.freedesktop.org/libreoffice/core/tree/filter/source/xslt for the code.--><head profile="http://dublincore.org/documents/dcmi-terms/"><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/><title xml:lang="en-US">嵌入式Linux资源的开发</title><meta name="DCTERMS.title" content="嵌入式Linux资源的开发" xml:lang="en-US"/><meta name="DCTERMS.language" content="en-US" scheme="DCTERMS.RFC4646"/><meta name="DCTERMS.source" content="http://xml.openoffice.org/odf2xhtml"/><meta name="DCTERMS.creator" content="mei"/><meta name="DCTERMS.issued" content="2013-08-04T20:09:00" scheme="DCTERMS.W3CDTF"/><meta name="DCTERMS.contributor" content="mei"/><meta name="DCTERMS.modified" content="2013-08-04T20:09:00" scheme="DCTERMS.W3CDTF"/><meta name="DCTERMS.provenance" content="" xml:lang="en-US"/><meta name="DCTERMS.subject" content="," xml:lang="en-US"/><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" hreflang="en"/><link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" hreflang="en"/><link rel="schema.DCTYPE" href="http://purl.org/dc/dcmitype/" hreflang="en"/><link rel="schema.DCAM" href="http://purl.org/dc/dcam/" hreflang="en"/><style type="text/css">
+	@page { }
+	body { background-color:#ffefd5; }
+	table { border-collapse:collapse; border-spacing:0; empty-cells:show }
+	td, th { vertical-align:top; font-size:12pt;}
+	h1, h2, h3, h4, h5, h6 { clear:both }
+	ol, ul { margin:0; padding:0;}
+	li { list-style: none; margin:0; padding:0;}
+	<!-- "li span.odfLiEnd" - IE 7 issue-->
+	li span. { clear: both; line-height:0; width:0; height:0; margin:0; padding:0; }
+	span.footnodeNumber { padding-right:1em; }
+	span.annotation_style_by_filter { font-size:95%; font-family:Arial; background-color:#ffefd5;  margin:0; border:0; padding:0;  }
+	* { margin:0;}
+	.P1 { font-size:12pt; font-family:Times New Roman; writing-mode:lr-tb; text-align:center ! important; }
+	.P10 { font-size:14pt; font-family:SimSun, 宋体; writing-mode:lr-tb; text-decoration:underline; font-weight:bold; }
+	.P11 { font-size:12pt; font-family:SimSun, 宋体; writing-mode:lr-tb; }
+	.P12 { font-size:14pt; font-family:Times New Roman; writing-mode:lr-tb; color:#ff0000; text-decoration:underline; font-weight:bold; }
+	.P13 { font-size:12pt; font-family:MS Mincho, ＭＳ 明朝; writing-mode:lr-tb; margin-left:0in; margin-right:0in; text-indent:0.5in; }
+	.P14 { font-size:12pt; font-family:Times New Roman; writing-mode:lr-tb; text-align:center ! important; }
+	.P2 { font-size:12pt; font-family:MS Mincho, ＭＳ 明朝; writing-mode:lr-tb; }
+	.P3 { font-size:12pt; font-family:MS Mincho, ＭＳ 明朝; writing-mode:lr-tb; text-align:center ! important; }
+	.P4 { font-size:12pt; font-family:MS Mincho, ＭＳ 明朝; writing-mode:lr-tb; text-decoration:underline; font-weight:bold; }
+	.P5 { font-size:14pt; font-family:MS Mincho, ＭＳ 明朝; writing-mode:lr-tb; text-decoration:underline; font-weight:bold; }
+	.P6 { font-size:12pt; font-family:MS Mincho, ＭＳ 明朝; writing-mode:lr-tb; font-weight:bold; }
+	.P7 { font-size:14pt; font-family:Times New Roman; writing-mode:lr-tb; font-weight:bold; }
+	.P8 { font-size:14pt; font-family:Times New Roman; writing-mode:lr-tb; text-decoration:underline; font-weight:bold; }
+	.P9 { font-size:14pt; font-family:SimSun, 宋体; writing-mode:lr-tb; font-weight:bold; }
+	.Standard { font-size:12pt; font-family:Times New Roman; writing-mode:lr-tb; }
+	.T1 { font-weight:bold; }
+	.T10 { font-family:SimSun, 宋体; font-size:14pt; font-weight:bold; }
+	.T12 { font-family:SimSun, 宋体; font-weight:bold; }
+	.T13 { font-family:Batang, 바탕; }
+	.T2 { font-size:18pt; font-weight:bold; }
+	.T3 { font-family:MS Mincho, ＭＳ 明朝; font-size:18pt; font-weight:bold; }
+	.T4 { font-family:MS Mincho, ＭＳ 明朝; }
+	.T5 { font-family:MS Mincho, ＭＳ 明朝; font-size:14pt; font-weight:bold; }
+	.T7 { font-family:MS Mincho, ＭＳ 明朝; font-weight:bold; }
+	.T8 { font-family:SimSun, 宋体; font-size:18pt; font-weight:bold; }
+	.T9 { font-family:SimSun, 宋体; }
+	<!-- ODF styles with no properties representable as CSS -->
+	 { }
+	</style></head>
+<body dir="ltr" style="max-width:8.5in;margin-top:1in; margin-bottom:1in; margin-left:1.25in; margin-right:1.25in; writing-mode:lr-tb; ">
+<a href="index.html"><img alt="union jack" src="union-jack_80.png"></a>
+<hr />
+<div class="figure">
+<p>
+<img height="125" alt="she-devel.com logo" src="/images/she-devel_logo_design.png"/></p>
+<p class="P14"><span class="T3">嵌入式</span><span class="T2">Linux</span><span class="T8">资源</span><span class="T3">的开</span><span class="T8">发</span></p>
+<p class="Standard"> </p>
+<p class="P1"><span class="T4">---使用开放源代码,</span><span class="T9">汽車司機</span><span class="T4">可以由“</span><span class="T9">司機分心驾驶” 达到“司機授权</span><span class="T4">和</span><span class="T9">辅</span><span class="T4">助</span><span class="T9">驾驶</span><span class="T4">” ---</span></p>
+<p class="P3"> </p>
+<hr/>
+
+<p class="Standard"><span class="T5">新</span><span class="T10">闻发</span><span class="T5">布</span></p>
+<p class="P2"> </p>
+<p class="Standard">•<span class="T4">接受新</span><span class="T9">华社的</span>CNC <span class="T4">世界</span><span class="T9">节</span><span class="T4">目采</span><span class="T9">访</span><span class="T4">，并</span><span class="T9">发</span><span class="T4">表后</span><span class="T9">续的文章（</span><span class="T4">中文</span><span class="T9">）.</span></p>
+
+<p class="Standard"><a href="http://gondwanaland.com/mlog/2012/04/10/libre-planet-2012/">•“<span class="T4">本次大会</span><span class="T9">最重要的演讲”. </span></a><span class="T4">Mike </span>Linksvayer<span class="T9">在</span>LibrePlanet 2012<span class="T4">年的</span><span class="T9">总结</span><span class="T4">中</span><span class="T9">概括评论道.</span></p>
+
+<p class="Standard">•<span class="T4">我的</span><span class="T9">SCALE演示</span><span class="T4">被</span><span class="T9">评为 </span><span class="T4">Nate Willis </span><span class="T9">的优秀</span><a href="http://lwn.net/Articles/476202/"><span class="T4">Linux Weekly News</span></a><span class="T9">文章.</span></p>
+
+<p class="Standard">•<span class="T4">被引用在</span><span class="T9">John Boudreau的文章的结尾 </span><a href="http://www.mercurynews.com/business/ci_19981113">“<span class="T4">即将来</span><span class="T9">临的</span><span class="T4">高速公路</span><span class="T9">：司機以</span>70<span class="T4">英里的</span><span class="T9">时速驾驶</span><span class="T4">, 同</span><span class="T9">时可以</span><span class="T4">写</span><span class="T9">微博</span>”</a><span class="T9">.</span></p>
+<p class="Standard"> </p>
+<p class="P9">演示</p>
+<p class="P9"> </p>
+
+<p class="Standard">• “<span class="T4">研</span><span class="T9">发</span><span class="T4">用于</span><span class="T9">汽车的</span>Linux<span class="T4">（</span><a href="Chaiken_NBLUG_2013.pdf">PDF</a>)<span class="T4">（以及</span><a href="Chaiken_NBLUG_2013.odp">ODP</a><span class="T4">）” 北湾区</span>Linux<span class="T4">用</span><span class="T9">户组,七月</span>2013<span class="T4">演示</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<a href="https://plus.google.com/u/0/events/cqj3grb8sm4tgsugjjvdc01e8mc">“Linux<span class="T4">解决汽</span><span class="T9">车的难题</span>” <span class="T4">谷歌</span>Hangout</a>, (<a href="Chaiken_Hangout_Mar2013.pdf">PDF</a><span class="T4">和</span><a href="Chaiken_Hangout_Mar2013.odp">LibreOffice</a><span class="T4">格式)</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•“2013<span class="T4">年汽</span><span class="T9">车</span><span class="T4">免</span><span class="T9">费软件</span><span class="T4">:</span><span class="T9">修改权和隐私权</span>”<a href="http://libreplanet.org/wiki/LibrePlanet:Conference/2013/Sessions">LibrePlanet2013</a><span class="T4">年</span><span class="T9">演讲,</span><span class="T4">(</span><a href="AlisonChaikenLibrePlanet2013.pdf">PDF</a><span class="T4">和</span><a href="AlisonChaikenLibrePlanet2013.odp">LibreOffice</a><span class="T4">格式)</span> 
+</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<a href="http://embeddedlinuxconference2013.sched.org/event/bedc505f903d6dacfc506eae5a361005?iframe=no&amp;w=900&amp;sidebar=yes&amp;bg=no#.URv8dOCaSOk">“<span class="T4">解决汽</span><span class="T9">车</span>Linux<span class="T4">的棘手</span><span class="T9">问题：网络和</span>IPC”</a><span class="T4">嵌入式</span>Linux<span class="T4">大会</span>2013<span class="T4">年</span><span class="T9">演讲,(</span><a href="Chaiken_ELC_2013.pdf">PDF</a><span class="T4">和</span><a href="Chaiken_ELC_2013.odp">LibreOffice</a><span class="T4">格式)</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•“X<span class="T9">代</span><span class="T4">和未来的自装(DIY)</span><span class="T9">计</span><span class="T4">算机</span><span class="T9">车</span>”<span class="T4">汽</span><span class="T9">车</span>Linux<span class="T4">峰会</span><span class="T9">讲座</span><span class="T4">，</span>2012<span class="T4">年</span>9<span class="T4">月</span>19<span class="T4">日,(幻灯片，</span><a href="ALS2012talk.pdf">PDF</a><span class="T4">和</span><a
+href="ALS2012talk.odp">LibreOffice</a><span class="T4">格式)</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">• “<span class="T9">为</span><span class="T4">硅谷的汽</span><span class="T9">车開放源代碼小組</span><span class="T4">在 </span><span class="T9">Maker Faire</span><span class="T4">展</span><span class="T9">位制作</span><span class="T4">的展</span><span class="T9">览内容”</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•“<span class="T4">由</span> ‘<span class="T4">司機分心</span><span class="T9">驾驶</span>’ <span class="T4">达到</span> ‘<span class="T4">司機授</span><span class="T9">权和辅助驾驶</span>’:<span class="T9"> 開放源代碼</span><span class="T4">在汽車中的應用</span>”</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard"><span class="T4">在第</span>7<span class="T4">届</span><span class="T9">湾区Maker Faire</span><span class="T4">展</span><span class="T9">览，</span>2012<span class="T4">年</span>5<span class="T4">月</span>19-20<span class="T4">日在圣</span><span class="T9">马刁县会展</span><span class="T4">中心, </span>(<span class="T4">幻灯片，</span><a href="AlisonChaikenMakerFaire2012.pdf">PDF</a><span class="T4">和</span><a
+href="AlisonChaikenMakerFaire2012.odp">LibreOffice ODP</a>)<span class="T4">，</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•“<span class="T4">汽</span><span class="T9">车開放源代碼：机遇和危险</span>” (<a href="Edmunds.pdf">PDF</a><span class="T4">和</span><a href="Edmunds.odp">LibreOffice ODP</a>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">洛杉</span><span class="T9">矶開放源代碼小組</span><span class="T4">的</span><span class="T9">演讲 </span>“<span class="T4">新邊疆：</span><span class="T9">開放源代碼</span><span class="T4">在汽車中的應用</span>”<span class="T4"> 2012年4月11日,(幻灯片，</span><a href="LAAOS_April11_Chaiken.pdf">PDF</a><span class="T4">和</span> <a href="LAAOS_April11_Chaiken.odp">LibreOffice</a><span class="T4">格式)</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<a href="http://gondwanaland.com/mlog/2012/04/10/libre-planet-2012/">LibrePlanet</a><span class="T9">演讲</span>“<span class="T9">为什么汽车需要免费開放软件</span>”2012<span class="T4">年</span>3<span class="T4">月</span>24<span class="T4">日,(幻灯片，</span> <a href="AlisonChaikenLibrePlanet2012.pdf">PDF</a><span class="T4">和</span><a href="AlisonChaikenLibrePlanet2012.odp">LibreOffice</a><span class="T4">格式)</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">在嵌入式</span>Linux<span class="T4">大会演示</span><span class="T9">厅</span><span class="T4">的</span><span class="T9">海报, </span>2012<span class="T4">年</span>2<span class="T4">月</span>(<a href="ELC-2012_Chaiken-fixed.pdf">PDF</a><span class="T4">和</span><a href="ELC-2012_Chaiken.odp">LibreOffice ODP</a><span class="T4">格式</span>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">南加州</span>Linux<span class="T4">博</span><span class="T9">览会,汽车演讲: “移动式</span>Linux<span class="T4">的下一个新邊疆” </span>2012<span class="T4">年</span>1<span class="T4">月</span>21<span class="T4">日，(展位内容，演示幻灯片，</span><a href="SCALE2012talk.pdf">PDF</a><span class="T4">和</span><a href="SCALE2012talk.odp">LibreOffice ODP</a>, <a href="http://lwn.net/Articles/476202/">LWN</a><span class="T4">的文章和采</span><span class="T9">访)。</span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•2011<span class="T4">年</span>12<span class="T4">月</span>6<span class="T4">日</span><span class="T9">演讲: </span>“<span class="T4">新一代的</span><span class="T9">车载软件的机遇</span>” (<a href="Dec2011_IVI_opportunities.pdf">PDF</a><span class="T4">和</span><a href="Dec2011_IVI_opportunities.odp">LibreOffice ODP</a><span class="T4">格式</span>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard"> •<span class="T4"><a href="http://www.meetup.com/Silicon-Valley-Automotive-Open-Source/">硅谷汽</span><span class="T9">车開放源代碼</span>Meetup</a><span class="T9">小組，</span>2011<span class="T4">年11月</span><span class="T9">演讲</span>“<span class="T4">汽</span><span class="T9">车：</span>Linux<span class="T4">的</span><span class="T9">下一个热点</span><span class="T4">移</span><span class="T9">动平台</span>” (<a href="SVAOS_presentation_Nov2011.pdf">PDF</a><span class="T4">和</span><a href="SVAOS_presentation_Nov2011.odp">LibreOffice ODP</a><span class="T4">格式</span>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard"> •<span class="T4">代</span><span class="T9">码阵营</span>2011<span class="T4">年</span>10<span class="T4">月</span>9<span class="T4">日</span><span class="T9">演讲</span>“<span class="T4">汽</span><span class="T9">车：</span>Linux<span class="T4">的</span><span class="T9">下一个热点</span><span class="T4">移</span><span class="T9">动平台</span>” (<a href="CodeCamp_Oct9_2011.pdf">PDF</a><span class="T4">和</span><a
+href="CodeCamp_Oct9_2011.odp">LibreOffice ODP</a><span class="T4">格式</span>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">硅谷</span>Linux<span class="T4">用</span><span class="T9">户组</span>2011<span class="T4">年</span>10<span class="T4">月</span>5<span class="T4">日</span><span class="T9">演讲</span>“<span class="T4">汽</span><span class="T9">车：</span>Linux<span class="T4">的</span><span class="T9">下一个热点</span><span class="T4">移</span><span class="T9">动平台</span>” (<a href="SVLUG_IVI_Oct2011.pdf">PDF</a><span class="T4">和</span><a
+href="SVLUG_IVI_Oct2011.odp">LibreOffice ODP</a><span class="T4">格式</span>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">北湾区</span>Linux<span class="T4">用</span><span class="T9">户</span><span class="T4">集</span><span class="T9">团</span>2011<span class="T4">年</span>9<span class="T4">月</span>13<span class="T4">日</span><span class="T9">演讲</span>“<span class="T4">汽</span><span class="T9">车：</span>Linux<span class="T4">的</span><span class="T9">下一个热点</span><span class="T4">移</span><span class="T9">动平台</span>” (<a
+href="NBLUG_Sep13_2011.pdf">PDF</a><span class="T4">和</span><a
+href="NBLUG_Sep13_2011.odp">LibreOffice ODP</a><span class="T4">格式</span>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•SF<span class="T4">北湾区</span>MeeGo<span class="T4">的网</span><span class="T9">络演讲</span>“<span class="T4">汽</span><span class="T9">车：</span>MeeGo<span class="T4">的</span><span class="T9">下一个平台</span>” (<a href="MeeGo_Meetup_Sep7_2011.pdf">PDF</a><span class="T4">和</span> <a href="MeeGo_Meetup_Sep7_2011.odp">LibreOffice ODP</a>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard"> •<a
+href="http://superhappydevhouse.org/w/page/44819342/SuperHappyDevHouse46_LightningTalks">SHDH46</a>“<span class="T9">闪电”演讲</span> “<span class="T4">汽</span><span class="T9">车：移动平台的下一个热点</span>” 2011<span class="T4">年</span>9<span class="T4">月</span>3<span class="T4">日，</span>(<a href="SHDH_AlisonChaiken.pdf">PDF</a><span class="T4">和</span><a
+href="SHDH_AlisonChaiken.odp">LibreOffice ODP</a>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">幻灯片<a href="http://www.slideshare.net/chaiken/rapid-prototypingopensource">“使用</span><span class="T9">開放源代碼作快速原型设计</span>”</a><span class="T4"> </span>2011<span class="T4">年</span>7<span class="T4">月</span>14<span class="T4">日在麻省理工学院的林肯</span><span class="T9">实验室的</span><span class="T4">研</span><span class="T9">讨会</span>(PDF<span class="T4">和</span>LibreOffice ODP)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">幻灯片关于开</span><span class="T9">发</span><span class="T4">中</span><span class="T9">的</span>MeeGo<span class="T4">,</span> MeeGo<span class="T4">会</span><span class="T9">议,</span>2011<span class="T4">年春季,</span> (<a href="MeeGoCon2011DevelopmentBoardBoFslides.pdf">PDF</a><span class="T4">和</span><a href="MeeGoCon2011DevelopmentBoardBoFslides.odp">LibreOffice ODP</a>)</p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">• “<span class="T9">鸟的羽毛</span>”<span class="T9">,演示</span><span class="T4">,未来的</span>MeeGo<span class="T4">,嵌入式</span>Linux<span class="T4">大会,</span>2011<span class="T4">年,</span> (<a href="BoFSlides.pdf">PDF</a><span class="T4">和</span><a
+href="BoFSlides.odp">LibreOffice ODP</a>)</p>
+
+<p class="Standard"> </p>
+<p class="Standard"><span class="T5">客</span><span class="T10">户</span></p>
+<p class="P7"> </p>
+<p class="Standard">•<a href="http://enlightedinc.com/">Enlighted</a></p>
+<p class="Standard">•<a href="http://caralta.com/">Caralta</a></p>
+<p class="Standard">•<a href="http://edmunds.com/">Edmunds</a></p>
+<p class="Standard">•<a href="http://wiki.tizen.org/wiki/IVI">Tizen-IVI</a></p>
+<p class="Standard">•<a href="http://openmobileww.com/">Open Mobile World Wide</p>
+<p class="Standard"> </p>
+-<p class="P12">个人简历: <a href="resume_chinese.html"><img alt="PRC flag" src="/images/chinese_flag_80.png"></a><a href="AlisonChaikenResume.pdf"><img alt="Union Jack" src="/images/union-jack_80.png"></a></p>
+<p class="Standard"> </p>
+
+<p class="P10">组织</p>
+<p class="P8"> </p>
+<p class="Standard">•<span class="T4">硅谷汽</span><span class="T9">车開放源代碼集团是一个免费的，非商业的网络，旨在促进软件开发商，汽车制造商，小型企业，系统集成商和业余爱好者之间的沟通。</span></p>
+<p class="P4"> </p>
+
+
+<p class="P5">提示和技巧</p>
+<p class="P8"> </p>
+
+<p class="Standard">•<span class="T4">一个</span><a href="BurnSystemRescueCD">bash script</a>(“<span class="T4">脚本”), 可以把新版的</span>SystemRescueCD<span class="T4">安装在一个</span>USB<span class="T9">记忆棒，并解决了</span>SystemRescueCD<span class="T4">安装失</span><span class="T9">败</span><span class="T4">的</span><span class="T9">两个最常见的原因.</span><span class="T4"> </span></p>
+
+<p class="Standard"> </p>
+
+<p class="Standard">•<span class="T4">控制器区域网</span><span class="T9">络（</span>CAN<span class="T4">）</span><span class="T9">协议应用于现代化的汽车：<a
+href="Mazda3_Controller_Area_Network_Experimentation.html">用我多</span><span class="T4">年</span><span class="T9">研究的</a></span>2005<span class="T4">年</span><span class="T9">马自达</span>3<span class="T4">两</span><span class="T9">厢车作为</span><span class="T4">一个</span><span class="T9">案例的研究</span></p>
+
+<p class="Standard">•<span class="T9"><a href="AmericanWheelsreview.html">迈克尔</a></span>·J·<span class="T9">邓恩的评论:</span><span class="T4">美国</span><span class="T9">车轮，中国道路</span></p>
+
+<p class="Standard">•<span class="T4">操作指南:</span><span class="T9">在QEMU虚拟机(QemuVM)</span><span class="T4">中,</span><span class="T9">ExoPC AtomSlate上运行<a href="installing_ubuntu_ivi.html">Ubuntu-IVI Remix</a>的说明书</span></p>
+
+<p class="Standard"><span class="T9">•<a href="GettingHDMIworking.html">笔记</a>:</span><span class="T4"> </span><span class="T9">如何在具有MeeGo-IVI,Ubuntu11.10和kernel3.0.0的ExoPC Vibe上运行HDMI.</span></p>
+
+<p class="Standard"><span class="T9">•如何在Atom-based ExoPC slate上运行<a href="http://wiki.meego.com/MeeGo_IVI_on_ExoPC">MeeGo IVI</a>（汽车的Linux）</span></p>
+
+<p class="Standard"><span class="T9">•一<a href="GumstixOveroExpansionBoards.html">些方便有用的</a>,Gumstix Overo<a href="http://www.gumstix.com/store/catalog/index.php?cPath=31_40">扩展板的信息</a></span></p>
+
+<p class="Standard"><span class="T9">•如何引导你的Fedora用户程序运行核心下降(<a href="LinuxNotes/HowToDropCoreOnFedora13.html">drop core</a>)以用于调试的目的</span></p>
+
+<p class="Standard"><span class="T9">•<a href="PCBSD/PCBSD8_under_qemu-kvm.html">在qemu-KVM和QEMU-GL下运行PCBSD和MeeGo</a></span></p>
+
+<p class="P11"> </p>
+<p class="Standard"> </p>
+<p class="P9">项目</p>
+<p class="P7"> </p>
+
+<p class="Standard">
+
+•<span class="T9">包括</span>nOBDy<span class="T4">,</span>libobd<span class="T4">和</span>obdref<span class="T4">的</span><a href="http://wiki.openice.org/">OpenICE</a><span class="T4">汽</span><span class="T9">车中间件套件</span><span class="T4">。</span> OpenICE<span class="T4">工具的</span><span class="T9">宗旨，是以使汽車司機和开发人员能够更创造性地使用车辆数据. 可以从</span>Launchpad<span class="T9">运行Deb</span><span class="T4">包,</span><span class="T9"> 有</span>Debian<span class="T4">和</span>Ubuntu,<span class="T9">还有</span>rpm<span class="T4">也即将提供</span></p>
+
+<p class="Standard"> •<span class="T9">在诺基亚</span><span class="T4">上所</span><span class="T9">进行</span><span class="T4">的</span>MeeGo<span class="T4">工作：</span><span class="T9">在</span><a href="http://wiki.meego.com/Hardware-accelerated_graphics_on_Pandaboard_using_MeeGo">Pandaboard</a>,<a
+href="http://wiki.meego.com/Installing_MeeGo_and_Handset_Images_on_ExoPC">ExoPC</a><span class="T4">,</span><a
+href="http://wiki.meego.com/Installing_MeeGo_Handset_image_on_WeTab_Tablet">WeTab</a><span class="T9">运行</span><span class="T4">硬件加速的</span><span class="T9">图形和</span><span class="T4">原始数据挖掘</span>.</p>
+
+<p class="Standard">•<span class="T4"><a href="Embedded_Linux_Decision_Tree.html"嵌入式</span>Linux<span class="T4">决策</span><span class="T9">树</a>（草图</span>;<span class="T9"> 可以</span><span class="T4">下</span><span class="T9">载并改善！）</span></p>
+
+<p class="Standard">•<a href="Linux_Android_Graphics_Stacks.html">GNU/Linux<span class="T4">与</span>Android2.x</a><span class="T4">的</span><span class="T9">图形叠加（非常粗略的草图</span>;<span class="T4">下</span><span class="T9">载并改善！）在已经有了优越的</span>0xlab<span class="T9">图</span><span class="T4">像的情况下</span><span class="T9">这些粗略的草图已经被放弃</span></p>
+
+<p class="Standard"/><p class="Standard"><span class="T4"><a href="http://www.exerciseforthereader.org">艾莉森的过去的和非技</a></span><span class="T9">术</span><span class="T4">性</span><span class="T9">的内容。</span></p>
+
+<p>
+<img width= "512" height="288" alt="Alison with gigantic Bob Noyce photo backdrop."
+src="/images/AlisonWray_and_BobKong.jpg"/></p>
+<p>Bob and I at the <a
+href="http://www.intel.com/content/www/us/en/company-overview/intel-museum.html">Intel Museum</a></p></div>
+
+<p class="Standard"> </p>
+<p class="P11">鲍勃和我在英特尔博物馆</p>
+<p class="P11"> </p>
+
+</body>
+</html>

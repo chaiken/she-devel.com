@@ -1,0 +1,18 @@
+#must run 'xhost +' first?
+[Unit]
+Description=Firefox web browser
+Requires=multi-user.target
+After=multi-user.target
+AllowIsolate=yes
+
+[Service]
+Environment=DISPLAY=:0.0
+ExecStart=/bin/startx /usr/bin/firefox -profile /home/kiosk/.mozilla/firefox/4d93921t.default/ http://fedoraproject.org/wiki/SysVinit_to_Systemd_Cheatsheet
+Restart=on-abort
+#PrivateDevices=true
+ProtectSystem=true
+InaccessibleDirectories=/home/achaiken
+
+[Install]
+WantedBy=kiosk.target
+

@@ -1,0 +1,22 @@
+deb http://ftp.debian.org/debian/ testing main non-free contrib
+deb-src http://ftp.debian.org/debian/ testing main non-free contrib
+
+deb http://security.debian.org/ testing/updates main non-free contrib 
+deb-src http://security.debian.org/ testing/updates main non-free contrib
+
+# testing-updates, previously known as 'volatile'
+deb http://ftp.debian.org/debian/ testing-updates main non-free contrib
+deb-src http://ftp.debian.org/debian/ testing-updates main non-free contrib
+
+#http://deb-multimedia.org/
+deb http://www.deb-multimedia.org testing main non-free
+
+#unstable: http://bonedaddy.net/pabs3/log/2012/10/29/thoughts-on-debian-testing/
+#paired with pinning in /etc/apt/preferences.d/packages
+deb http://http.debian.net/debian/ unstable main contrib non-free
+deb-src http://http.debian.net/debian/ unstable main contrib non-free
+
+#experimental: http://bonedaddy.net/pabs3/log/2012/10/29/thoughts-on-debian-testing/
+#paired with pinning in /etc/apt/preferences.d/packages
+deb http://http.debian.net/debian/ experimental main contrib non-free
+deb-src http://http.debian.net/debian/ experimental main contrib non-free

@@ -1,0 +1,16 @@
+systemd-nspawn containers:
+c495df0710560790121145e62d8f2ef4  debianTestingcontainer.tar.xz
+6d130c72f810cad0ade0b47e5ea032cd  f22container.tar.xz
+
+Qemu: 
+8f770fb859d621f3967132679a4ede51  debian-testing.raw.gz
+62f97309f93ced51c7f2f11290fe4a8c  fedora-22.raw.gz
+
+VMware: 
+5ee8bc4e56d737026bd85c16a32c77ed  debian-testing-VMware.tar.xz
+b3130879b02ffe03c0f2339cf8fd13ac  fedora22-VMWare.tar.xz
+
+Slides:
+cd570ed2fea601127fe76e9d8a63de95  LISA15_systemd.odp
+36354b4b96fe66e78b74522de4079e4d  LISA15_systemd.pdf
+da0ad85682f9768de5c848c4496585ca  LISA15_systemd.ppt

@@ -1,0 +1,21 @@
+#!/bin/bash
+echo "Requires at least 14 GB of empty disk space"
+
+echo "Downloading 3.6 GB PCBSD iso image to /tmp"
+cd /tmp
+wget http://www.pcbsd.org/content/view/169/11/#DVD-64
+qemu-img create -f raw /tmp/pcbsd.raw 10G
+
+echo "Starting PCBSD installer.   Just wait and let the bootloader timeout."
+echo "Installation takes several hours options depending on user selections."
+#should work on most hardware
+qemu-kvm -hda /tmp/pcbsd.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000 -vga std -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name PCBSD8.1 -localtime
+#Note: press and *release* Ctrl-Alt to exit the qemu window.
+#Note: move cursor away from installer soft buttons to release them;
+#button-up event doesn't occur when mouse button is released, only cursor is
+#moved away.
+
+echo "PCBSD image created.   Exit the PCBSD window (Alt-F4 in window or Ctrl-C at the terminal where qemu-kvm was started)."
+echo "Move your new filesystem from /tmp to a more permanent location and restart with"
+echo "qemu-kvm -snapshot -hda /opt/pcbsd.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000 -vga std -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name PCBSD8.1 -localtime"
+echo "to avoid overwriting your new creation."

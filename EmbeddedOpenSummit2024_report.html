@@ -1,0 +1,459 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Report from the Embedded Open Source Summit 2024</title>
+  <link rel="stylesheet" type="text/css" href="pt_style.css" />
+  <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <link rel="icon" href="/she-devel_favicon_16.jpg" type= "image/png" />
+<!-- copied from Alexis Menard, http://darktears.fr/presentations/DevDays2011/HTML5/html5.html
+
+  <script type="text/javascript"
+  src="google-code-prettify/prettify.js"></script> -->
+<meta name="description" content= "personal highlights from EOSS 2024" />
+<meta name="keywords" content= "linux, embedded, realtime, softirq, locking,
+  wiki, kaslr, kthread, NAPI" />
+<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style type="text/css">
+  img { max-width: 100%; height: auto; }
+</style>
+</head>
+
+<body onload="prettyPrint()">
+
+<hr />
+
+<div class="title">Report from the 2024 <a href="https://events.linuxfoundation.org/embedded-open-source-summit/program/schedule/">Embedded Open Source Summit</a></div>
+
+<div class="figure"><p>Prepared by <a href="mailto:alison@she-devel.com">Alison Chaiken<img src="logo/she-devel_small.jpg" alt="she-devel logo"/></a>
+and offered under <a href="
+http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" src="/icons1/by-sa.png" alt="Creative Commons logo" /></a>
+</p>
+</div>
+
+<hr />
+
+<div class="heading">Presentations</div>
+
+<menu>
+<li><h3><a href="https://eoss24.sched.com/event/1aBFB/preemptrt-how-not-to-break-it-sebastian-siewior-linutronix?iframe=yes&w=100%&sidebar=yes&bg=no">PREEMPT_RT - How Not to Break It</a> by Sebastian Siewior, Linutronix</h3>
+
+<p><a href="Siewior-How_Not_to_Break_it.txt">Semi-transcript</a> of the
+  talk.</p>
+
+Some takeaways:
+<ul>
+  <li>The RT patch set for x86_64 has been almost completely merged.  We are
+  about to enter a new era where compatibility with PREEMPT_RT is a criterion
+    for acceptance of new patches into mainline Linux.</li>
+
+  <li>The goal of the RT project is to make userspace applications run as
+    quickly as possible.  RT Linux developers make patches all over the kernel
+    source, not just to the scheduler.</li>
+
+  <li>When code within critical sections protected by locks is preempted, the
+  runtime must guarantee that side-effects which are observable from other cores
+  are unaltered.   For example, the task state must be preserved, and the thread
+    may not migrate.</li>
+
+  <li>Timer interrupt and perf events are exceptions which run in atomic context
+    even in PREEMPT_RT, where most IRQs run as regular kthreads in process
+    context.</li>
+
+  <li>Since v6.3.1-rt13/v6.5, it is no longer true that "Once ksoftirqd is
+   active, it will process all following requests."  If ksoftirqd has been
+   preempted by a hard IRQ, then its follow-on softirq will run in ksoftirqd
+   since local_bh_disable() will have run.  However, if ksoftirqd is merely
+   "raised," the softirq corresponding to a hard IRQ may run immediately in
+   atomic context.</li>
+
+  <li>Any code which runs in a "vanilla" (voluntary preemption) kernel in hard
+    IRQ context that takes a spinlock must be moved to a softirq in
+    PREEMPT_RT.</li>
+
+  <li>clock_nanosleep() runs in atomic context if called from an RT thread, but
+    runs in process context if invoked from a SCHED_OTHER task.</li>
+
+  <li>The irq_work mechanism was originally developed to support callbacks for
+  NMIs, which cannot sleep or spin.  Later on printk adopted the mechanism.</li>
+
+  <li>RCU works mostly the same in PREEMPT_RT as in a voluntary preemption
+  kernel.  Realtime kernels typically run RCU in separate kthreads rather than
+  via a softirq.  The RCU_BOOST mechanism was invented to prevent stalls by
+  allowing RCU readers which were preempted in critical sections to finish their
+  work.</li>
+
+  <li>Slides 10-11 and discussion near 28:00 into video describe problems with
+  open-coded spinlocks and semaphores.  The open-coded replacement does not
+  prevent preemption.  The thread that is waiting on the release of the homemade
+  lock can preempt the lock holder and trigger a deadlock.</li>
+
+  <li>The function <a name="del_timer_sync">del_timer_sync()</a> in core kernel
+  code had a similar potential for deadlock.  The thread which calls
+  del_timer_sync() may preempt the thread running the timer.  seq_count had a
+  related problem.  RT had to invent new synchronization primitives for these
+  mechanisms to prevent the lockup.</li>
+
+  <li>The RT developers have been replacing calls to preempt_disable() and
+  local_irq_disable()
+  with <a href="https://lkml.org/lkml/2020/6/1/318">local_lock()</a>.
+  local_locks protect per-CPU data with named, scoped locks, thereby enabling
+  static lockdep analysis.  On non-RT kernels, local_locks simply wrap
+  {preempt,irq}_{enable,disable} and have no effect.  With PREEMPT_RT,
+  preemption and interrupts are enabled, but inside a data section protected by
+  an actual lock that serializes accesses on that CPU.  RAID5 code offers
+  a <a href="https://lkml.indiana.edu/hypermail/linux/kernel/2111.1/10410.html">clarifying
+  example</a> given that {get,put}_cpu() are wrappers for
+  preempt_{enable,disable}.
+  </li>
+
+<li>Lock nesting rules are another important concept for writing
+  PREEMPT_RT code.  It would make no sense to have a preemptible lock protecting
+  a code section which is inside a large code segment protected by a
+  never-preemptible "raw" lock.
+      <i>"Lock ordering is from sleeping to may spin, to spinning:
+	<ol><li>Sleeping locks (mutex, semaphore, ...)</li>
+               <li> Sleeping locks on PREEMPT_RT spinlock_t, rwlock_t, local_lock. </li>
+               <li> Always spinning locks raw_spinlock_t and bit spinlocks.</li>
+               <li>Preempt and interrupt disabled sections (atomic sections) count as 3)."</li>
+       </i></ol>
+</li>
+
+<li>Note PI won't work with multiple-reader locks like rwsem and rwlock_t.  The
+  single writer could inherit a priority boost if need be, but that is rarely
+  the case.
+</li>
+
+<li> Interrupt handlers which are threads running in process context may take a
+  while to be scheduled in the first place.  Disabling preemption under those
+  conditions often scarcely makes sense.
+</li>
+  
+<li>The difficulty with merging RT-safe printk support to mainline is that
+  printing characters to a console is so slow, but messages can be added to the
+  dmesg buffer from atomic context.
+</li>
+
+  <li> On x86_64, cache flushes, often due to GPU drivers, are incredibly
+  costly.  A core may essentially be offline for 150-200 &micro;s.  Note also
+  that problems with contended, unpreemptible raw spinlocks tend to get worse
+  with the number of cores.   A given lock may not be a problem with a small
+  numbers of cores or tasks blocked on it, and then suddenly balloon into a
+  significant source of latency.
+    </li>
+
+<li>Latency-sensitive userspace code which rely on mutexes should be sure to
+  call <a href="https://linux.die.net/man/3/pthread_mutexattr_setprotocol">pthread_mutexattr_setprotocol()</a>
+  with protocol PTHREAD_PRIO_INHERIT.  [Note: both glibc and
+  the <a href="https://github.com/dvhart/librtpi">RT-specific librtpi</a>
+  support this capability.  librtpi provides a helper function wrapper which
+  automatically sets the correct options.]  The PRIO_INHERIT protocol allows
+  threads to jump the queue when they are contending on a lock with other
+  waiters.
+</li>
+
+  <li>Softirqs are a giant headache for PREEMPT_RT.    local_bh_disable() is
+  essentially a per-CPU Big Kernel Lock.   The essential problem is that the
+  code which run as a softirq and provides functionality like NET_TX, tasklet or
+  timer is lockless.   These callbacks have never needed locks since only one
+  softirq could run at a time, back when that constraint was not a big
+  performance limitation.   If only the softirqs had local_lock() instead of
+  local_bh_disable(),  they could run to some extent concurrently and the locks
+  could be PI-boosted.  Siewior added:
+    <p><i>
+I've been working to resolve the issue and to add more locking with soft
+interrupts so that we don't have this one global lock per CPU, but identify
+resources which are shared and require explicit locking. . . . if
+you have like one networking card that is more important that needs to do things
+regularly, and you have another networking card which is handling byte-traffic
+like ssh copying, and those things run on the same CPU, then what basically
+happens is, the periodic traffic from the high important task gets locked until
+the  byte traffic is completed. . . .  The first version was not what the community
+expected, and now I'm working on a rework which should be more or less what they
+asked for on the last review.</i> </p>
+    </li>
+
+  <li>
+Siewior also called out workqueues as a source of trouble for PREEMPT_RT:
+<i>"The problem is more or less that work originates in a specific context like a specific
+driver, once you hand it over to a workqueue or a soft interrupt, this work
+becomes anonymous.   So you have your threaded interrupt running at a specific
+priority, but you cannot inherit this priority to your workqueue, and then your
+work stalls."</i>   He recommends plain old kthreads for execution of deferred work rather than
+either softirqs or kworkers.
+  </li>
+
+      </p>  <li>Summary:
+    <ol>
+       <li>Merging of remaining RT patchset into mainline means that driver
+       authors need to avoid practices, like open-coded locks, which will
+       "break" it.</li>
+      <li>Rely on actual locks rather than disabling preemption.</li>
+      <li>Use RT-friendly locks like spinlock_t or local_lock when
+	possible.</li>
+      <li>Prefer kthreads to softirqs and workqueues.</li>
+       <li>Pick <a href="https://github.com/dvhart/librtpi">librtpi</a> rather
+	 than glibc's libpthread.</li>
+       <li>Siewior has hope that local_lock() in the network stack will
+	 eventually allow removal of local_bh_disable() there.
+	 <li>The <a href="https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/application_base">RT
+      wiki</a> is the best source of documentation.</li>
+      </ol>
+    </li>
+
+  <li>Q&amp;A:
+    <ol>
+      <li>Q: Do driver authors need to change anything when IRQs are threaded?<br/>
+      A.: No.   Userspace must set the IRQ priority.
+      </li>
+      <li>Q.: Is QEMU useful for RT-testing? <br/> A.: No, due to the continuing
+      stream of "sleeping while atomic" warnings caused by the intermittent
+      execution of the VM.
+	</li>
+      <li>Q.: Do improvements with futex2() in v6.7 now mean that glibc now can
+      support PI-aware condition variables without breaking ABI? <br/> A. with
+      comments from Jan Kiska of Siemens and Gratian Crisan of NI: RT
+      users should still choose Darren Hart's librtpi instead.   librtpi is now
+      available as a Debian package.
+      </li>
+      <li>Q.: What is the best source of RT documentation? <br/> A.: A long
+      discussion ensued about
+      the <a href="https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/application_base">RT
+      wiki</a> and information present in it or missing from it.  There was
+      general agreement that improving the in-tree kernel Documentation was also
+      desirable.
+      </li>
+      </ol>
+  </li>
+
+</ul>
+</li>
+
+<li><h3><a href="https://eoss24.sched.com/event/1aBFI/do-existing-drivers-conflict-with-preemptrt-a-3-year-survey-ahmed-s-darwish-linutronix-gmbh?iframe=yes&w=100%&sidebar=yes&bg=no">Do Existing Drivers Conflict with PREEMPT_RT?  a 3-Year Survey</a> by Ahmed
+  S. Darwish, Linutronix</h3></li>
+
+<ul>
+   <li>Running a Linux device driver which was developed with a voluntary
+   preemption kernel instead on PREEMPT_RT usually requires no modification.
+   The porting effort  is far less than for RTOSes.</li>
+
+  <li>Darwish's talk answers the obvious follow-on question, why then has the RT
+  patchset included so many patches to drivers/?  He covers the three main areas
+  where he patched drivers to remove sources of latency, namely sequence
+  counters, tasklets and open-coded synchronization methods.</li>
+
+  <ol>
+    <li><p><a href="https://static.lwn.net/kerneldoc/locking/seqlock.html"><b>Sequence
+    counters</b></a> are a type
+    of <a href="https://lwn.net/Articles/844224/">lockless pattern</a> which
+    notifies readers of infrequently modified data that they should briefly
+    wait.  As always, multiple writers need to be deconflicted with an actual
+    lock, but readers of any number can just check if the sequence counter is
+    even or odd, and wait in the latter case.
+      </p><p> One adaptation necessary for RT is to disable preemption of
+	writers so that the potentially many readers need not wait.  The second
+	problem is common to all lockless synchronization patterns, namely that
+	lock-dep analysis won't make it clear to the scheduler that a
+	high-priority reader should never preempt the writer.
+      </p>
+      <p>The solution was simply
+      to <a href="https://static.lwn.net/kerneldoc/locking/seqlock.html">add a
+      set of write-serialization locks</a> only for PREEMPT_RT.  Readers try to
+      take the lock, and now writers can inherit their priority.  A further
+      problem though is with NMIs, which interrupt even when preemption is
+      disabled.  The solution there is
+      the <a href="https://lwn.net/Articles/831540/">seqcount latch</a>, which
+      essentially means maintaining two copies of the data, not unlike RCU.</p>
+    </li>
+    <li><p>The existing <b>tasklet API</b> had potential deadlock problems not unlike that
+    of <a href="#del_timer_sync">del_timer_sync()</a>, as described by Siewior
+    above.  Just as a thread which wants to delete a timer may preempt the
+    timer, just so code which wants to disable or delete a tasklet may preempt a
+    running instance, resulting in a run-forever busy-loop.</p>
+<p>Linutronix surveyed over 400 call-sites where tasklet_delete() or
+  tasklet_disable() was called.  Of these, 10 were instances where the
+  invocation of tasklet_disable() was in non-preemptible atomic context.  To
+  deal with these cases, Linutronix invented
+  the <a href="https://lore.kernel.org/all/20210309084241.563164193@linutronix.de/">new
+  tasklet_disable_in_atomic()</a>, while a bit
+  comically <a href="https://github.com/torvalds/linux/blob/8282d5af7be82100c5460d093e9774140a26b96a/kernel/softirq.c#L852">simply
+  enables and then disables softirqs</a>.  Then Peter Ziljstra fixed all the
+  call-sites which formerly spun waiting for a running tasklet to exit
+  to <a href="https://lore.kernel.org/r/20210309084241.890532921@linutronix.de">rely
+  on condition variables instead</a>.   We hope that tasklets can be replaced in
+  the future.
+</p>
+      <p>Q.: Who is replacing tasklets?</br>  A. by
+      Siewior: <a href="https://lore.kernel.org/all/CAHk-=wjDW53w4-YcSmgKC5RruiRLHmJ1sXeYdp_ZgVoBw=5byA@mail.gmail.com/T/#u">At
+      Linus' suggestion</a>, Tejun
+      Heo <a href="https://lwn.net/Articles/960041/">created a "low-latency
+      atomic workqueue"</a> by relabelling tasklets as "bottom-half workqueues."
+      They don't rely on the existing buggy tasklet API, but are still run by
+      ksoftirqd.
+    </p>
+    <p>Darwish money quote: <i>The most important thing about this talk is that,
+    if you really use the standard kernel-locking APIs, and if you use them the
+    way that they should be used, and do not depend on implementation details of
+    locking APIs, then we do all the hard work for you.  We only had problems
+    when drivers are overly smart, doing something that they should not be
+    doing.  There were, for example, during the sequence counter work, a lot of
+    drivers that open-coded certain locking because they thought that their own
+    implementation is better than the standard kernel locking mechanisms, which
+    is false not only from a performance perspective, but also from a lockdep
+    perspective.<b>When any driver break on RT, we hope that driver will not be
+    merged because it will not be respecting the kernel locking APIs.</b></i>  The
+    i915 graphics driver and DRM code still contain open-coded locks.
+    </p>
+      </li>
+
+   <li><p>A third major difficulty with drivers was <b>misuse of
+   context-detection macros</b>
+   like <a href="https://lore.kernel.org/r/20201126132952.2287996-3-bigeasy@linutronix.de">preemptible()</a>
+   and <a href="https://lore.kernel.org/all/20201101211536.2966644-7-bigeasy@linutronix.de/">in_atomic()</a>.
+   The behavior of these macros in device drivers depends on details of the kernel configuration.
+   They are fine in core scheduler code which is less dependent on configuration
+   details, and whose developers understand execution context but well, but
+   makes no sense in device drivers.
+      </p>
+   </li>
+
+   <li><p>The last major part of driver cleanup for RT involves <b>printk and
+   atomic consoles</b>.  When those changes merge to mainline, there will no
+   longer be an "RT patchset" for device drivers.
+</p>  
+    </ol>
+
+   <li>Summary:
+     <ol>
+       <li>One learns from these presentations how much of a problem the lack of
+       data encapsulation in C is.   A main focus of both these presentations if
+       on the headaches created by code depending on the internal implementation
+	 of locking and the scheduler.</li>
+
+       <li>An entire class of bugs (now mostly fixed in drivers) has to do with
+       cancellation functions preempting the running instance of the feature
+       they mean to cancel.
+</li>
+</ol>
+     </li>
+
+   <li>Q&A:
+     <ul>
+       <li><p>Q.: Is coccinelle or another static analysis tool applicable to find problems like
+open-coded lock, or are the the various weird  reimplementations too different
+	   from one another?</p>
+	 <p>A by Darwish: Coccinnelle was useful for certain tasks, although the
+	 tasklet survey was completely manual since it was necessary to
+	 determine if the tasklet_delete() or tasklet_disable() call-site was
+	 preemptible or not.  The sequence locks bugs could be caught only by
+	 dynamic analysis.</p>
+	 <p>A by Siewior: If in_interruptible() and friends are invoked in code
+	 and a preemption model is chosen where they are meaningless,
+	   compilation will now fail.</p>
+	 <p>A by Darwish:  Unfortunately the dynamic behavior of seqlocks means
+	 that compile-time rejection of error-prone code is not possible.</p>
+       </li>
+
+       <li><p>
+	   Q.: As PREEMPT_RT moves into mainline, how do users who move all the RT stuff to
+	   another core with Zephyr decide whether that still needs to
+	   happen?       </p>
+	 <p>A. by Darwish: The <a href="https://github.com/siemens/jailhouse">jailhouse
+	 hypervisor</a> is quite suitable for partitioning systems.   Whether or
+	 not it makes sense to partition depends on the use case and latency requirements.
+	 </p>
+	 <p>A. by Daniel Bristot de Oliviera: Let me add just one remark on top of this.  When we talk
+about partitioning the system, an orthogonal feature of Linux that helps is CPU
+isolation.  Isolcpus can deliver almost full isolation. 
+	 </p>
+	 <p>A. by Darwish: Isolcpus is not only for performance, but for safety
+and standards compliance.  There are multiple safety certifications, and there
+is a benefit but also safety validation and benefits.
+	   </p>
+       </li>
+
+       <li><p>Q.: What about the common use case of audio, where partitioning
+	   is still a common solution?</p>
+	 <p>A.: Audio is a classic use case for realtime Linux.  Audio
+	 developers who run PREEMPT_RT systems often post bug reports to
+	 the <a href="https://lore.kernel.org/linux-rt-users/">linux-rt-users
+	 mailing list</a>.
+	   </p>
+</li>
+       </ul>
+</li>
+
+  </ul>
+
+<li><a href="https://eoss24.sched.com/event/1bapC/journey-of-improving-rt-performance-on-single-cpu-equipped-preemptrt-linux-umesh-papadkar-intel?iframe=yes&w=100%&sidebar=yes&bg=no">Journey of improving RT Performance on Single CPU equipped PREEMPT_RT Linux</a>
+by Umesh Papadkar, Intel</li>
+
+<li><a href="https://eoss24.sched.com/event/1aBFd/low-latency-real-time-rt-kernel-the-cornerstone-of-arms-5g-oran-strategy-shiyou-huang-arm-inc">Low-Latency
+    Real-Time (RT) Kernel: The Cornerstone of Arm's 5G ORAN Strategy</a>  by
+  Shiyou Huang, ARM, INC.
+  <p>The presentation reported on a heroic effort to track down causes of
+  latency 
+</p>
+</li>
+
+
+</menu>
+
+<div class="heading">About OBDII and CAN Protocols</div>
+
+<ul>
+
+<li><p><a
+href="/home/alison/IVI/nobdy/EcuSim/mx_protocol_commands.pdf">OBDLink
+MX Protocol Commands</a> set by STN1110 chip, supports all CAN standards</p></li>
+
+<li><p><a
+href="http://www.boschdiagnostics.com/TESTEQUIPMENT/DIAGNOSTICS/SCANTOOLS/Pages/ScanTools.aspx">Link</a>
+to user's manuals for some Bosch commercial scan-tools (H/T Alan Maldonado)</p></li>
+
+
+<li>
+<p>
+<a
+href="https://en.wikipedia.org/wiki/Controller_area_network">Wikipedia
+Controller Area Network article</a>
+<pre>
+There are several CAN physical layer standards:
+<pre>
+</p>
+</li>
+
+
+<div class="heading">Set-up</div>
+
+<div class="figure"><p><a
+href="http://www.scantool.net/scan-tools/obdlink-mx.html"><img
+max-width=100% height=auto src="images/OBDLinkMX.jpg" alt="OBDLink MX scantool"
+/></p>
+
+<p>Scantool.net's OBDLink MX</a>, which is based on the <a
+href="http://www.scantool.net/scantool/downloads/102/stn1110_vs_elm327.pdf">STN1110
+interface chip</a>, not the well-known ELM327 they used in earlier
+products.</p></div>
+
+
+<div class="figure"><p><a href="OBDLinkMX_firmware_update.png"><img max-width=100% height=auto
+src="/images/OBDLinkMX_firmware_update_small.png" alt="OBDLink MX scantool"
+/></a></p>
+<p>Screenshot of a Windows 7 VM running on VMWare on top of Ubuntu
+that is reflashing the OBDLink MX's firmware (click for larger
+version).  In order to connect, I had to click on the tiny blue
+Bluetooth hardware device icons circled on the lower right corner,
+which caused Windows to query whether I wanted to install Bluetooth
+drivers.  Before the drivers were installed, Windows showed the icons
+with red X's through them.  There appeared to be no other way to
+install the drivers, not through the "network center" or "wireless
+device" control panel settings.  Once the drivers were installed, the
+larger and familiar Bluetooth connectivity icon appeared to the upper
+left of the Bluetooth hardware icons.
+</p></div>
+
+
+</body>
+</html>

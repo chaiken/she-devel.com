@@ -1,0 +1,164 @@
+http://wiki.meego.com/ARM/Meego_on_Qemu
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+http://forum.meego.com/showthread.php?t=30
+http://wiki.meego.com/ARM/Meego_images_for_N900
+
+  Open source image
+
+The open image for N900 can be obtained from http://repo.meego.com/MeeGo/releases/1.0/core/images/. There are four kind of files
+
+    * .ubiimg for native install
+    * .zImage is the linux kernel image
+    * .tar.gz for chroot install
+    * .ks for creating and customizing the image yourself using MeeGo Image Creator 
+
+Day one codedrop available here:
+http://repo.meego.com/MeeGo/devel/n900/images/ 
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+alison@tomales ;-) ./configure --target-list=arm-softmmu --enable-sdl 
+ERROR
+ERROR: User requested feature sdl
+ERROR: configure was not able to find it
+ERROR
+alison@tomales ;-) pkg-config --list-all | grep sdl
+alison@tomales ;-) sudo yum install SDL-devel
+Setting up Install Process
+Resolving Dependencies
+--> Running transaction check
+---> Package SDL-devel.x86_64 0:1.2.14-8.fc13 set to be installed
+--> Processing Dependency: libGL-devel for package: SDL-devel-1.2.14-8.fc13.x86_64
+--> Processing Dependency: alsa-lib-devel for package: SDL-devel-1.2.14-8.fc13.x86_64
+--> Processing Dependency: libGLU-devel for package: SDL-devel-1.2.14-8.fc13.x86_64
+[  .   .   . ]
+alison@tomales ;-) pkg-config --list-all | grep sdl
+sdl                        sdl - Simple DirectMedia Layer is a cross-platform multimedia library designed to provide low level access to audio, keyboard, mouse, joystick, 3D hardware via OpenGL, and 2D video framebuffer.
+
+alison@tomales ;-) ./configure --target-list=arm-softmmu --enable-sdl 
+Install prefix    /usr/local
+BIOS directory    /usr/local/share/qemu
+binary directory  /usr/local/bin
+config directory  /usr/local/etc
+Manual directory  /usr/local/share/man
+ELF interp prefix /usr/gnemul/qemu-%M
+Source path       /home/alison/qemu
+C compiler        gcc
+Host C compiler   gcc
+CFLAGS            -O2 -g 
+QEMU_CFLAGS       -Werror -m64 -Wold-style-definition -Wold-style-declaration -I. -I$(SRC_PATH) -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wendif-labels -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing 
+LDFLAGS           -Wl,--warn-common -m64 -g 
+make              make
+install           install
+host CPU          x86_64
+host big endian   no
+target list       arm-softmmu
+tcg debug enabled no
+Mon debug enabled no
+gprof enabled     no
+sparse enabled    no
+strip binaries    yes
+profiler          no
+static build      no
+-Werror enabled   yes
+SDL support       yes
+curses support    yes
+curl support      no
+check support     no
+mingw32 support   no
+Audio drivers     oss
+Extra audio cards ac97 es1370 sb16
+Block whitelist   
+Mixer emulation   no
+VNC TLS support   no
+VNC SASL support  no
+VNC JPEG support  yes
+VNC PNG support   yes
+VNC thread        no
+xen support       no
+brlapi support    no
+bluez  support    no
+Documentation     yes
+NPTL support      yes
+GUEST_BASE        yes
+PIE user targets  no
+vde support       no
+IO thread         no
+Linux AIO support no
+ATTR/XATTR support no
+Install blobs     yes
+KVM support       yes
+fdt support       no
+preadv support    yes
+fdatasync         yes
+uuid support      no
+vhost-net support yes
+gles2 support     no
+gles2 static      no
+dgles2 prefix     
+Skinning support  no
+libpng support    no
+
+alison@tomales ;-) which qemu-system-arm
+/usr/bin/qemu-system-arm
+
+alison@tomales ;-) arm-softmmu/qemu-system-arm -M ?
+Supported machines are:
+syborg     Syborg (Symbian Virtual Platform)
+musicpal   Marvell 88w8618 / MusicPal (ARM926EJ-S)
+mainstone  Mainstone II (PXA27x)
+n800       Nokia N800 tablet aka. RX-34 (OMAP2420)
+n810       Nokia N810 tablet aka. RX-44 (OMAP2420)
+n900       Nokia N900 (OMAP3)
+cheetah    Palm Tungsten|E aka. Cheetah PDA (OMAP310)
+sx1        Siemens SX1 (OMAP310) V2
+sx1-v1     Siemens SX1 (OMAP310) V1
+beagle     Beagle board (OMAP3530)
+beaglexm   Beagle board XM (OMAP3630)
+tosa       Tosa PDA (PXA255)
+akita      Akita PDA (PXA270)
+spitz      Spitz PDA (PXA270)
+borzoi     Borzoi PDA (PXA270)
+terrier    Terrier PDA (PXA270)
+connex     Gumstix Connex (PXA255)
+verdex     Gumstix Verdex (PXA270)
+lm3s811evb Stellaris LM3S811EVB
+lm3s6965evb Stellaris LM3S6965EVB
+realview-eb ARM RealView Emulation Baseboard (ARM926EJ-S)
+realview-eb-mpcore ARM RealView Emulation Baseboard (ARM11MPCore)
+realview-pb-a8 ARM RealView Platform Baseboard for Cortex-A8
+realview-pbx-a9 ARM RealView Platform Baseboard Explore for Cortex-A9
+versatilepb ARM Versatile/PB (ARM926EJ-S)
+versatileab ARM Versatile/AB (ARM926EJ-S)
+integratorcp ARM Integrator/CP (ARM926EJ-S) (default)
+
+alison@tomales ;-) sudo arm-softmmu/qemu-system-arm -M n900 -mtdblock /opt/meego/meego-codedrop-arm-n900-201003311614.ubiimg  -serial stdio -clock unix
+qemu: hardware error: no boot device found
+CPU #0:
+R00=00000000 R01=00000000 R02=00000000 R03=00000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=00000000 R14=00000000 R15=400140a4
+PSR=400001d3 -Z-- A svc32
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+http://forum.meego.com/showthread.php?t=787
+
+alison@tomales ;-) sudo arm-softmmu/qemu-system-arm -M n900 -mtdblock /opt/meego/meego-codedrop-arm-developer-201003311152.img  -serial stdio -clock unix
+qemu: fatal: Trying to execute code outside RAM or ROM at 0x00018020
+
+R00=40014044 R01=00018020 R02=00000000 R03=00000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=4020fcb0 R14=00000000 R15=00018020
+PSR=400001df -Z-- A sys32
+
+
+http://repo.meego.com/MeeGo/builds/1.0.90/1.1.80.1.20101012.1/non-oss/repos/source/
+
+[Meego]
+name=Meego Repository
+baseurl=http://repo.meego.com/MeeGo/builds/1.0.90/1.1.80.1.20101012.1/non-oss/repos/source/repodata/
+gpgkey=http://repo.meego.com/MeeGo/builds/1.0.90/1.1.80.1.20101012.1/non-oss/repos/source/repodata/repomd.xml.asc

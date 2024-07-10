@@ -1,0 +1,121 @@
+Disk-space consumed: < 500 MB.
+
+0. Run in shell; takes about 5 minutes depending on download speed.
+
+   #!/bin/bash
+   SYSR=/var/lib/machines/debian
+   sudo mkdir $SYSR
+   sudo chown $USER $SYSR; sudo chgrp $USER $SYSR
+   sudo debootstrap --include=sudo,dbus,libpam-systemd sid $SYSR http://httpredir.debian.org/debian/
+
+1. Open a shell inside the new container:
+
+   export SYSR=/var/lib/machines/debian
+   sudo systemd-nspawn -m sid -D $SYSR
+   
+See: root@debian prompt.
+
+2. Create another user the usual way:
+
+   root@debian:~# adduser jack
+   Adding user `jack' ...
+
+3. Add your user to systemd-journal group:
+
+   root@debian:~# addgroup jack systemd-journal
+   Adding user `jack' to group `systemd-journal' ...
+
+4. Exit container with Ctrl-] 3 times in a row.
+
+5. Employ a text editor from localhost to add jack to /etc/sudoers:
+
+   # User privilege specification
+   root    ALL=(ALL:ALL) ALL
+   jack    ALL=(ALL:ALL) ALL
+
+Also, employ a text editor to change /etc/hostname to differ from that
+of your test machine in order to minimize confusion.
+
+6. Now boot the container and login as your new user:
+
+   [alison@localhost ]$ sudo systemd-nspawn -bD $SYSR
+   Spawning container debian on /vol/debian.
+   Press ^] three times within 1s to kill container.
+   Detected virtualization systemd-nspawn.
+   Detected architecture x86-64.
+
+   Welcome to Debian GNU/Linux stretch/sid!
+   Debian GNU/Linux stretch/sid sid.localhost.com console
+
+   sid login: jack
+   Password:
+
+   jack@sid:~$ systemctl status
+   ● sid.localhost.com
+    State: running
+     Jobs: 0 queued
+   Failed: 0 units
+    Since: Thu 2015-08-27 17:58:03 UTC; 3min 6s ago
+   CGroup: /machine.slice/machine-sid.scope
+           ├─1 /lib/systemd/systemd
+           └─system.slice
+             ├─dbus.service
+             │ └─58 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+             ├─cron.service
+             │ └─57 /usr/sbin/cron -f
+             ├─systemd-journald.service
+             │ └─17 /lib/systemd/systemd-journald
+             ├─systemd-logind.service
+             │ └─56 /lib/systemd/systemd-logind
+             ├─console-getty.service
+             │ ├─62 /bin/login --
+             │ ├─69 -bash
+             │ ├─86 systemctl status
+             │ └─87 pager
+             └─rsyslog.service
+               └─60 /usr/sbin/rsyslogd -n
+
+   jack@sid:~$ sudo dpkg -l "*systemd*"
+   sudo: unable to resolve host sid.localhost.com
+   [sudo] password for jack:
+   Desired=Unknown/Install/Remove/Purge/Hold
+   | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+   |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+   ||/ Name                  Version         Architecture    Description
+   +++-=====================-===============-===============-================================================
+   ii  libpam-systemd        <none>          <none>          (no description available)
+   ii  libsystemd0:amd64     224-2           amd64           systemd utility library
+   ii  systemd               224-2           amd64           system and service manager
+   un  systemd-container     <none>          <none>          (no description available)
+   un  systemd-shim          <none>          <none>          (no description available)
+   ii  systemd-sysv          224-2           amd64           system and service manager - SysV links
+   un  systemd-ui            <none>          <none>          (no description available)
+
+   jack@sid:~$ systemctl --version
+   systemd 224
+   +PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT -GNUTLS +ACL +XZ -LZ4 +SECCOMP +BLKID -ELFUTILS +KMOD -IDN
+
+
+7. View/control container from localhost:
+
+   [alison@localhost systemd_tutorial]$ machinectl
+   MACHINE CLASS     SERVICE
+   sid     container nspawn
+   1 machines listed.
+
+   [alison@bonnet systemd_tutorial]$ sudo machinectl list-images
+   NAME   TYPE      RO  USAGE CREATED MODIFIED
+   debian directory no  n/a   n/a     n/a
+   1 images listed.
+
+
+8. Now you're ready for testing systemd.
+
+   jack@sid:~$ sudo systemctl poweroff
+
+More information:
+systemd-nspawn man page
+http://www.freedesktop.org/software/systemd/man/systemd-nspawn.html
+
+machinectl man page
+http://www.freedesktop.org/software/systemd/man/machinectl.html

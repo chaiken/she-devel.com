@@ -1,0 +1,116 @@
+For all provided images:
+user jack
+pword jack
+root pword jack
+
+Fedora systemd version: 219
+Debian systemd version: 224
+
+Feel free to run the tests with any systemd that is most relevant to your
+typical computing environment.
+
+Be sure that the image files are owned by root.  Untarring the
+provided images as a normal user may lead to weird errors after boot.
+
+Before class, I recommend everyone to install the Graphviz package
+
+-- Recommendations for users of recent Linux versions --
+Try the Debian or Fedora systemd-nspawn containers (provided).
+BEFORE CLASS: check that your version of systemd supports systemd-nspawn.
+
+Container images:
+http://she-devel.com/LISA15/debianTestingcontainer.tar.xz
+http://she-devel.com/LISA15/f22container.tar.xz
+
+Advantage: the containers method is the fastest for testing.
+Disadvantage: won't work with older versions of systemd or with SysVinit-only systems.
+
+Files: debianTestingcontainer.tar.xz, f22container.tar.xz
+
+-- Recommendations for users of older Linux versions --
+Run the Debian or Fedora Qemu .raw images (provided).
+BEFORE CLASS:  please install qemu, qemu-kvm, qemu-utils and qemu-system-x86.
+You may also need to turn on virtualization extensions in your bios.
+
+Advantage: should work on any Linux system from the last several years with SysVinit.
+Disadvantage: slower, takes more disk space.
+
+Files: debian-testing.raw.gz, fedora-22.raw.gz
+Available from USB stick only.
+
+These images will work on any system that runs Qemu.
+
+-- Recommendations for Windows and MacOS users --
+Run VMplayer with the provided Debian or Fedora VMX files.
+BEFORE CLASS: please install VMplayer.
+
+Advantage: cross-platform.
+Disadvantage: I haven't much tested it.   Takes more disk space than containers, less than Qemu.
+
+Files: debian-testing-VMware.tar.xz, fedora22-VMWare.tar.xz
+Available from USB stick only.
+
+These images will work on any system that runs VMplayer.
+
+-- Or, if you have a network connection,
+login into a remote host running systemd natively that you don't mind rebooting.
+
+-- Or, simply run the examples on your laptop, keeping in mind that you will hvae to reboot several times.
+
+&&&&&&&&
+
+How to run the containers:
+-----------------------------------
+sudo tar xJf {debianTesting.tar.xz, f22container.tar.xz}
+Get console:
+sudo systemd-nspawn -D <path to top-level directory of untarred files>
+'Boot' the container:
+sudo systemd-nspawn -bD <path to top-level directory of untarred files>
+Info: man systemd-nspawn
+
+How to run the Qemu images:
+-----------------------------------
+gunzip the image of your choice as root.
+
+run_Fedora_Qemu.sh:
+#!/bin/bash
+ROOTDIR=<your TLD>
+HDNAME=fedora-22
+qemu-system-x86_64 -machine accel=kvm -name ${HDNAME} -boot c -drive file=${ROOTDIR}/${HDNAME}.raw,format=raw -m 4096 -smp cpus=1 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -localtime
+
+run_Debian_Qemu.sh:
+#!/bin/bash
+ROOTDIR=<your TLD>
+HDNAME=debian-testing
+qemu-system-x86_64 -machine accel=kvm -name ${HDNAME} -boot c -drive file=${ROOTDIR}/${HDNAME}.raw,format=raw -m 4096 -smp cpus=1 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -localtime
+
+How to run the VMware images
+--------------------------------------
+
+Untar the provided image of your choice as root.
+
+Start VMplayer from a shell.
+
+From the GUI, choose "Open a Virtual Machine."
+
+Navigate to the top-level directory and select the .vmx file.
+
+On Linux, if you get an error message that vmmon and vmci are not found, then
+try
+
+sudo modprobe vmw_vmci; sudo modprobe vmmon
+
+then try again.
+
+&&&&&
+
+Slides
+--------------------
+
+http://she-devel.com/LISA15/LISA15_systemd.odp
+http://she-devel.com/LISA15/LISA15_systemd.pdf
+http://she-devel.com/LISA15/LISA15_systemd.ppt
+
+Latest version of this file: http://she-devel.com/LISA15/Testing_environment.txt
+
+Questions?   Email alison@she-devel.com

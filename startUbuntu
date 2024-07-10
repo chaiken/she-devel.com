@@ -1,0 +1,16 @@
+#!/bin/bash
+#sudo qemu-kvm -hda /tmp/pcbsd.img -cdrom /opt/PCBSD8.1-x64-bootonly.iso -boot d -m 2048 -usb -soundhw all 
+# see meego-qemu-start
+#sudo qemu-kvm -name PCBSD8.1 -hda /opt/pcbsd.img -cdrom /opt/PCBSD8.1-x64-bootonly.iso -boot d -m 4096 -net user,hostfwd=tcp:127.0.0.1:6666-:22 -net nic,model=e1000 -noreboot
+#sudo qemu-kvm -name PCBSD8.1 -hda /opt/pcbsd.img -L /opt/PCBSD8.1-x64-bootonly.iso -boot c -m 4096 -net user,hostfwd=tcp:127.0.0.1:6666-:22 -net nic,model=e1000
+#genisoimage -o /tmp/fakeCD.iso /dev/null
+#qemu-kvm --cdrom /tmp/fakeCD.iso -hda /opt/pcbsd.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000 -vga std -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name PCBSD8.1 -localtime -no-reboot
+#CAUSES HANG: sudo qemu-kvm -hda /opt/ubuntu_10.10.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000 -vga std -name ubuntu_10.10 -localtime -no-reboot
+#qemu-kvm -hda /opt/ubuntu_10.10.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_10.10 -localtime -no-reboot -g 1024x768  "Option g not supported for this target"
+#qemu-kvm --cdrom /opt/ubuntu-10.10-desktop-amd64.iso -boot d -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_10.10 -localtime -no-reboot 
+#pandroid27.2
+#qemu-kvm -hda /opt/ubuntu_10.10.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_10.10 -localtime -no-reboot -nographic   Console only
+qemu-kvm -hda /opt/ubuntu_10.10.raw -boot c -m 4096 -usb -soundhw all -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -vga std -name ubuntu_10.10 -localtime -no-reboot -full-screen
+
+
+

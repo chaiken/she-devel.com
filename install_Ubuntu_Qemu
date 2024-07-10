@@ -1,0 +1,9 @@
+#!/bin/bash
+#run with "sudo -u alison ~alison/bin/install_Ubuntu_IVI_Qemu"
+#Without -u, xauth error:
+#"Could not initialize SDL(No available video device) - exiting"
+ROOTDIR=/fedora14/bonnet_f14/opt/opt/Ubuntu
+sudo qemu-img create -f raw ${ROOTDIR}/ubuntu_debian.raw 10G
+sudo chown alison ${ROOTDIR}/ubuntu_debian.raw 
+#installs from "cdrom" onto "hard disk a"
+qemu-system-i386 --enable-kvm --cdrom ${ROOTDIR}/ubuntu-11.10-desktop-i386.iso -boot d -hda ${ROOTDIR}/ubuntu_debian.raw -m 2048 -net nic,model=e1000  -net user,hostfwd=tcp:127.0.0.1:6666-:22 -name ubuntu_debian -localtime -no-reboot 

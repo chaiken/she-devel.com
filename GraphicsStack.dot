@@ -1,0 +1,152 @@
+/* Linux and Android Graphics Stack
+
+  Alison Chaiken
+  alchaiken@gmail.com
+  http://www.exerciseforthereader.org/, http://she-devel.com
+  8/9/2011
+
+  Docs: 
+  =======
+
+  Graphviz: http://www.graphviz.org/Documentation.php
+
+  OpenGLES, EGL: http://www.khronos.org/
+
+  X11: http://www.bitwiz.org.uk/s/how-dri-and-drm-work.html
+
+  http://yangman.ca/blog/2009/10/linux-graphics-driver-stack-explained/
+
+  Android: Sasken Communications Technologies' "Graphics in Android," http://www.scribd.com/doc/52905278/Graphics-in-Android-an-Introduction
+  http://developer.android.com/sdk/ndk/index.html
+  file:///opt/android-ndk-r6/docs/STABLE-APIS.html
+
+   Create SVG file: dot -Tsvg GraphicsStack.dot -o GraphicsStack.svg
+   View with browser, or from command-line: eog GraphicsStack.svg
+*/
+
+digraph "parallel_graphics_stacks" {
+ graph [fontsize=12,label="Android and Linux Graphics Stacks\n\n",labelfontsize=24,labelloc="t"];
+// ,rankdir="LR"
+ node [fontsize=10,fillcolor=thistle,style=filled,color=lightslateblue];
+ edge [fontsize=12,color=springgreen3];
+
+//top-level nodes
+{ node [fillcolor=pink,style=filled,color=pink]
+  xRoot [label="Linux program"];
+ aRoot [label="Android app"];
+}
+//Note [label="Need new modification or wrapping",fontcolor="red",style=""];
+//{rank = source xRoot; aRoot; Note}  
+{rank = source xRoot; aRoot}  // breaks node coloration declaration if it precedes it
+
+//unused Android nodes  
+/* 
+  WindowManager [label="WindowManager"];
+  SurfaceHeapManager [label="SurfaceHeapManager"];
+  MemoryDealer [label="MemoryDealer"];
+  renderscript [label="renderscript"];
+*/
+
+SurfaceFlingerIn [label="SurfaceFlinger "];
+X11In [label="X11 "];
+{ rank=same; SurfaceFlingerIn; X11In }
+
+  EGL [label="EGL (embedded)\nor GLX (desktop)"];
+//  EGLwrapper [label="EGL wrapper",fontcolor=red];
+  aEGL [label="EGL",fontcolor=black];
+  {rank = same; EGL; aEGL} 
+  JNI [label="JNI "];
+
+  DRI2in [label="DRI2 "];
+//  libjnigraphicsIn[label="libjnigraphics",fontcolor=red];
+  gralloc[label="gralloc",fontcolor=black];
+  {rank = same; DRI2in; gralloc}
+//{rank = same; DRIin; DRI2in; GPUso}
+//  GPUso [label="GPU SO library"];
+
+  OpenGLES [label="OpenGLES "];
+  aOpenGLES [label="OpenGLES "];
+  OpenVG [label="OpenVG "];
+  Skia [label="Skia"];
+  agl [label="agl"];
+{rank = same; OpenGLES; OpenVG; aOpenGLES;Skia; agl}
+
+{ node [fillcolor=palegoldenrod,style=filled]
+  DRM [label="DRM KM"];
+  GPU [label="GPU KM"];
+  aDRM [label="DRM KM"];
+  aGPU [label="GPU KM"];
+}
+{rank = same; DRM; GPU; aDRM; aGPU}  // breaks node coloration declaration if it precedes it
+
+  DRI2out [label="DRI2 "];
+//  libjnigraphicsOut [label="libjnigraphics",fontcolor=black];
+  aEGLout [label="EGL",fontcolor=black];
+  SurfaceFlingerOut [label="SurfaceFlinger "];
+  Compositor [label="Compositor\n(mutter or\nkwin)"];
+{ rank = same; SurfaceFlingerOut; Compositor }
+
+  Framebuffer [label="Framebuffer"];
+  aFramebuffer [label="Framebuffer"];
+{rank=same; Framebuffer; aFramebuffer};
+
+{ edge [headport=n]
+    xRoot -> X11In -> EGL;
+    aRoot -> SurfaceFlingerIn;
+    SurfaceFlingerIn -> JNI;
+    JNI -> aEGL;
+    EGL -> OpenGLES [label="3D",fontcolor=springgreen3];  
+    EGL -> OpenVG [label="2D",fontcolor=springgreen3];  
+    aEGL -> aOpenGLES [label="3D",fontcolor=springgreen3];  
+    aEGL -> Skia [label="2D",fontcolor=springgreen3];  
+    aEGL -> agl [label="SW rendering\nfallback",fontcolor=red,style=dashed,color=red]
+    OpenGLES -> DRI2in [label="3D",fontcolor=springgreen3];
+    OpenVG -> DRI2in [label="2D",fontcolor=springgreen3];
+    aOpenGLES -> gralloc;
+    agl -> gralloc;
+    Skia -> gralloc;
+    aDRM -> aEGLout -> SurfaceFlingerOut;
+}
+	
+// double-headed
+edge [headport=w] DRM -> GPU;
+edge [headport=w] aDRM -> aGPU;
+edge [headport=e] GPU-> DRM;
+edge [headport=e] aGPU-> aDRM;
+
+{ edge  [labelangle=-90.0,lp=8,fontcolor=blue,label="instructions",labeldistance=0,tailport="e",headport="e",color=blue]
+  DRI2in -> GPU;
+  gralloc -> aGPU;
+}
+
+{ edge  [tailport="w",headport="w",label="data",distance=0,fontcolor=springgreen3]
+  DRI2in -> DRM ;
+  gralloc -> aDRM;
+}
+
+{ edge [headport="n"]
+  DRM -> DRI2out [fontcolor=springgreen3]; 
+}
+
+//GPU -> GPUso;
+//GPUso -> DRI2out [label="3D",fontcolor=springgreen3];
+//GPUso -> DRIout [label="2D",fontcolor=springgreen3];
+DRI2out -> Compositor [fontcolor=springgreen3,headport="n"];
+Compositor -> Framebuffer [fontcolor=springgreen3,headport="n"];
+SurfaceFlingerOut -> aFramebuffer [fontcolor=springgreen3,headport="n"];
+{ rank=same; SurfaceFlingerOut; Compositor }
+
+// Android edges
+/* aRoot -> SurfaceFlinger;
+SurfaceFlinger -> SurfaceHeapManager;
+SurfaceFlinger -> OpenGLES;
+SurfaceHeapManager -> MemoryDealer;
+//MemoryDealer -> gralloc;
+MemoryDealer
+//gralloc -> DRM;
+DRM -> GPU;
+GPU -> GPUso;
+GPUso -> SurfaceFlinger;
+//Framebuffer -> aRoot;
+*/
+}

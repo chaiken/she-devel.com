@@ -1,0 +1,3 @@
+bacula_sd_enable="YES"
+bacula_sd_flags=" -u bacula -g bacula -v -c /usr/local/etc/bacula/bacula-sd.conf"
+#bacula_sd_flags=" -u bacula -g bacula -v -c /usr/pbi/bacula-sd-amd64/etc/bacula/bacula-sd.conf"

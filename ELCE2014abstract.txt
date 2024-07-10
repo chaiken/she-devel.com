@@ -1,0 +1,59 @@
+1. Submission type: presentation
+
+2. Category: developer
+
+3. Bio:
+
+Alison Chaiken
+Mentor Graphics
+
+Alison works for Mentor Graphics Embedded Software Division in
+Fremont, CA although most recently she has developed automotive Linux
+in Germany.  Her automotive Linux career began at Nokia, where she
+ported MeeGo-IVI to the Pandaboard.  Previous speaking experience
+includes ELC, ELCE, Automotive Linux Summit, Southern California Linux
+Expo, Maker Faire and many local Linux user groups. Alison has
+been using POSIX variants for "personal productivity" since BSD 4.3.
+Her now dimly remembered physics career started at MIT and included
+stints at Hewlett-Packard and Stanford.  She disorganizes the
+1000+-member Silicon Automotive Open Source Group and is a founder of
+Hacker Dojo.
+
+Assya Raskin
+Mentor Graphics
+
+
+4. Abstract:
+
+Beyond the sandbox: the many embedded uses of virtualization
+
+Embedded engineers employ virtualization to isolate programs, provide
+a clean build environment, or visualize how an application looks on
+unavailable HW. For ARM, the Qemu emulator only supports VExpress
+CPU. A new Freescale i.MX6 emulator based on transaction-level
+modeling extends Qemu and highlights additional applications for
+embedded VMs. VMs that support TLM add IEEE-standard SystemC libraries
+can emulate multicore or find HW bugs. Changing out the emulator's
+device-tree allows testing on a variety of virtual targets. Modifying
+the rootfs enables the bisection of a bug against an entire runtime
+environment.  Running many VM instances in parallel offers a speed
+increase for regression testing.  A demo of the i.MX6 VM will be
+followed by a discussion of how to match virtualization methods to
+problems.
+
+5. Audience: build-release and QA engineers who are curious about
+virtualization but think it's irrelevant to their job assignment.
+Also virtualization fans who know about LXC, Qemu and KVM but have
+never heard of transaction-level modelling.  
+
+6. How the abstract will help better the Linux community: by provoking
+the audience to think anew, for themselves, how they might use VMs to
+improve their workflow.  Enterprise developers have completed this
+exercise, but virtualization is still not fully integrated into
+embedded.
+
+7. Experience level: intermediate.  Anyone who has ever heard of Qemu or
+ARM should be able to glean some ideas.
+
+8. Technical requirements: none.  My demo involves the ever-popular
+text-mode boot of a virtual machine.

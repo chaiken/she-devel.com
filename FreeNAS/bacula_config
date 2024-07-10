@@ -1,0 +1,74 @@
+#!/bin/sh
+cat << __EOC__
+$ ./configure  '--sbindir=/usr/local/bacula/bin' '--sysconfdir=/usr/local/bacula/bin' '--with-pid-dir=/usr/local/bacula/bin/working' '--with-subsys-dir=/usr/local/bacula/bin/working' '--enable-smartalloc' --enable-bat' '--with-sqlite3' '--with-working-dir=/usr/local/bacula/bin/working' '--with-dump-email=root' '--with-job-email=root' '--with-smtp-host=localhost' '--with-systemd=/etc/systemd/system' '--enable-readline' 'CFLAGS=-g -O2'
+
+Configuration on Sat Dec 26 14:53:21 PST 2015:
+
+   Host:		     x86_64-unknown-linux-gnu -- debian 8.2
+   Bacula version:	     Bacula 7.2.1 (23 December 2015)
+   Source code location:     .
+   Install binaries:	     /usr/local/bacula/bin
+   Install libraries:	     /usr/lib
+   Install config files:     /usr/local/bacula/bin
+   Scripts directory:	     /usr/local/bacula/bin
+   Archive directory:	     /tmp
+   Working directory:	     /usr/local/bacula/bin/working
+   PID directory:	     /usr/local/bacula/bin/working
+   Subsys directory:	     /usr/local/bacula/bin/working
+   Man directory:	     ${datarootdir}/man
+   Data directory:	     /usr/share
+   Plugin directory:	     /usr/lib
+   C Compiler:		     gcc 4.9.2-10)
+   C++ Compiler:	     /usr/bin/g++ 4.9.2-10)
+   Compiler flags:	      -g -O2 -Wall -fno-strict-aliasing -fno-exceptions -fno-rtti
+   Linker flags:	      
+   Libraries:		     -lpthread -ldl -ldl 
+   Statically Linked Tools:  no
+   Statically Linked FD:     no
+   Statically Linked SD:     no
+   Statically Linked DIR:    no
+   Statically Linked CONS:   no
+   Database backends:	     SQLite3
+   Database port:	      
+   Database name:	     bacula
+   Database user:	     bacula
+   Database SSL options:     
+
+   Job Output Email:	     root
+   Traceback Email:	     root
+   SMTP Host Address:	     localhost
+
+   Director Port:	     9101
+   File daemon Port:	     9102
+   Storage daemon Port:      9103
+
+   Director User:	     
+   Director Group:	     
+   Storage Daemon User:      
+   Storage DaemonGroup:      
+   File Daemon User:	     
+   File Daemon Group:	     
+
+   Large file support:	     yes
+   Bacula conio support:     yes -ltinfo
+   readline support:	     no 
+   TCP Wrappers support:     no 
+   TLS support: 	     yes
+   Encryption support:	     yes
+   ZLIB support:	     yes
+   LZO support: 	     yes
+   enable-smartalloc:	     yes
+   enable-lockmgr:	     no
+   bat support: 	     yes
+   client-only: 	     no
+   build-dird:		     yes
+   build-stored:	     yes
+   Plugin support:	     yes
+   AFS support: 	     no
+   ACL support: 	     yes
+   XATTR support:	     yes
+   systemd support:	     yes /etc/systemd/system
+   Batch insert enabled:     SQLite3
+
+  
+__EOC__

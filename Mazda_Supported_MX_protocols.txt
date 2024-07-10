@@ -1,0 +1,198 @@
+Figuring out Controller Area Network Protocols for 2005 Mazda 3
+
+The 2005 Mazda 3 supports 3 communication protocols over the OBDII
+Data Link Connector as identified using a Scantool.net OBDLink MX scantool and a
+minicom connection.  [Note that Data Link Connector and Data Length
+Code are both interpretations of "DLC" in this context, just as "CAN"
+might refer to a variety of protocols.]   
+
+1. Auto-protocol for OBDII
+As printed by vehicle in response to "ATSP0;ATDPN":
+A6 [AT]
+As printed by vehicle in response to "ATSP0;STRPRS":
+AUTO, ISO 15765-4 (CAN 11/500) [AT]
+
+2. High Speed CAN
+HS CAN (ISO 11898, 11-bit Tx, 500kbps, var DLC)
+As printed by vehicle in response to "STP31;STPRS":
+HS CAN (ISO 11898, 500K/11B)
+
+3. Medium Speed CAN
+51 - MS CAN (ISO 11898, 11-bit Tx, 125kbps, var DLC)
+As printed by vehicle in response to "STP51;STPRS":
+MS CAN (ISO 11898, 125K/11B)
+
+Resources:
+/home/alison/IVI/nobdy/EcuSim/mx_protocol_commands.pdf
+OBDLink MX Protocol Commands
+Updated December 29, 2011
+
+/home/alison/IVI/nobdy/EcuSim/elm327dsh.pdf, p. 23
+ELM327 Protocols for OBDII
+0 - Automatic
+1 - SAE J1850 PWM (41.6 kbaud)
+2 - SAE J1850 VPW (10.4 kbaud)
+3 - ISO 9141-2 (5 baud init, 10.4 kbaud)
+4 - ISO 14230-4 KWP (5 baud init, 10.4 kbaud)
+5 - ISO 14230-4 KWP (fast init, 10.4 kbaud)
+6 - ISO 15765-4 CAN (11 bit ID, 500 kbaud)
+7 - ISO 15765-4 CAN (29 bit ID, 500 kbaud)
+8 - ISO 15765-4 CAN (11 bit ID, 250 kbaud)
+9 - ISO 15765-4 CAN (29 bit ID, 250 kbaud)
+A - SAE J1939 CAN (29 bit ID, 250* kbaud)
+B - USER1 CAN (11* bit ID, 125* kbaud)
+C - USER2 CAN (11* bit ID, 50* kbaud)
+
+https://en.wikipedia.org/wiki/Controller_area_network
+There are several CAN physical layer standards:
+    ISO 11898-1: CAN Data Link Layer and Physical Signalling
+    ISO 11898-2: CAN High-Speed Medium Access Unit
+    ISO 11898-3: CAN Low-Speed, Fault-Tolerant, Medium-Dependent Interface
+    ISO 11898-4: CAN Time-Triggered Communication
+    ISO 11898-5: CAN High-Speed Medium Access Unit with Low-Power Mode
+    ISO 11898-6: CAN High-speed medium access unit with selective wake-up functionality
+    ISO 11992-1: CAN fault-tolerant for truck/trailer communication
+    ISO 11783-2: 250 kbit/s, Agricultural Standard
+    SAE J1939-11: 250 kbit/s, Shielded Twisted Pair (STP)
+    SAE J1939-15: 250 kbit/s, Unshielded Twisted Pair (UTP) (reduced layer)
+    SAE J2411: Single-wire CAN (SWC)
+
+2005 Mazda 3 specifics
+VIN JM1BK3437XXXXXXXX, 2005 Mazda3 with manual transmission, no turbo
+
+3 protocols:
+
+OBDLink MX's number 6 on standard OBDII pins 5, 6 and presumably 14
+(signal common), talking 15765-4 "HS-CAN"
+or "CAN" protocol at 500 kb/s with 29-bit identifiers.
+
+MX's number 31 on pins 3, 11 and presumably 14, talking (Mazda's "MS-CAN") 11898  at 500 kb/s
+with 11-bit identifiers and variable Data Length Code.   Might be
+11898-2, which came out in 2003 and supports up to 1 MB/s.
+
+MX's number 51 on pins 3, 11 and presumably 14 (same as protocol 31), talking 11898
+(Mazda's "LS-CAN") at 125 kb/s with 11-bit identifiers and variable
+Data Length Code.   11898-2 also, but at lower speed?    Slower
+11898-3 didn't come out until 2006, although that doesn't mean
+2006-model car couldn't already support it.
+
+
+
+p. 59, Mazda 3 shop manul:
+
+080-11 DRIVE MODE[LF, L3]
+id0102a3801300
+•	 Using the OBD-II drive mode, the monitoring item requested by OBD-II regulations can be easily diagnosed.
+•	 Performing the Drive Mode inspects the OBD-II system for proper operation and must be performed to ensure
+that no additional DTCs are present.
+•	 The OBD-II drive mode is divided into the specific drive mode and single drive mode.
+•	 For the specific drive mode, specified drive modes have been set for each individual monitoring item requested
+
+by OBD-II regulations, and they can be diagnosed individually. For the single drive mode, the entire monitoring
+
+item requested by OBD-II regulations can be diagnosed.
+
+•	 The following modes are in the specific drive mode. The applicable system is diagnosed by driVing in the
+
+following drive modes.
+
+PCM (Powertrain Control Module) Adaptive Memory Produce Drive Mode
+
+-
+EGR (Exhaust Gas Recirculation) System Repair Verification Drive Mode
+
+- H02S heater, H02S, and TWC Repair Verification Drive Mode
+
+-
+EVAP System Repair Verification Drive Mode
+
+•	 The following systems are diagnosed with the single drive mode.
+
+EGR system
+
+Oxygen sensor (H02S)
+
+Oxygen sensor heater
+
+Catalytic converter (TWC)
+
+Fuel, misfire and evaporative (EVAP) system
+
+Caution
+•	 While performing the Drive Mode, always operate the vehicle in a safe and lawful manner.
+•	 When the M-MDS is used to observe monitor system status while driving, be sure to have another
+technician with you, or record the data in the M-MDS using the PID/DATA MONITOR AND RECORD
+function and inspect later.
+Note
+•	 Vehicle speed and engine speed detected by the PCM may differ from that indicated by the speedometer
+and tachometer. Use the M-MDS to monitor vehicle speed.
+•	 If the OBD-II system inspection is not completed during the Drive Mode, the following causes are
+
+considered:
+
+- The aBO-II system detects the malfunction.
+
+- The Drive Mode procedure is not completed correctly.
+
+•	 Disconnecting the battery will reset the memory. Do not disconnect the battery during and after Drive
+Mode.
+•	 The M-MDS can be used at anytime through the course of the Drive Mode to monitor the completion
+status. Monitoring can be done by viewing the ON BOARD SYSTEM READINESS menu.
+•	 The aBO monitoring status can be confirmed with the ignition switch operation. During KOEO, the MIL
+illuminates for a fall-light inspection for approx. 17 s. The aBO monitoring status is confirmed after the
+fail-light inspection.
+If all of the diagnosis is completed even one time, the MIL will continue to illuminate.
+-
+If all of the diagnosis is not completed, the MIL flashes for approx. 7 s, and then it illuminates until the
+engine is started.
+PCM Adaptive Memory Production Drive Mode
+1.	 Start the engine and warm it up completely.
+2.	 Verify the following conditions and correct if necessary:
+•	 All accessory loads (AlC, headlights, blower fan, rear window defroster) are off.
+3.	 Perform no load racing at the engine speed shown in the graph, then idle the engine for more than 60 s after
+
+the cooling fan has stopped. If possible, monitor RPM PID for engine speed during this procedure.
+
+p. 63-71, shop manual, 9-page table including Diagnostic Trouble Code
+numbers and associated fault conditions.
+
+DIAGNOSTIC MONITORING TEST RESULTS[LF, L3]
+id0102a3801400
+The purpose of this test mode is to confirm the result of OBD-II
+monitor diagnostic test results. The result values stored when
+particular monitor is completed are displayed. If the monitor is not
+completed, initial value is displayed.
+ 
+Info on how to repair DTC-indicated problems continues to p. 609.
+
+Tire-pressure monitoring, anti-lock brakes, and dynamic stability
+control all can be watched through OBDII, but I don't have them
+installed.
+
+Power steering can be read out, p 2125: ON-BOARD DIAGNOSTIC [ELECTRO HYDRAULIC POWER ASSIST STEERING (EHPAS)]
+
+DTC Table, p. 2128:
+B1238 EHPAS control module
+B1317 Battery power supply
+B1318 Battery power supply
+B1342 EHPAS control module
+B1352 Ignition power supply
+B2477 EHPAS control module configuration
+C1099 Electric power steering oil pump (motor)
+C1278 Steering angle sensor
+U0073 CAN bus communication error
+U0100 Lost communication with the PCM
+U2023 EHPAS control module
+B1317 DTC Fault received from other modules
+
+PID/DATA Monitor Table, p. 2129:
+
+PID Name (Definition)
+MTR_AMP(Pump Motor Operation Current)
+RPM_ACT (Actual pump motor revolution per minutes)
+RPM_TGT (Target pump motor revolution per minutes)
+ENGRPM (Engine speed signal)
+STEER_RATE (Steering wheel rotation rate)
+TEMP_BOARD (Printed circuit board temperature)
+VPWR (Module supply voltage)
+VSS (Vehicle speed)
