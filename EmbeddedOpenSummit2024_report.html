@@ -393,8 +393,30 @@ by Umesh Papadkar, Intel</li>
     Real-Time (RT) Kernel: The Cornerstone of Arm's 5G ORAN Strategy</a>  by
   Shiyou Huang, ARM, INC.
   <p>The presentation reported on a heroic effort to track down causes of
-  latency as measured by the standard <a href="https://wiki.linuxfoundation.org/realtime/documentation/howto/tools/cyclictest/start">cyclictest</a> tool.
+  latency as measured by the
+  standard <a href="https://wiki.linuxfoundation.org/realtime/documentation/howto/tools/cyclictest/start">cyclictest</a>
+  tool.  The goal of the work was to support development of IoT endpoint devices
+  connected by ultralow latency 5G communication.  The role of RT Linux would be
+  to run on a controller for edge devices like sensors.
 </p>
+<p>
+The investigation compared cyclictest results between an ARM Ampere
+  Altra 80-core system, an Altra 24-core system and an Intel Cascade Lake
+  24-core system.   All systems ran the Ubuntu 5.15-RT kernel.  Initial
+  measurements indicated classical good-RT performance for the Intel-based test
+  system and many latency measurement up to 125 micros for the ARM hosts, with
+  outliers up to 240 micros, 134 micros and  31 micros for the 80-core ARM host,
+  the 24-core ARM host and the Intel host.  What was wrong on ARM?
+</p>
+
+  <p>Huang presented the kernel tuning options that his team test, many of which
+  like pinning IRQs and workqueues, disabling the timer tick and setting isolcpus are common in
+  RT systems.  With the optimal choice of parameters, they reduced the max
+  latency for 8 cores to 8 micros, for 48 cores to 12 micros,and for 64 cores to
+  143 micros.   Finally then they set the cmdline parameter
+  randomize_kstack_offset=0, which made the latency independent of core core.
+  Why did this final tuning parameter have such a large impact?
+    </p>
 </li>
 
 
