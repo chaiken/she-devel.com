@@ -62,7 +62,7 @@ digraph "embedded_linux_decision_tree" {
   ARMQ -> ARMnotHeadless [weight=2,label="Yes"];
   ARMQ -> AtomOrMIPS [weight=2,label="No,\nAtom\nor MIPS"];
 
-Footer [style="",label="Alison Chaiken, alchaiken@gmail.com, distributed under CC-BY-SA license",URL="http://she-devel.com/",fontsize=8,fontcolor=black,color=white]
+Footer [style="",label="Alison Chaiken, alison@she-devel.com, distributed under CC-BY-SA license",URL="http://she-devel.com/",fontsize=8,fontcolor=black,color=white]
 { rank = max Footer }
 
 }
