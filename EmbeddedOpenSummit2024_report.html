@@ -10,11 +10,12 @@
 
   <script type="text/javascript"
   src="google-code-prettify/prettify.js"></script> -->
+<meta charset="utf-8">
 <meta name="description" content= "personal highlights from EOSS 2024" />
 <meta name="keywords" content= "linux, embedded, realtime, softirq, locking,
   wiki, kaslr, kthread, NAPI" />
 <meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <style type="text/css">
   img { max-width: 100%; height: auto; }
 </style>
@@ -36,8 +37,7 @@ http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" src="/icons1/
 
 <div class="heading">Presentations</div>
 
-<menu>
-<li><h3><a href="https://eoss24.sched.com/event/1aBFB/preemptrt-how-not-to-break-it-sebastian-siewior-linutronix?iframe=yes&w=100%&sidebar=yes&bg=no">PREEMPT_RT - How Not to Break It</a> by Sebastian Siewior, Linutronix</h3>
+<li><h3><a href="https://eoss24.sched.com/event/1aBFB/preemptrt-how-not-to-break-it-sebastian-siewior-linutronix">PREEMPT_RT - How Not to Break It</a> by Sebastian Siewior, Linutronix</h3>
 
 <p><a href="Siewior-How_Not_to_Break_it.txt">Semi-transcript</a> of the
   talk.</p>
@@ -112,12 +112,14 @@ Some takeaways:
   PREEMPT_RT code.  It would make no sense to have a preemptible lock protecting
   a code section which is inside a large code segment protected by a
   never-preemptible "raw" lock.
+     <obj>
       <i>"Lock ordering is from sleeping to may spin, to spinning:
 	<ol><li>Sleeping locks (mutex, semaphore, ...)</li>
                <li> Sleeping locks on PREEMPT_RT spinlock_t, rwlock_t, local_lock. </li>
                <li> Always spinning locks raw_spinlock_t and bit spinlocks.</li>
                <li>Preempt and interrupt disabled sections (atomic sections) count as 3)."</li>
-       </i></ol>
+       </ol></i>
+     </obj>
 </li>
 
 <li>Note PI won't work with multiple-reader locks like rwsem and rwlock_t.  The
@@ -184,7 +186,7 @@ work stalls."</i>   He recommends plain old kthreads for execution of deferred w
 either softirqs or kworkers.
   </li>
 
-      </p>  <li>Summary:
+      <li>Summary:
     <ol>
        <li>Merging of remaining RT patchset into mainline means that driver
        authors need to avoid practices, like open-coded locks, which will
@@ -230,7 +232,7 @@ either softirqs or kworkers.
 </ul>
 </li>
 
-<li><h3><a href="https://eoss24.sched.com/event/1aBFI/do-existing-drivers-conflict-with-preemptrt-a-3-year-survey-ahmed-s-darwish-linutronix-gmbh?iframe=yes&w=100%&sidebar=yes&bg=no">Do Existing Drivers Conflict with PREEMPT_RT?  a 3-Year Survey</a> by Ahmed
+<li><h3><a href="https://eoss24.sched.com/event/1aBFI/do-existing-drivers-conflict-with-preemptrt-a-3-year-survey-ahmed-s-darwish-linutronix-gmbh">Do Existing Drivers Conflict with PREEMPT_RT?  a 3-Year Survey</a> by Ahmed
   S. Darwish, Linutronix</h3></li>
 
 <ul>
@@ -386,7 +388,7 @@ is a benefit but also safety validation and benefits.
 
   </ul>
 
-<li><a href="https://eoss24.sched.com/event/1bapC/journey-of-improving-rt-performance-on-single-cpu-equipped-preemptrt-linux-umesh-papadkar-intel?iframe=yes&w=100%&sidebar=yes&bg=no">Journey of improving RT Performance on Single CPU equipped PREEMPT_RT Linux</a>
+<li><a href="https://eoss24.sched.com/event/1bapC/journey-of-improving-rt-performance-on-single-cpu-equipped-preemptrt-linux-umesh-papadkar-intel?">Journey of improving RT Performance on Single CPU equipped PREEMPT_RT Linux</a>
 by Umesh Papadkar, Intel</li>
 
 <li><a href="https://eoss24.sched.com/event/1aBFd/low-latency-real-time-rt-kernel-the-cornerstone-of-arms-5g-oran-strategy-shiyou-huang-arm-inc">Low-Latency
@@ -418,9 +420,6 @@ The investigation compared cyclictest results between an ARM Ampere
   Why did this final tuning parameter have such a large impact?
     </p>
 </li>
-
-
-</menu>
 
 <hr />
 
