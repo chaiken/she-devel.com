@@ -1,40 +1,40 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
   <title>Report from the Embedded Open Source Summit 2024</title>
-  <link rel="stylesheet" type="text/css" href="pt_style.css" />
-    <meta name="resource-type" content="document" />
-    <meta name="distribution" content="global" />
+  <link rel="stylesheet" type="text/css" href="pt_style.css" >
+    <meta name="resource-type" content="document" >
+    <meta name="distribution" content="global" >
     <meta http-equiv="Content-Type" content=
-    "text/html; charset=utf-8" />
+    "text/html; charset=utf-8" >
     <meta name="GENERATOR" content=
-    "GnuEmacs/19.34 [en] (X11; I; NetBSD 1.2G i386) [emacs]" />
-    <link rev="made" href="mailto:alchaiken@gmail.com" />
-<meta name="description" content= "personal highlights from EOSS 2024" />
+    "GnuEmacs/19.34 [en] (X11; I; NetBSD 1.2G i386) [emacs]" >
+<meta name="description" content= "personal highlights from EOSS 2024" >
 <meta name="keywords" content= "linux, embedded, realtime, softirq, locking,
-  wiki, kaslr, kthread, NAPI" />
-<meta name="resource-type" content="document" /> <meta name="distribution" content="global" />
-<style type="text/css">
+  wiki, kaslr, kthread, NAPI" >
+<meta name="resource-type" content="document" > <meta name="distribution" content="global" >
+<style>
   img { max-width: 100%; height: auto; }
 </style>
 </head>
 
-<body onload="prettyPrint()">
+<body onload="prettyPrint()" lang="en">
 
-<hr />
+<hr >
 
 <div class="title">Report from the 2024 <a href="https://events.linuxfoundation.org/embedded-open-source-summit/program/schedule/">Embedded Open Source Summit</a></div>
 
-<div class="figure"><p>Prepared by <a href="mailto:alison@she-devel.com">Alison Chaiken<img src="logo/she-devel_small.jpg" alt="she-devel logo"/></a>
+<div class="figure"><p>Prepared by <a href="mailto:alison@she-devel.com">Alison Chaiken<img src="logo/she-devel_small.jpg" alt="she-devel logo"></a>
 and offered under <a href="
-http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" src="/icons1/by-sa.png" alt="Creative Commons logo" /></a>
+http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" src="/icons1/by-sa.png" alt="Creative Commons logo" ></a>
 </p>
 </div>
 
-<hr />
+<hr >
 
 <div class="heading">Presentations</div>
+
+<ul> <!--  top level list around all speakers -->
 
 <li><h3><a href="https://eoss24.sched.com/event/1aBFB/preemptrt-how-not-to-break-it-sebastian-siewior-linutronix">PREEMPT_RT - How Not to Break It</a> by Sebastian Siewior, Linutronix</h3>
 
@@ -42,7 +42,7 @@ http://creativecommons.org/licenses/by-sa/3.0/"><img class="right" src="/icons1/
   talk.</p>
 
 Some takeaways:
-<ul>
+<ul>  <!-- 2nd level  for Siewior -->
   <li>The RT patch set for x86_64 has been almost completely merged.  We are
   about to enter a new era where compatibility with PREEMPT_RT is a criterion
     for acceptance of new patches into mainline Linux.</li>
@@ -88,7 +88,7 @@ Some takeaways:
   prevent preemption.  The thread that is waiting on the release of the homemade
   lock can preempt the lock holder and trigger a deadlock.</li>
 
-  <li>The function <a name="del_timer_sync">del_timer_sync()</a> in core kernel
+  <li>The function <a id="del_timer_sync">del_timer_sync()</a> in core kernel
   code had a similar potential for deadlock.  The thread which calls
   del_timer_sync() may preempt the thread running the timer.  seq_count had a
   related problem.  RT had to invent new synchronization primitives for these
@@ -111,14 +111,12 @@ Some takeaways:
   PREEMPT_RT code.  It would make no sense to have a preemptible lock protecting
   a code section which is inside a large code segment protected by a
   never-preemptible "raw" lock.
-     <obj>
-      <i>"Lock ordering is from sleeping to may spin, to spinning:
-	<ol><li>Sleeping locks (mutex, semaphore, ...)</li>
-               <li> Sleeping locks on PREEMPT_RT spinlock_t, rwlock_t, local_lock. </li>
-               <li> Always spinning locks raw_spinlock_t and bit spinlocks.</li>
-               <li>Preempt and interrupt disabled sections (atomic sections) count as 3)."</li>
-       </ol></i>
-     </obj>
+      <i>"Lock ordering is from sleeping to may spin, to spinning:</i>
+	<ul><li><i>Sleeping locks (mutex, semaphore, ...)</i></li>
+               <li><i> Sleeping locks on PREEMPT_RT spinlock_t, rwlock_t, local_lock. </i></li>
+               <li><i> Always spinning locks raw_spinlock_t and bit spinlocks.</i></li>
+               <li><i>Preempt and interrupt disabled sections (atomic sections) count as 3)."</i></li>
+       </ul>
 </li>
 
 <li>Note PI won't work with multiple-reader locks like rwsem and rwlock_t.  The
@@ -205,20 +203,20 @@ either softirqs or kworkers.
 
   <li>Q&amp;A:
     <ol>
-      <li>Q: Do driver authors need to change anything when IRQs are threaded?<br/>
+      <li>Q: Do driver authors need to change anything when IRQs are threaded?<br>
       A.: No.   Userspace must set the IRQ priority.
       </li>
-      <li>Q.: Is QEMU useful for RT-testing? <br/> A.: No, due to the continuing
+      <li>Q.: Is QEMU useful for RT-testing? <br> A.: No, due to the continuing
       stream of "sleeping while atomic" warnings caused by the intermittent
       execution of the VM.
 	</li>
       <li>Q.: Do improvements with futex2() in v6.7 now mean that glibc now can
-      support PI-aware condition variables without breaking ABI? <br/> A. with
+      support PI-aware condition variables without breaking ABI? <br> A. with
       comments from Jan Kiska of Siemens and Gratian Crisan of NI: RT
       users should still choose Darren Hart's librtpi instead.   librtpi is now
       available as a Debian package.
       </li>
-      <li>Q.: What is the best source of RT documentation? <br/> A.: A long
+      <li>Q.: What is the best source of RT documentation? <br> A.: A long
       discussion ensued about
       the <a href="https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/application_base">RT
       wiki</a> and information present in it or missing from it.  There was
@@ -228,13 +226,13 @@ either softirqs or kworkers.
       </ol>
   </li>
 
-</ul>
+</ul>  <!-- end list for Siewior -->
 </li>
 
 <li><h3><a href="https://eoss24.sched.com/event/1aBFI/do-existing-drivers-conflict-with-preemptrt-a-3-year-survey-ahmed-s-darwish-linutronix-gmbh">Do Existing Drivers Conflict with PREEMPT_RT?  a 3-Year Survey</a> by Ahmed
-  S. Darwish, Linutronix</h3></li>
+  S. Darwish, Linutronix</h3>
 
-<ul>
+<ul>    <!-- top level for Darwish -->
    <li>Running a Linux device driver which was developed with a voluntary
    preemption kernel instead on PREEMPT_RT usually requires no modification.
    The porting effort  is far less than for RTOSes.</li>
@@ -244,7 +242,7 @@ either softirqs or kworkers.
   where he patched drivers to remove sources of latency, namely sequence
   counters, tasklets and open-coded synchronization methods.</li>
 
-  <ol>
+  <li><ol>   <!-- 2nd level for Darwish-->
     <li><p><a href="https://static.lwn.net/kerneldoc/locking/seqlock.html"><b>Sequence
     counters</b></a> are a type
     of <a href="https://lwn.net/Articles/844224/">lockless pattern</a> which
@@ -285,7 +283,7 @@ either softirqs or kworkers.
   on condition variables instead</a>.   We hope that tasklets can be replaced in
   the future.
 </p>
-      <p>Q.: Who is replacing tasklets?</br>  A. by
+      <p>Q.: Who is replacing tasklets?<br>  A. by
       Siewior: <a href="https://lore.kernel.org/all/CAHk-=wjDW53w4-YcSmgKC5RruiRLHmJ1sXeYdp_ZgVoBw=5byA@mail.gmail.com/T/#u">At
       Linus' suggestion</a>, Tejun
       Heo <a href="https://lwn.net/Articles/960041/">created a "low-latency
@@ -323,7 +321,8 @@ either softirqs or kworkers.
    atomic consoles</b>.  When those changes merge to mainline, there will no
    longer be an "RT patchset" for device drivers.
 </p>  
-    </ol>
+    </ol>  <!-- end Darwish main -->
+</li> <!-- container for ol above -->
 
    <li>Summary:
      <ol>
@@ -336,11 +335,10 @@ either softirqs or kworkers.
        cancellation functions preempting the running instance of the feature
        they mean to cancel.
 </li>
-</ol>
-     </li>
+</ol>   <!-- end 2nd level for Darwish -->
 
-   <li>Q&A:
-     <ul>
+   <li>Q&A:   <!-- inside top-level ul -->
+     <ul>    <!-- new 2nd level -->
        <li><p>Q.: Is coccinelle or another static analysis tool applicable to find problems like
 open-coded lock, or are the the various weird  reimplementations too different
 	   from one another?</p>
@@ -382,10 +380,11 @@ is a benefit but also safety validation and benefits.
 	 mailing list</a>.
 	   </p>
 </li>
-       </ul>
-</li>
+       </ul>  <!-- end Q&A level -->
+</li> 
 
-  </ul>
+  </ul> <!-- overall end of Darwish -->
+</li>
 
 <li><a href="https://eoss24.sched.com/event/1bapC/journey-of-improving-rt-performance-on-single-cpu-equipped-preemptrt-linux-umesh-papadkar-intel?">Journey of improving RT Performance on Single CPU equipped PREEMPT_RT Linux</a>
 by Umesh Papadkar, Intel</li>
@@ -419,8 +418,9 @@ The investigation compared cyclictest results between an ARM Ampere
   Why did this final tuning parameter have such a large impact?
     </p>
 </li>
+</ul>  <!--  top level list around all speakers -->
 
-<hr />
+<hr>
 
 <p></p>
 
@@ -429,19 +429,19 @@ The investigation compared cyclictest results between an ARM Ampere
 
       <a href="http://creativecommons.org/licenses/by-sa/3.0"><img width= "133"
       height="25" src="/icons1/by-sa.png" alt= "offered under the Creative Commons
-      Attribution-ShareAlike 3.0 license"/></a>
+      Attribution-ShareAlike 3.0 license"></a>
 
        <a href="http://validator.w3.org/check/referer"><img
       src="/icons1/valid-xhtml10.png" alt="Valid XHTML 1.0!"
-      height="31" width="88" /></a>
+      height="31" width="88" ></a>
 
       <a href=
       "http://jigsaw.w3.org/css-validator/check/referer"><img
       src="/icons1/valid-css.png" alt="Valid CSS!" height="31" width=
-      "88" /></a><br />
+      "88" ></a><br >
 
       <a href="mailto:alison@she-devel.com">alison@she-devel.com (Alison
-      Chaiken)</a><br />
+      Chaiken)</a><br>
 
     </p>
 
