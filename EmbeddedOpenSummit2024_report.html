@@ -404,19 +404,33 @@ The investigation compared cyclictest results between an ARM Ampere
   Altra 80-core system, an Altra 24-core system and an Intel Cascade Lake
   24-core system.   All systems ran the Ubuntu 5.15-RT kernel.  Initial
   measurements indicated classical good-RT performance for the Intel-based test
-  system and many latency measurement up to 125 micros for the ARM hosts, with
-  outliers up to 240 micros, 134 micros and  31 micros for the 80-core ARM host,
+  system and many latency measurement up to 125 &micro;s for the ARM hosts, with
+  outliers up to 240 &micro;s, 134 &micro;s and  31 &micro;s for the 80-core ARM host,
   the 24-core ARM host and the Intel host.  What was wrong on ARM?
 </p>
 
-  <p>Huang presented the kernel tuning options that his team test, many of which
+  <p>Huang presented the kernel tuning options that his team tested, many of which
   like pinning IRQs and workqueues, disabling the timer tick and setting isolcpus are common in
   RT systems.  With the optimal choice of parameters, they reduced the max
-  latency for 8 cores to 8 micros, for 48 cores to 12 micros,and for 64 cores to
-  143 micros.   Finally then they set the cmdline parameter
-  randomize_kstack_offset=0, which made the latency independent of core core.
+  latency for 8 cores to 8 &micro;s, for 48 cores to 12 &micro;s,and for 64 cores to
+  143 &micro;s.   Finally then they set the cmdline parameter
+  <i>randomize_kstack_offset</i>=0, which made the latency independent of core core.
   Why did this final tuning parameter have such a large impact?
     </p>
+
+  <p>Randomizing the stack requires calling _get_random_bytes(), which in turn.
+calls crng_make_state(), which calls crng_reseed() if the entropy is currently
+    exhausted.  disables IRQs and takes a spinlock.     As <a href="https://lwn.net/Articles/963038/">LWN noted</a>: 
+  <p><i> “The existing arm64 stack randomization uses the kernel rng to acquire
+    5 bits of address space randomization. This is problematic because it
+    creates non- determinism in the syscall path when the rng needs to be
+    generated or reseeded.  This shows up as large tail latencies in some
+    benchmarks and directly affects the minimum RT latencies as seen by
+    cyclictest.”</i>
+    </p>
+    </p>
+
+
 </li>
 </ul>  <!--  top level list around all speakers -->
 
