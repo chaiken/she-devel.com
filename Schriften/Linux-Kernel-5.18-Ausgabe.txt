@@ -1,0 +1,57 @@
+https://www.heise.de/news/Linux-5-18-kommt-als-kleine-Revolution-7121451.html
+
+In Heises Artikel 'Linux 5.18 kommt als "kleine Revolution"' beschreibt Oliver
+Müller die Entwicklung und die wichtigsten neuen Besonderheiten vom kürzlich
+ausgegeben 5.18 Linux-Kernel.  Am bemerkenswertesten in 5.18 ist die Einführung
+von Intels "Software Defined Silicon."  Intel hat angekündigt, dass ihre Kunden
+künftig die Hardware-Features abonnieren müssen.  Die Bezahlung dafür wird durch
+Authentifizierungszertifikate überprüft.  Ohne Abo und verbundene Zertifikate,
+werden verschiedene Eigenschaften ganz nicht verfügbar.  Die Akzeptanz von
+Unterstützung dieser Veränderung ist sehr umstritten, indem die Ankäufer von
+Prozessoren tatsätlich vermieten werden.
+
+Für viele Teilnehmer in der Linux-Kernel Gemeinschaft ist SDSi ganz inakzeptabel
+aus technischen sowohl als politischen Gründen.  SDSi gibt Intel viel mehr
+Kontrolle über ihre Produkte, und mit dieser vergrößerten Kontrolle kommt neue
+Risiken.  Zum Beispiel, sie könnten Obsoleszenzplanung von den Prozessoren
+erzwingen, obwohl die Kunden wollen sie viel länger nutzen.  Auch kommt die
+Frage, wie zuverlässig SDSi wird.  Der Intels Ruf ist ziemlich hinsichtlich
+Sicherheit-Fehlers in Hardware angeschlagen.  Aus diesem Grund zweifeln manche
+Beitragenden dass Intel die Technologie erfolgreich und stabil schaffen kann.
+Viele Fragen bleiben unbeantwortet, z.B. welche Eigenschaften werden nur durch
+SDSi verfügbar, und was eigentlich Intels Wahrleistungen wird.  Angeblich hat
+Linux schon erlaubt, dass IBM Mainframes ausschaltbar Besonderheiten anbieten.
+Doch, ist die Beziehung mit IBM in diesem Fall sehr unterschiedlich.
+
+Eine andere Schlagzeile von 5.18 ist verbesserte Verteidigung gegen feindliche
+Veränderung von Programmflussen.  Seit der 5.13 Auflage kann der Kernel sich
+durch Androids Control Flow Integrity gegen Umlenkung der Indirekten
+Funktionsaufrufen schützen.  Allerdings ein Nachteil von CFI ist dass es
+komplett durch Software eingebaut ist.  Müller berichtet Intels neue Indirect
+Branch Tracking ist eine reine Hardware Lösung, damit es schneller wird.  Die
+zentrale Idee von IBT ist, dass jede Programmzweig mit genau einem bestimmten
+Befehl beenden soll.  Ob diesen Befehl getroffen würde, dann findet eine
+Exception sofort statt und das Programm schließ ab.  Bis jetzt bieten nur die
+Intels Prozessor IBT an.
+
+Mit 5.18 beginnt die Beseitigung von ReiserFS, eine Dateisystem dass lang ein
+Teil vom Kernel wurde.  Hans Reiser, der Schöpfer, hat ursprünglich das
+Journaling Konzept erfunden, mit dem die Veränderung zum Dateisystem
+"transactional" sind.  Das "Journal" ist eine getrennte Sperrleiste von den
+Änderungen der Dateisysteme, damit der Kern die Konsistenz einfach und schnell
+kontrollieren kann.  Später hat andere Dateisysteme, z. B. ext3, das Konzept
+angenommen.  Trotz dieses frühen Erfolgs kommt die Wartung von ReiserFS zu ende.
+Hans Reiser mordete seine Frau in 2008 und ist seitdem im Gefängnis.  ReiserFS
+ist noch nicht für die Y2038 Frist vorbereitet, und alle solcher Code ist jetzt
+wegeworfen.
+
+Die Linux Gemeinschaft ist häufig vorgeworfen, weil die Entwickler sehr veraltet
+Kommunikationsmittel benutzen.  Bis 5.18 wurde der Code auf einer veralteten
+Aufgabe der C-Sprache geschrieben.  In letztem Jahr bewies Jakob Koschel, dass
+die Kopfzeiger von verketteten Listen oft nach Durchlauf der C-Schleifen
+ungültig sind.  Dann geschehen Bugs wenn der Code diese Kopfzeiger weiter lesen.
+Mit dem C89-Standard ist es notwendig, die Variablen vor einer Schleife zu
+deklarieren.  Deshalb ist der Kopfzeiger immer außer der Schleife sichtbar.
+Nach Müller ist es seit C99 erlaubt, der Laufvariable drinnen eine Liste zu
+deklarieren.  Tatsächlich überspringt Linux C99 und hat für C11 statdessen
+entschieden.

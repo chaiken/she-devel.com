@@ -1,0 +1,66 @@
+https://www.heise.de/news/heiseshow-AMD-obenauf-Intel-und-Nvidia-am-Boden-was-ist-da-los-7216053.html
+
+AMD obenauf, Intel und Nvidia am Boden – was ist da los?
+
+mit Martin Holland von Heise, Carsten Spille von c't Magazin und Mark Mantel von
+Heise
+
+Alle ewarteten, dass die Geschaftszahlen diesen Quartal im PC-Markt sehr
+schlecht werden.  Zwar, die Ankündingungen von Intel und Nvidia sind wirklich so
+düster als vorhergesagt.  Die Überraschung kommt vom Rekordumsatz AMDs.
+
+Nvidia hat im August vor geringem Umsatz gewarnt, aber ihre mehr als ein
+Milliarden Rückgang war trotzdem nicht vorausgesehen.  Deutlich ist der Einsturz
+von der Kryptowahrung ein Anlass, warum Nvidias Bilanz so geschrumpft ist.
+Niemand hat bei Nvidia eine Verringerung von 20% seit dem jungsten Quartal
+vorgestellt.  Wirklich hat der Verkauf von Nvidias Grafikkarten 44% gefallen.
+Diese kommt für Nvidia gleichzeitig mit der Verlangsammung des PC-Markts.  Für
+Nvidia ist das Automotive Bereich stark gewachsen, aber bleibt es nur 10% so
+groß als die Grafikkarten.
+
+Kürzlich hat Intel wieder die Einführung der nächsten Generation von
+Server-Prozessoren verschoben.  Inzwischen nimmt AMD jeden Quartal ihren
+Marktanteil zu.  In diesem Bereich ist die Marge am höchsten.  Die Architektur
+von Intels Angebot ist jetzt ungefähr funf Jahre alt.  Die Leistung von diesen
+Produkten ist nicht mehr mit AMD konkurrenzfähig.  Auch bietet ARM
+Server-Prozessoren an, aber diese sind noch nicht maßgeblich.  RedHat kündigt
+an, dass sie für Intel warten wollen, aber wie lange?
+
+Im PC-Markt gibt es kein großes Unterschied in der Leistung zwischen AMD und
+Intel.  Trotz der riesigen wirtschaftlichen Resourcen Intels, damit sie
+Entwicklung unterstützen kann, bekam nur AMD Gewinn in diesen Quartal.
+
+Ein Zuhörer fragte, wie gut die neuen Intels Grafikkarten sind.  Carsten Spille
+antwortet, dass nur die Einsteigerkarten sind schon verfügbar.  Die Intels
+Grafikkarten sind auch verspätet.
+
+Niemand ist überraschend, dass der PC-Markt nach der Pandemie-Konjunktur
+schrimpft.  Die neue Rezession tragt auch die Verkleinerung des Umsatzes zu.
+Wie hat AMD unter diesen Bedingungen einen Rekordquartal geschafft?  Warum hat
+der Untergang von den Kryptowähren nicht sie auch verletzt?  Deutlich hat AMD
+den Markanteil ausgebaut.  Mark Mantel betont, dass die niedrigere
+Speicherbandbreite von den AMD Grafikkarten macht sie für "Mining" ungeeignet.
+Diesen Quartal kündigt AMD Erfolg mit Playstation und Xbox Produkte an.
+Angeblich war der Verkauf von Consoles nicht so schwer getroffen.
+
+Seit 2018 war die Technik AMDs für Notebooks ein bischen fortgeschritten.
+Kürzlich hat Intel aufgeholt, aber ihrer Ruf war noch geschadet, und die
+Verkaufer momentan zugen AMD bevor.
+
+Die Kunden wundern sich natürlich, ob sie ein Snäppchen für Grafikkarten finden
+können.   Spille behauptet, dass nur die teueresten Karten schon stark im Preis
+reduziert worden.   Weil die Preise in letzten Jahren so unvernünftig wurden,
+die Kunden vielleicht ein bischen länger warten sollen.     Die Kunden
+übergangsweise sollen die mittele Stufe von Karten ansehen.
+
+Man sieht dass AMDs Umsatz von FPGAs und Nvidias von Autos sind stark
+gestiegen.  Der Beitrag dieser Sparten zu der Gesamtzahl in beiden
+Fälle ist doch klein aber wird vielleicht diesen Jahr merkbar.
+Nächtstes Jahr vielleicht werden die ARM Server-Prozessoren wichtiger
+für Nvidias Gewinn.
+
+Ein anderer bemerkenswerter Punkt ist, dass die USAs Regierung wird neuen Intels
+Chip-Fabrik teilweise unterstützen.  Die neuen Produkte sollen im 2028 auf den
+Markt kommen.  Intel selbst investiert viel in der Fabrik, und auch in der
+Entwicklung der ihren neuen Grafikkarten.
+

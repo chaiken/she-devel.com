@@ -1,0 +1,59 @@
+https://www.heise.de/news/Java-19-verbessert-die-Nebenlaeufigkeit-mit-virtuellen-Threads-aus-Project-Loom-7269453.html
+
+"Java 19 verbessert die Nebenläufigkeit mit virtuellen Threads aus Project Loom"
+von Rainald Menge-Sonnentag
+
+In einem neuen Podcast (https://www.twoscomplement.org/podcast/async_await.txt),
+äuserten Präsentator Ben Radey und Matt Godbolt eine Begeisterung für die Javas
+Idee über virtuelle Threads.  Sie haben in Kürze beschrieben, wie virtuelle
+Threads ähnlich mit C++ Coroutines sind.  Das große Unterschied mit Coroutines
+ist, die Java Virtual Machine (JVM) die Herstellung von diesen Coroutines auf
+etwa ungenaue Weise automatisiert.  Weil ich dieses Podcast zugehört, merkte ich
+den Artikel mit großen Interesse.
+
+Laut des Artikels wird JDK 19 in sechs Monaten freigeben.  Diese neue Auslösung
+soll vier hauptsächliche Neuerungen enthalten, von denen zwei besonders
+bemerkenswert sind.  Die erste ist eine Umsetzung der JVM für die RISC-V
+Familie, und die zweite ist zwar die virtuellen Threads von Project Loom.  Die
+Neuerung besteht sich aus zwei Komponenten: Java Enhancement Proposal (JEP) 425
+mit Thema "Virtual Threads" und JEP 428, die "Structured Concurrency" genannt
+ist.  Bisher würde Java auf "Platform-Threads" angewiesen.  Diese kommen wie
+immer direkt vom Betriebssystem.
+
+Mit virtuellen Threads, besorgt die JVM eine neue "Carrier Thread", ob ein
+virtueller Thread ansonsten blockiert würde.  Die Carrier Threads stellen eine
+zusätzliche Stufe dar.  Die Entwickler brauchen nicht mehr ein Pool von Threads
+zu schaffen, indem die Laufzeitumgebung selbst die Carrier Threads ausführt.
+Die grundsätzliche Motiv für JEP 425 ist, dass ein großes Java Programm nur eine
+begrenzte Menge von Betriebsystem Threads verfügen kann.  Im Gegensatz ist der
+Vorrat von virtuellen Threads grenzenlos.  Ein Scheduler innerhalb der JVM teilt
+diese Threads aus ähnlich mit wie das Betriebsystem scheinbare grenzenlose
+Speicherplätze ergibt.
+
+Das verbundene Structured Concurrency Neuerung bietet Entwickler die Fähigkeit,
+eine Gruppe von Tasks zusammen zu kontrollieren.  Structured Concurrency
+erscheint wie Linuxs Cgroups, die auch ermöglichen, eine Gruppe von Threads als
+Einheit zu regeln.  Angeblich handelt Structured Concurrency mehr um abgestimmt
+Anfang und Ende von Bedienung und wenig von Verteilung der Ressourcen im
+Vergleich mit Cgroups.
+
+Zunächst präsentiert der Artikel die Konzepte die von Projekt Amber stammt.  Die
+zwei Komponente davon sind "Pattern Matching" und "Record Patterns" genannt.
+Das erste war in
+https://www.heise.de/news/Programmiersprache-Java-18-erhebt-UTF-8-zum-Standard-6602882.html
+weiter beschrieben.  Diese Neuerung erlaubt, dass man komplizierte Ausdrücke als
+Case Labels nützen kann.  Die zweite ermöglicht die einfache Aggregierung und
+Deaggregierung von Objekten die einem Muster entspricht.  Der erfolgreiche
+Vergleich stellt ein vorübergehende Kopie automatisch her, sodass man ihre
+Entitäte sofort nützen kann.  Die eingeschachtelten Entitäte vom Objekt können
+mit Muster innerhalb anderer Muster deaggregiert worden.  Mit dem Code vom
+Projekt Amber sehen die Disaggregierung ganz symmetrisch mit Konstruktoren aus.
+
+Verschiedene JEPs ergeben eine neue Foreign Function Interface.  Die Neuerungen
+warnen, ob einer Funktionsanruf von anderer Sprache ein großes Risiko mit
+unsicherer Speicherverwaltung hat.   Ein zweiter JEP schafft eine Schnittstelle
+für Vektor-Rechnungen in SIMD-Systeme.
+
+Der Artikel zeichnet Oracle als wichtigester Beitragende zu Java aus.  RedHat
+und Tencent stehen in den nächsten Plätze.  Die Bevölkerung von Javas
+Entwicklern ist beeindruckend riesig, und ist heute als 10 Millionen einschätzt.

@@ -1,0 +1,75 @@
+https://www.heise.de/news/Linux-6-6-bringt-neuen-Scheduler-9350044.html
+"Linux 6.6 bringt neuen Scheduler"
+von Oliver Müller
+
+https://www.heise.de/news/Linux-Kernel-6-6-bekommt-drei-Jahre-Langzeitunterstuetzung-9532885.html
+"Linux-Kernel 6.6 bekommt drei Jahre Langzeitunterstützung"
+
+https://lwn.net/Articles/948896/  
+
+Am 29 Oktober hat Linus Torvalds die Linux Version 6.6 veröffentlicht.  Diese
+Ausgabe enthalt viele Verbesserungen der Leistung, ein Paar von neuen
+Schutzzäune für die Sicherheit, und Säuberung von veralteten, nicht gewarteten
+Code.  Die Schlagzeilen erwähnen den neuen Earliest Virtual Deadline First
+Scheduler, aber gibt es auch langfristige Entwicklungen, die gleichmäßig
+merkwürdig sind.
+
+Die Veränderung des Schedulers in der aktuellen Ausgabe ist wirklich mutig.  Der
+Heises Artikel beschreibt denWandel als "Schichtwechsel."  Man konnte
+vorstellen, dass der EEVDF Scheduler ein Option von der Konfiguration ist.
+Tatsächlich ist der alte Completely Fair Scheduler weg, indem seine Logik mit
+der von EEVDF ersetzt ist.  Die Umsetzung besteht aus einem neuen Verfahren zu
+rechnen, welches Prozess zunächst laufen soll.
+
+Beiden EEVDF und CFS zielen, die Zeit von den Prozessors gerecht zu teilen.
+Komplexität entsteht von zwei zusätlichen Bedürfnissen, namentlich elektrische
+Kraft zu sparen und die Latenz-sensitivesten Ausgaben zuerst zu bewältigen.  Was
+ist die Beziehung zwischen der Konservierung von Energie und dem Scheduler?  Oft
+die Ausgaben sind möglich ohne alle die verschiedene Kerne.  Zwar, eine große
+Menge können manchmal ausgeschaltet sein.  Die Lage ist einfach arrangiert, ob
+der Scheduler die meisten Threads zu anderere Kernen verlegt.  Leider ist der
+Umzug von Threads sehr teuer für die Leistung, weil der Cache dann "kalt" ist.
+
+EEVDF bietet ein neues Verfahren für die Kontrolle der Latenz.  Dieser Ansatz
+hängt von der Rechnung von "Lag."  Lag bedeutet die Menge der Zeit in einem
+Zyklus, dass ein Thread nutzen dürfte, aber bekommt dem nicht.  Das "virtual
+Deadline" ist dann die Summe von Lag und der ertwarte Anteil pro Zyklus.  Die
+Prozesse sind dann zunächst Lag sortiert, deswegen "Earliest Virtual Deadline
+First."  Mit dieser Rechnung werden die schnellen, Latenz-sensitiven Prozesse
+automatisch zuerst zum Zug kommen.  Im Gegensatz erzielte CFS jedem Prozess den
+gleichen Anteil zu verleihen.
+
+Mit 6.6 treten Intels Shadow-Stack ein.  Das Shadow-Stack ist ein bestimmtes
+Gebiet im Speicher, worauf den Stack der Funktion kopiert ist.  Das Hardware
+vergleicht den Stapelzeiger in Aufrufstapel mit dem in Shadow-Stack.  Wenn sie
+unterschiedlich würde, der Prozessor meldet eine Ausnahme an.  Diese Prüfung
+soll gegen die meisten "return-oriented programming" Angriffe von Schadprogramme
+vorsorgen.
+
+Zwei langfristige Projekte kommen mit 6.6 voran.  Das System-Call Interface
+io_uring beschleunigt merkwürdig die Verlegung von Daten hinein und heraus den
+Kernel.  Auch schritt das Projekt der Beseitigung von "Buffer-Heads" fort.
+Buffer-Heads müssen weg, sodass die Vereinfachung des Kernels mit "Folios"
+weitergehen kann.  Buffer-Heads und Folios sind Bestandteile von der
+Seiten-Verwaltung des Kernels, mit dem den Speicher besorgt und rückgeführt ist.
+Die 6.6 Ausgabe erlaubt dem Nutzer, ein Kernel ohne Buffer-Heads zu kompilieren.
+Der Haken ist noch, dass solches System dann nicht auf FAT oder CDROM
+Dateisysteme verlassen kann.  Auf jedem Fall, steigt die Effizienz wegen Folios
+mit jeder Ausgabe, besonders mit dem Dateisystem XFS.
+
+Ein dritter langfristiger Trend ist die größere Unterstützung von Rust, und 6.6
+ist darauf keine Ausnahme.  Die Ausgabe aktualisiert die Version der Sprache und
+verschiedene verbundenene Werkzeuge.  Auch es gab mehr innene Unterstützung für
+die Verwendung von Rust.
+
+Mit dieser aktuellen Ausgabe sind das Dateisystem ReiserFS und die Chiffre DES
+beseitigt.  ReiserFS ist seit langem marode, weil seiner Entwickler Reiser im
+Gefängnis sitzt.  DES ist bei Triple-DES und AES lang ertsetzt.  Trotzdem war
+die Umstellung von den Bestandteile, die sich auf diese Verhältnisse verließen,
+eine große Anstrengung.
+
+Als die Linux Gemeinschaft erwartet hatte, ist 6.6 die nächste Ausgabe mit
+langfristiger Unterstüztung.  Das heißt, 6.6 wird für drei Jahre Korrekturen
+bekommen, dass zuerst in neueren Ausgaben entwickelt wurden.   Mit der
+Verlagerung zu EVDF ist 6.6 ein Meilenstein und auch eine Version dass lang
+genützt wird.

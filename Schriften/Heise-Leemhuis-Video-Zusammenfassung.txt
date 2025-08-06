@@ -1,0 +1,59 @@
+https://www.heise.de/news/heiseshow-30-Jahre-Linux-eine-ungewoehnliche-Erfolgsgeschichte-6192751.html
+
+#heiseshow: 30 Jahre Linux – eine ungewöhnliche Erfolgsgeschichte 
+
+In diesem Video von Heise.de, sprachen Kristina Beer und Martin Holland mit
+Thorsten Leemhuis, der Heises Linux Kernel Fachmann ist.  Der Anlass von der
+Rede ist das dreissigste Jubiläum von der ersten Linuxs Aufgabe.  Meistens reden
+sie über, warum Linux so erfolgreich ist und wie es sehr lang dauert.  Laut
+Leemhuis, das Entwicklungsmodell und die Architekur sind vor allem
+verantwortlich für diesen Erfolg.
+
+Leemhuis beschriebt wie das Linuxs Entwicklungsmodell unterschiedlich von den
+meisten anderen Projekte ist.  Linux ist von einer großen Menge Konzerne
+entwickelt, so dass im Kern keine Firma eigene besondere Lösung einpressen kann.
+Obwohl die Konzerne Unterstützung für ihre bestimmten Geräte beitragen, niemand
+darf auf eigenen neuen Prozess-Scheduler oder Arbeitsspeicher dringen.  Im
+Gegensatz erwähnt er das OpenStack Projekt, in dem jeder Teilnehmer eigene
+überflüssige Umsetzung hinzufügen darf.  Mit Linuxs Entwicklungmodell müssen
+alle eigentlich zusammenarbeiten, wenn sie das gleiche Bestandteil verbessern
+möchten.  Mit dem OpenStacks Modell, es gibt fast keine etliche Kooperation.
+
+Leemhuis betont auch, wie einstellbar Linux ist.  Er vergleicht Linux mit einer
+Bauzeichnung, von der man entweder einen Iglu oder ein Familienhaus bauen kann.
+Davon läuft Linux beide an Supercomputers sowohl als kleine Geräte.  Viele
+Konzerne wählen Linux für ihre Projekte aus, weil es so viele Funktionalität hat
+und mit alle Produkte geeignet ist.  Aus diesem Grund ist Zusammenarbeit mit den
+Kernel Entwicklern sinnvoll.
+
+Dieses vereintes Entwicklungsmodell muss trotzdem Zugeständnis schaffen für die
+große Verschiedenheit von Apparaten, Dateisysteme, Chiffierungen u.s.w. dass
+Linux enthält.  Etwa Abstraktionsschicht besorgen die Verträglichkeit zwischen
+der Grundlage des Kerns und dieser Menge von Umsetzungen.
+
+Leemhuis behauptet auch die Wichtigkeit von Maintainers, die Menschen die sich
+um unterschiedliche Teile des Kernels kümmern.  Linus Torvalds hat nicht selbst
+die Fähigkeit, alle die Subsysteme des Kernels instand zu halten.  Laut Leemhuis
+gibt es ungefähr 200 Maintainers, die für die verschiedene Bestandteile
+verantwortlich sind.  Die fachkundige Hilfe von diesen Stellvertretern
+ermöglicht die bemerkenswerte Geschwindigkeit mit der, Linux entwickelt ist.
+
+Die Zuhörer des Programms fragte Leemhuis, wer Torvalds nachfolgen würde,
+wenn seine Leitung nicht weitergeht.   Leemhuis antwortet, dass Greg
+Kroah-Hartman offensichtlich der Nachfolger ist.  Schon unterschriebt GKH
+kryptographisch jede Kernel Aufgabe.
+
+Auch fragten die Zuhörer über das Torvalds Benehmen.  Vor ein Paar Jahren, wurde
+der zeitwillige bissige Ton von den Torvalds Nachrichten kontrovers.  Die
+technischen Medien übten dann eine starke Kritik gegen Torvalds, und behaupten
+dass, seines Benehmen ein Hindernis für Linux ist.  Leemhuis erklärt dass die
+Nachrichten sind auf die Maintainers scharf gezielt, und für diese Menschen der
+Ton ist kein Problem.  Trotzdem hat Torvalds sich entschuldigt, und eine Ausfallzeit
+von einigen Monaten freigenommen.  Seitdem hat er nur achtungsvoller Nachrichten
+geschickt, damit die Kontroverse vorbei ist.
+
+Zuletzt hat die Gruppe über die Zukunft von Linux gesprochen.  Leemhuis glaubt
+dass in kurzer Laufzeit, keine große Drohung gegen Linux gibt es.  Er erwähnt
+das Beispiel von Android, dass ein neues Betriebsystem ist, aber ist auf Linux
+begründet.  Trotzdem können Konkurrenten wie Googles Fuchsia einen Marktanteil
+winnen.

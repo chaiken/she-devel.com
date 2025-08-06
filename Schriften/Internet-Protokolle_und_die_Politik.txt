@@ -1,0 +1,173 @@
+https://www.heise.de/ratgeber/FAQ-Routing-AS-Protokolle-wie-das-Internet-als-Netz-der-Netze-funktioniert-6549768.html
+von Monika Ermert
+
+
+https://youtu.be/_NqZOILLJ_I
+"Wie Russland im Internet isoliert werden kann und wie nicht?" mit Monika
+Ermert, Jürgen Kuri und Martin Holland
+
+Basiert auch auf BGP.pdf und ospf.pdf Präsentationsfolien von UCSC "Networking
+Fundamentals" Klasse
+
+Internet-Protokolle und die Politik
+
+Seit dem russischen Eingriff in der Ukraine, haben verschiedene Politiker und
+Techniker geäußert, dass die russische Verbindung mit dem Internet geschnitten
+soll.    Diese Menschen glauben, dass jede mögliche Strafmaßnahme gegen
+Russland verwendet soll.    Allerdings der Vorschlag präsentiert ein große Menge
+von Schwierigkeiten und Gefahren, beiden technische und politische.
+
+Der Artikel und die Präsentationfolien erklären wie der Verkehr im Internet
+fließt, wer die Verwaltungsräte sind und wie dieses System entwickelt wurde.
+Ermert beschriebt, dass das Internet aus einer Gruppe von "Autonomous Systems"
+aufgebaut ist.  Jedes AS enthalt etwa Routers, die das gleiche Routing-Protokoll
+nutzen und die zusammen geregelt sind.  Einige AS enthalten ein ganzes Land,
+während andere servieren besondere Ziele.  Russlands Netz besteht aus einem paar
+solchen AS.  Die AS-Nummer sind von bestimmten Verwaltungen ausgestellt.  In
+Europa, Nahe Osten und Russland ist Réseaux IP Européens (RIPE) für diese
+Registratur veräntwörtlich.
+
+Die AS austauschen Daten miteinander durch Backbone-Routers, die unterschiedlich
+vom Rest des Internets, müssen Border Gateway Protokoll nutzen.  Dieses
+Protokoll ist fähig, unterschiedliche Protokolle zwischen zwei AS zu übersetzen
+und vermitteln.  Meistens finden automatische die Routers am Internet ihre
+Nachbar, die direkt verbunden sind.  BGP ist eine Ausnahme in dieser Hinsicht,
+indem ihre Leitwegtabellen beim Eigentümer geschrieben muss.  Natürlich machen
+die Menschen immer Fehler mit dieser Aufgabe.  Berühmte Beispiele davon sind die
+Pakistans Störung auf YouTube in 2008, und der Ausfall von Facebooks Diensten in
+2021, der machte ihres AS vorübergehend unverfügbar.
+
+Jeder BGP Router veröffentlicht, aus welchen Präfixe sein Netz besteht.  Die
+Präfixe gehören verschiedenartig zu einzelnen Regierungen, Unternehmen,
+Internetanbietern und anderen Organisationen.  Von diesen Meldungen bauen die
+Routers die Leitingtabellen auf.  Natürlich entstehen Ausfälle wenn die
+Meldungen falsch sind.  Laut Ermert ist Routing Public Key Infrastucture (RPKI)
+eine Verteidigung gegen falsche Umleitungen.  Mit RPKI signieren kryptografisch
+ihre Leitung die Gruppen die besitzen einige Präfixe.  Leider ist die Annahme
+von RPKI und die zusammengehörige BGPsec Technologie langsam.
+
+Wie würde es möglich unter den Umständen, Russland vom Internet abzuschneiden?
+Ist solcher Vorschlag praktisch?  Angeblich wurde hinsichtlich Iran in letzten
+Jahren eine ähnliche Frage gestellt, weil Iran lange mit Sanktionen belastet
+ist.  Ermert berichtet, dass RIPE die Abschaltung von Russland und Iran
+ablehnte.  Die internationale Registuren verlangen Neutralität, und wollen nur
+Entscheidungen aus technischen Gründen treffen.  Von der politischen Absicht
+soll man vorsichtig an der Wirkung einer Trennung.  Die Putins Gegner würden
+auch verhindert und von westlichen Nachrichten begrenzt.   Auch betont Ermert,
+dass alle die Backbone-Routers zustimmen müssen, ob Russland abschneiden würde.
+Ansonstens könnte jede Router die Russlands Präfixe anzeigen.
+
+auswerfen
+ICANN  Domain-Verwaltung: .ru aus der Rootzone
+Anfragen ins leere laufen
+die AS-Nummer einziehen
+Russlands Rootservers blockieren
+die Zertifikate devalidieren
+Innerhalb Infrastruktur aufbauen, Russland können sie selber weitermachen
+Analog mit Great Firewall
+Authoritative Root Zone File koordinieren, 13 Betreiber davon.  Würde sie alle
+mitspielen?   ICANN steht ganz oben und kann verboten.
+
+Das Internet ist von vielen verkoppelten Netze ausgebaut.
+Welche AS in Russland es gibt?  Das Internet hat keinen Zentralen Lieferant.
+Zur Neutralität verpflichtet.   Die Russische sind schon für Abspaltung vorbereitet.
+Dann sehen wir ein Präzedens für Grenzen im Internet, und in die Hände von Oligarchen spielen.
+In Iran sind die IP-Adressen von verschiedenen Firmen eingefroren aber nicht
+eigentlich gestreichen.
+
+Das russische Internet wird noch innerhalb des ASs funktionieren.   Die Systeme
+im Russland würden nur von anderen AS getrennt.
+
+Laut Kuri, dass Russland so schwierig vom Internet spalten ist, ist ein Zeichnen
+der Stärke von der Technologie,  die sehr robust und belastbar ist.
+
+Einige Versuch, Russland abzutrennen, muss freiwillig in Anerkennung von
+Dezentralität sein, so Ermert.   Jeder Netzwerkbetrieber kann sich entscheiden.
+
+Holland betont, dass die Menschen immer finden, eine Weise damit sie eine
+Blockade umgehen können.  Kuri sagt Chinesiche Hilfe für solche Hinterziehung
+vorher.
+
+Viele Asiatische Republik verbinden ihre Netzwerke durch Russland.
+Auch Tschechien.
+
+Was ist die Lage mit Starlink?   Ist es ein eigenes AS?
+
+Nach Holland, ist die Beschränkung problematischer für die jungen Menschen, die
+mehr auf dem Internet für die aktuellen Nachrichten verlassen.
+
+Ermert berichtet über die erregte Debatte in der technische Gemeinschaft.  Warum
+soll der technische Bereich neutral bleiben und der finanzielle im Gegensatz
+nicht?  Macht sinn wenn die Länder die Lieferung des Ernähungsmittels nach
+Russland verboten, aber nicht das Netzwerkverkehr?  Es gibt keinen
+Präzedensfall.  IP-Domains sind doch schon ausgefilteret, wenn die Absender
+Malware überträgt.
+
+Nach Kuri hat IETF auch die Beziehung zwischen Politik und Technik besprochen.
+Das Thema entsteht im Bezug auf Chinesichen Vorschläge für neue Protokolle die
+Zensur einbauen.  Die Dezentralisierung ist ein Kernwert vom Internet, mit dem
+die Zensur nicht vereinbar ist.  Laut Ermert, fehlt die EU allgemein die
+vorgeschlagte Standards zu achten.  Davon müssen sie später gegen FAANG kämpfen.
+
+https://www.heise.de/hintergrund/Missing-Link-Wie-das-Internet-auch-kuenftig-am-Laufen-gehalten-wird-6702206.html
+
+Der jüngste Bericht von Ermert beschriebt ein neues Konsultationspapier von der
+USAs FCC.  In diesem Dokument wirft die FCC Unternehmen und Ingenieure vor, weil
+sie nicht die Löcher in der BGP Protokolle korrigiert haben.  Warum sind RKPI
+und BGPsec in Routers nicht weiter eingebaut?  Die Forscher von
+Netzwerksicherheit sind frustriert, weil sie lang diese Aktualisierung empfohlen
+haben.  Verschiedene Swachstellen hat Prof. Steve Bellovin von Columbia
+University in 1989 gezeichnet.  Seitdem geschahten eine lange Liste von
+Ausfällen der Sicherheit.  Es gibt zwei verschiedene Type, Route Leaks und
+BGP-Hijacking.  Hijacking ist ganz klar: ein Router falsch behauptet, dass es
+die Adressen von anderem Router kontrolliert.  Route Leaks sind subtiler.  In
+diesem Fall ein Router teilt Leitungen mit, die es Privat halten soll.  Als
+Folge wird Datenverkehr zu richtigen Empfängern gesendet, aber nicht durch den
+kürzesten Pfad.
+
+Wegen des Ukrainekriegs ruft die FCC der USA für sofortige Veränderung der
+Routing-Protokolle an, damit die Sicherheit verbessert würde.  Etwa Fachleute
+reagieren negativ, weil sie empfehlen, dass der Wandel sehr nachdenklich
+überlegt solle.  Sie errinern an der Reaktion auf 11 September, wenn die
+Behörden die Unterstützung für Entwicklung von kryptografischen
+Internet-Protokollen rasch vermehrt.  Besonders aktiv wurden NIST und Dept. of
+Homeland Security in USA, während das Europäische Interesse klein war.  Der
+Resultät war die X509 Zertifikat-Protokolle.  Diese Protokolle hat vielen
+Sicherheitslöchern, indem sie nicht genug diskutiert wurden.      Ein
+alternatives dezentrales Web of Trust-Lösung war nicht seriös überlegt.
+
+RPKI erlaubt AS, ihre Routing-Präfixen abzusichern.  Dieses Verfahren schutzt
+das Netz gegen Fehler sowohl als auch echte Verbrechen.  RPKI verwendet den
+Schutz für Beweise von Route Origin Authorisations.  Mit ROAs können Versorger
+von  Routing-Präfix Information ihre Veranwortlichkeit nachweisen.  In
+2022 ist RPKI noch nicht überall eingesetzt, aber die Annahme ist immer zunehmend.
+In Europa and Nahe Osten sind fast alle die Präfixe signiert, weil weltweit ist
+der Bruchteil nur 63 prozent.
+
+BGPsec soll die Routen entlang den Pfad absichern, sondern die aktuellen Routers
+sind nicht mit dieser Protokolle ausgerüstet.  Die Netzbetrieber möchten nicht
+neue Geräte kaufen, damit sie dann BGPsec unterstützen können.  Vielleicht wird
+die FCC BGPsec erfordern und die Aktualisierung von Routers drängen.  Jetzt
+sagen Fachleute, dass BPGsec machbar ist, und dass Feldtests zunächst geplant
+werden sollen.  Sodass die Routers leistungsfähig sind, brauchen sie neue
+cryptografische Hardwarebeschleuniger.   Aus diesem Grund mussen viele Routers
+ersetzt werden.   Da es ist wichtig, die kleine Netzbetrieber zu unterstützen.
+Ohne besondere Förderung können sie nicht leisten die Kosten für die
+Aktualisierung.   Diese kleinere Unternehmen sind für die Sicherheit wichtig,
+indem die Pfadvalidierung eine ununterbrochene Kette erfordert.
+
+RPKI ist nicht so teuer, und deutlich lohnt sich für die Netzbetrieber.  Die
+lage mit BPGsec ist komplizierter, weil die Pfadvalidierung die Empfänger hilft,
+nicht der Sender.  Die Spieltheorie trifft dafür zu.  Mindestens hoffen die
+internationalen Verwaltigungen, dass jedes Land nicht eigene unterschiedliche
+Lösung einführt.
+
+USA Netzbetrieber Juniper Networks und eine Gruppe von Europäischen Forscher
+schlagen jetzt verschiedene Pläne in Hinsicht auf internationaler Zusammenarbeit
+vor.  Schweizer Prof. Adrian Perrig von ETH stellt eine neue SCION Protokolle
+vor.  Mit SCION besteht das Internet aus isolierten Inseln, die mit sicheren
+Routers verbindet sind.  Mitglieder von IETF wurfen diesen Vorschlag vor, weil
+sie davon den Abbau des vereinigten Internets vorhersagen.  Die Fachleute
+behaupten auch, dass Aktualisierung von Internets Rückrat sehr vorsichtig
+umgesetzt muss.  Man kann doch keine außer Funktion Wartungsintervall leiden.
+

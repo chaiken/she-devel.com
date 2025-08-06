@@ -1,0 +1,56 @@
+https://www.heise.de/hintergrund/Zahlen-bitte-Die-glorreichen-7-der-Mathematik-7529850.html
+
+"Zahlen, bitte! Die glorreichen 7 der Mathematik"
+von Detlef Borchers
+
+Die mathematischen Rechnungen aufzuführen nur mit Wörtern, ohne Symbole, ist
+heute unvorstellbar.  Die Gleichungen sind viel kompakter und präzier mit
+Zahlzeichen und Operatoren.  Dass ist ein Anlass, warum Rechnungen mit Schreiben
+einfacher als mit Sprechen sind.  Woher bekommen uns diese Symbole, und wer hat
+sie ursprünglich erfunden?
+
+Der erste in einer langen Reihe von Beiträgern zur Entwicklung der
+mathematischen Schreibweise war der Italiener Fibonacci, nach wem die
+Fibonacci-Folge bennant ist.  Er schrieb in 1202 ein Rechenbuch, in dem er einen
+Bruchstrich für Brüchen einsetzte.  Auch erklärte er die Zahlzeichen.  Wie ein
+groẞes Teil der Mathematik, kamen die Zahlzeichen von den Arabern durch die
+Italiener.  Besonders auffällig ist die Übertragung von der Null, dass nicht nur
+eine neue Symbole, aber auch eine neue Idee, bedeutet.
+
+In 1237 stellte Jordanus Nemorarius die Ersetzung von Unbekannten in Gleichungen
+mit Buchstabe vor.  Leider niemand passte ihn auf.  Stattdessen hat Johann
+Müller, mit dem Spitznamen "Regiomontanus," diesen Vorschlag in Europa bekannt
+geben.  Regiomontanus war eine wichtige Figur, die die Kraft hat, die Ideen von
+anderen populär zu machen.  Der
+Wikipedias Artikel dass sich um Regiomontanus handelt
+(https://de.wikipedia.org/wiki/Regiomontanus#cite_note-11) schreibt ihm die
+Vorstellung von Multiplikationspunkt ᐧ zu.
+
+Vor allem waren die Rechnung für Handel benutzt.  Aus diesem Grund sollen wir
+nicht überrascht sein, dass das Prozentzeichnen nächst entwicklet wurde.
+Prozent stammte von "per cento" in Italienisch.  Anfangs war Prozent als "pc^o"
+geschrieben, dann "c^o" und endlich wie das getraute Prozentzeichen in 1335.
+Die Wörter netto, brutto und Konto bekommen uns auch von Italienisch.  Die
+Rechenbücher wurden auch "Coß" genannt und die Schreiber darauf Cossiste.  Die
+Namen stammen vom italienischen Wort "cosa" oder "Ding." Angeblich war der
+aktuelle Name "Variable" nicht jetzt benutzt.
+
+In 1489 veröffentlichte Rechenmeister Johannes Wildmann ein auf den Händler
+gezieltes Rechenbuch.  Die Bücher für die Handler wurden auf Deutsch geschrieben
+im gegensatz zu den auf Latein für die Gelernte. In diesem Buch setze er + und -
+für die Operationen Plus und Minus ein.  Die Erscheinung von den Symbolen ging
+langsam weiter, mit der Wurzel Symbole erstmals in 1525 beim Christoff Rudolf
+vorgestellt.  In 1544 Rudolf veröffenlichte ein Rechenbuch in dem er auch eine
+Hochzahl als Zeichen für Exponenten nutzte.  Wichtiger, hat er in diesem Buch
+die beruhmte quadratische Formel zuerst besorgt, dass bis heute bekannt ist.  Er
+war der letze in einer langen Schlange der deutschen Cossisten.
+
+In 1557 hat der Englischer Robert Recorde endlich das Gleichheitszeichen
+vorgeschlagt.  Die gewöhnlichen Symbolen × und ÷ für Multiplikation und Division
+mussten bis 1659 warten.  In diesem Jahr hat Schweizer Johann Heinrich Rahn
+biden das Zeichen für Division und das Sternchen als Malzeichen eingestellt.
+Zugleich stellte er einen Punkt als Geteilzeichen vor.
+
+Der "Dreiẞigjähriger Krieg" begann nicht lang danach, obwohl Niederlande un
+Spanien greiften einander von 1568 an.  Die ganze Lage in Mitteleuropa ändert
+sich, und die Unterstutzung von Mathematik schrumpfte dauerhaft dabei.

@@ -1,0 +1,78 @@
+https://www.heise.de/news/heiseshow-Weltraumschrott-Wie-gross-ist-die-Gefahr-im-All-was-wird-getan-6336059.html
+
+Die frischeste HeiseShow Sendefolge ist "Weltraumschrott – Wie groß ist die
+Gefahr im All, was wird getan?" genannt.  Das Video handelt von den ESAs Plänen
+wegen der Verschmutzung vom All.  In diesem Programm, führen Journalistin
+Kristina Beer und Journalist Martin Holland ein Gespräch mit Holger Krag, der
+Leiter vom ESAs Weltraumsichereits-Programm.
+
+Das Hauptthema ist die Gefahr dass Weltraumschrott in der Erdumlaufbahn bringt.  Beide
+Sateliten und Raumfahrten sind zunehmend gefährdet.  Besonders mit der
+Einführung von Starlink und andere riesigen Flotten wird die Dringlichkeit scharf
+vergrößert, internationale Zustimmung bald zu finden.  Es gibt zwei
+hauptsächliche Bedarfe: den aktuellen Trümmer zu beseitigen, und die neue
+Verschmutzung zu verringen.
+
+Ein erste Aufgabe wird, mit dem größeren Restmüll umzugehen.  An einer Seite
+sind große Objekte einfacher zu greifen.  An der anderen Seite enthalten oft die
+außerbetriebgesetzten Sateliten restlichen Brennstoff, dass mit einem Anstoß
+explodieren kann.  Eine einfache Sicherheitmaßnahme würde, alle den restlichen
+Brennstoff am Ende der Lebensdauer freizusetzen.  Besser wird auch die Bahn von
+den alten Sateliten abzusenken, damit sie in der Atmosphäre verbrannt werden.
+
+Die größere Stücke von Schrott sind deutlich die Quelle für die kleine.  Die
+Militärdienste beobachten die großen Objekten mit RADAR, damit sie ihre Anzahl
+schätzen können.  Die Militärdienste teilen nur die Weltraumorganistatione wie
+NASA und ESA die Daten mit, aber haben keine Verantwortlichkeit, die privaten
+Kunden darüber zu informieren.  Drei Startups von USA verkaufen die Daten wegen
+Weltraumschrotts.  In 1962 wurden 50 Objekte verfolgt, weil heutzutage die
+Anzahl ist zu 30e3 vergrößert.
+
+ Ein paar Startups mit Unterstuztung von ESA oder NASA versuchen, größere Stücke
+mit einem Netz oder mit Zangen zu fangen.  Die Aufgabe ist nicht leicht, indem
+die Objekte ein Netz mit Geschwindigkeit so hoch als 50e3 km/h begegnen. Trotzem
+sehen die ersten Versuche gut aus.
+
+Im Gegensatz ist die Menge von Kurzgröse ungewiss.  Die größeren Objekte
+zerlegen manchmal und verwandeln in einer Wolke der Stückchen mit gleichen
+Massenmittelpunkt und Trajektorie.  Trotz ihres kleineren Gewichts, die
+Partikeln mit Geschwindigkeit von tausende km/h sind sehr gefährlich, aber ganz
+schwieriger einzufangen.  ESA auch fördert Startups, die versuchen, dieses Problem zu
+lösen.  Das Ziel ist, alle die Partikeln innerhalb eines Behalters zu stellen,
+und zunächst den Behalter durch Wiederentritt zu zerstören.
+
+Andere Startups vorhersagen Trajektorien der Objekten und verkaufen die Daten zu
+Kunden.  Fliegerei hat Warnsysteme gegen Kollisionen zwischen gesteurten Geräte.
+Die orbitalen Vorhersagen mit Schrott sind im Vergleich unpräzis, weil die
+Gewichte der Objekten unbekannt sind.  Zwar, ist die Trümmer ganz außer
+Kontrolle. Auch sind die Prognosen ungenau, weil oft zwei Umlaufbahne
+vorhergesehen muss.  Die ISS hat kein Warnsystem. Stattdessen hat der
+Raumstation eine Außenhülle mit Schilden und doppelten Wände um die bemannten
+Module herum.
+
+Weil zwei Sateliten beiden gesteuert sind, können sie aktiv einander vermeiden.
+Leider es gibt keine internationale Gesetz oder Abkommen im Bezug auf geplanten
+Erdumlaufbahnen oder Kollisionsvermeidung.  Deutlich brauchen Raumfarhten jetzt
+Regelungen.  Es gibt Space Treaty von 1971, aber ist das doch kommisch veraltet.
+Die Erdlaufbahnen und Raketenstarts mussen irgendwie koordiniert werden.  Ein
+offensichtlicher Vorschlag ist, dass jeder Staat Raumfahrte von eigenem Land
+kontrolliert.  Eine andere Eingebung ist, dass Unternehmen eine Kaution für neue
+Raketen bezahlen, die zurückgestattet wird, wenn sie den Satelliten beseitigen.
+Mit diesem Arrangement, kann die Welt mindestens den Weltraumschrott nachziehen.
+Ein Zühorer vom Podcast schlagt Abwrackprämien für zerstörten Weltraumschrott
+vor.  Krag von der ESA stimmt diesen Vorschlag zu.
+
+Dieses Thema wurde kürzlich sehr verschärft mit dem Starlinks Auftritt.  Die
+Musks Firmen wollen immer die Ressourcen ohne Erlaubnis fassen und besetzen.
+Trotzdem ist der Dienst wirklich nützlich, z.B. für die Ukrainer während des
+Russischen Einmarschs.  Die Astronomen üben eine scharfe Kritik gegen Starlink,
+weil die Satelliten ein größe Himmelverschmutzung erschaffen.  Auf jedem Fall,
+beabsichtigen viele andere Unternehmen ähnliche Flotten von Raketen einzuführen.
+Die Interessen von den Astronomen werden vielleicht nicht geschützt.
+
+Manchmal hört man Besprechung von Antisatelliter Technologie.  Wegen Krag sind
+diese Waffen verrückt, weil der Weltraumschrott gleich alle Satelliten und
+Raumfarhte gefährdet.  Trotzdem haben Russland, China, USA und Indien jeweils
+"kinetic kill" antisatellite Technologie getestet.  Eine neue Möglichkeit ist
+Angreife mit Lasern oder Radio-Störung.  Die Informationen über diese Waffe ist
+noch geheimlich.

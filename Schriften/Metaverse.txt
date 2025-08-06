@@ -1,0 +1,117 @@
+https://www.heise.de/news/heiseshow-AR-VR-MR-wer-hat-kuenftig-den-Durchblick-im-Metaverse-7157662.html
+
+#heiseshow: AR, VR, MR – wer hat künftig den Durchblick im Metaverse? 
+
+Malte Kirchner und Jan-Keno Janssen
+
+Das Video beginnt mit Diskussion über die geläufigen Stichwörter Virtuell-,
+Augmented- und Mixed-Realität.  Kirchner bat Janssen, diese Konzepte zu erklaren
+und von einander unterscheiden.  Janssen Zuerst definierte AR als angereicherte
+Realität, dass jetzt meistens auf 2D Smartphone Bildschirme verfügbar ist.
+Künftig erwarten wir doch AR in Brille.  Die echte Welt ist als gewöhnlich
+dargestellt, aber hingestellt mit virtuellen Objekte.  Oft sind die Objekte
+praktisch, z.B. Schilder und Richtungsanzeiger von einem Navisystem.  Natürlich
+können sie auch Bestandteilen von einem Spiel repräsentieren.
+
+Mit VR taucht man komplett in der virtuellen Welt ab, ohne dass man die echte
+Welt sieht.  Die echte Welt oder stattdessen der Spielbereich muss dann in der
+Brille dargestellt geworden.  Die aktuellen Bewegungen vom Nutzer haben da die
+gleiche Auswirkung.  Das Spielfeld für die meiste VR "apps" ist relativ klein,
+damit man diese apps irgendwo ohne besondere Vorbereitung nutzen kann.
+
+Wegen Mixed-Reality fragte Jannsen, was das genau ist?  Vielleicht ein
+Übergangsbegriff, weil AR jetzt nicht völlig fertig ist.  Microsoft hat dieses
+Wort als Vermarktung Begriff erfunden.  Natürlich erwarten wir, dass Apple einen
+ganz neuen Begriff einführen will.
+
+Die Leute beschreiben Google Glass oft als AR.  Diese Zuordnung ist unpassend,
+indem die Bildschirme zeigt Informationen, die nicht mit der Umgebung zu tun
+hat.  AR wird Informationen zum Blick hinfügen, die komplett integriert mit der
+Szene ist, und sieht realistich aus.  Google Glass hat zwar die Realität
+verdeckt und abgewichen.
+
+MS Hololens tatsächlich augmentiert die Realität, indem die Brille passt die
+irrealen Objekte zur Umgebung ein.  Das Hondas Navisystem ist ebenso.  Ein
+Beamer stellt die Information von der Karte am Regenschirm aus, und muss dafür
+die Größe und Helligkeit von den Objekten anpassen.  Im Gegensatz hat Google
+Glass nur Emails vor den Augen gezeigt, die gar nicht maßgeblich wurden.
+
+Es gibt in Zusammenfassung drei Arte von Brille: Brille die bestimmtem Teil vom
+Bildschirm nutzen (z.B. Google Glass); Brille die die echte Welt anreichen
+(z.B. Hololens); und VR Brille mit ganz artifizieller Welt (z.B. Quest).
+
+Viele Apple Fans hat erwartet, dass die Firma ein AR Produkt während WWDC
+ankündigen wollte.  Obwohl Apple keine Angabe darauf macht, trotzdem hat Apple
+viele Entwickler und Entwicklerinnen der VR eingestellet und hat Interesse
+darüber ausgedrückt.  Zwar bietet Apple VR Apps in iOS "Store" an.  Mit einem
+Handy sind diese Apps langweilig, aber mit AR Brille werden sie mindestens schon
+verfügbar.   Zum Beispiel, Deutsche Post hat ein App entwicklet, die die Kunden
+über die Pakete beratet.
+
+Seit Jahren haben die Appples Geräte AR-Kit eingebaut, dass viele relevanten
+Funktionen ermöglicht.  Laut Jannsen diese Fähigkeiten sind jetzt noch fast
+ungenutzt, indem es so blöd ist, ein ganze Welt am kleinen flachen Bildschirm zu
+begegnen.  Er erwartet die häufige Anwendung von AR in Werbungen, z.B. im
+Supermarkt.  Kirchner erwähnt die Möglichkeit, dass kostenlos Apps immer
+Anzeigen an irwelchen Flächen zeigen werden.  Vielleicht werden wollten
+Touristen oder Radfahrer solche Hinweise in "Navi-Apps" nützlich finden.
+
+Ein Zuschauer schlägt vor, dass man beim Einkaufen die AR Brille fragen könnte,
+wo z.B. eigentlich die Hefe im Supermarkt steht.  Tatsächlich konnte schon
+Google Glass diese Angabe schaffen.  Laut Janssen wird Apple solches
+Kontext-Unabhängiges Display mit kleinem aktiven Bereich anbieten.
+
+Kirchner fragte, erwarten wir dass die VR wirklich Spielerei wird?  Janssen
+findet dass bei VR die Arbeitstagungen besonders gut funktioniert, indem die
+Teilnehmer keine Möglichkeit haben, aus der künstlichen Welt zuschauen, und
+müssen dafür alle fokussieren.  Kirchner ging dann nach and fragte, ob VR mit
+einem Präsenztreffen konkurrenzfähig wird.   Nach Janssen werden die zwei Arten von
+Treffen fast gleich, indem die Teilnehmer die körperliche Präsenz voneinander fühlen.
+
+Hand-Tracking ist eine wichtige Technologie für VR.  Mit H-T könnten die Nutzer
+künstliche Objekte in der Luft zeichnen und danach halten und handstellen.
+
+Der Begriff "Metaverse" kam ursprünglich im Buch _Snow Crash_.  Facebook hat
+sich selbst Metaverse umbenannt.  Zum Teil möchten sie die Aufmerksamkeit des
+Publikums von ihren Skandalen umlenken und ihren Ruf verändern.  Auch ist "Meta"
+in hinsicht auf VR sehr ambitioniert, und hat schon Milliarden dafür ausgegeben,
+z.B. durch ihren Kauf von Oculus.  Meta hat fast ein Monopol für VR-Headsets
+erschafft.  Bis jetzt laut Janssen ist ihres Software nicht beeindruckend.
+
+Warum kann man nicht die populärsten VR-Spielen im Metaverse verbinden?  Dieser
+Ausfall ist der größte Nachteil des Metaverses und ein Anlass, warum die
+aktuelle VR nicht mit dem Hype gerechtfertigt ist.  Die wichtigsten Spielen sind
+bei verschiedenen Firmen entwickelt, die viel Geld von Verkauf der digitalen
+Gütern verdienen.  Diese Firmen haben keine Lust, ihre Gewinn mit Meta
+mitzuteilen.  Sie glauben sich, die Besitzer von Metaverse schon zu sein, und
+möchten nicht mit Meta mitmachen.  Weder kann man eine Arbeitstagung in
+Facebooks Metaverse einführen, weil Zoom und Cisco keinen Plan haben, mit Meta
+zusammenzuarbeiten.  Aus diesem Grund ist das Facebooks Metaverse nur ein
+langweilige soziales Netzwerk, und keine schicke neue Welt.
+
+Seit langem gibt es artifizielle Welten in den die "Multiplayer" Spielen wie
+Fortnite finden statt.  Die Kunden können drinnen Konzerte zuhören und Feste
+mitmachen.  Sind solche Milieus allerdings Metaverses oder sind sie irgendwie
+unterschiedlich?  Nach Janssens Meinung ist VR an PCs ganz tot.  Nur die
+Entwicklung mit Brille wird weitergehen.
+
+Meta verkauft in 2021 über 10 millionen Quest Headsets, aber sind sie verstaubt
+oder wirklich benutzt?   Im Gegensatz ist Google ganz gescheitert.   Sie haben
+viel Geld im VR Bereich verbrannt aber wenig vorzuweisen.   In 2020 hat Google
+die kanadische Firma North gekauft, die die Brille im Alltag einblenden wollten.
+
+Kirchner fragte Janssen über Datenschutz und VR.    Janssen betont, dass die
+Daten von den Kameras niemal rausgeschickt dürften.  Er errinert sich, wie die
+ärgerlich Leute worden, wenn sie die Google Glass gesehen hatten.
+
+Jetzt kündigt Meta die OpenXR Bündnis an.  Die zentrale Idee ist, ein einzelnes
+Metaverse zu schaffen, so dass die Meta's artifizielle Welt mit der Apples und
+Googles verbinden kann.  Auf diese Weise stammt im besten Fall ein Metaverse,
+dass vergleichbar mit dem Internet ist.  Auch hoffen die Unternehmen,
+verschiedene Industriestandards zu zustimmen.  Mit solchen Standards könnten die
+Geräte von einem Hersteller mit dem Angebot von den anderen funktionieren.
+Kommt dieser Versuch zu früh, bevor den technischen Unterbau der Technologie
+verstanden ist?  Janssen stellt die sehr erfolgreiche Khronos Gruppe als ein
+Vorbild vor.  Dieses Bündnis hat die Standards für weit verbreitete
+hardwarebeschleunigte Grafik entwickelt.  Wegen dieser Technologie kann man eine
+Videospiele mit irgendwelchem GPU spielen.
